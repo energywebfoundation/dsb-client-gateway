@@ -41,5 +41,9 @@ export const config = {
             processName: process.env.DSB_PM2_PROCESS_NAME ?? defaults.dsbProcessName,
             dsbBinPath: process.env.DSB_PM2_BIN_PATH ?? defaults.dsbBinPath
         })
+    },
+    authentication: {
+        username: process.env.USER_NAME,
+        password: process.env.PASSWORD
     }
 }
