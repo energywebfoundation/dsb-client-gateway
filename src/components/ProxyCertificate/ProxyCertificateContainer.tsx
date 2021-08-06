@@ -1,6 +1,7 @@
 import react, { useState } from 'react'
 import axios from 'axios'
 import { ProxyCertificate } from './ProxyCertificate'
+import { config } from 'config';
 
 type ProxyCertificateContainerProps = {
     certificate?: {
@@ -8,13 +9,23 @@ type ProxyCertificateContainerProps = {
         tenantId: string
         clientSecret: string
     }
+    auth: string 
 }
 
 export const ProxyCertificateContainer = ({
-    certificate
+    certificate, 
+    auth
 }: ProxyCertificateContainerProps) => {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
+
+    const token: string | undefined= auth.split(" ").pop() as string;
+    console.log('token', token)
+
+
+    if(config.authentication.username && config.authentication.password && !token) {
+        setError(`Error: 'Authentication Required!'`)
+    }
 
     const handleSubmit = async (clientId: string, tenantId: string, clientSecret: string) => {
         setError('')

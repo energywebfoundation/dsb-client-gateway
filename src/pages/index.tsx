@@ -32,11 +32,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       baseUrl: config.dsb.baseUrl,
       health: health,
       state: state,
+      auth: auth
     }
   } else if (!auth) {
     context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
     context.res.statusCode = 401
-    context.res.statusMessage = 'Authorization Required!'
+    context.res.statusMessage = 'Authentication Required!'
     result = {
       baseUrl: config.dsb.baseUrl,
       health: health,
@@ -50,7 +51,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       result = {
         baseUrl: config.dsb.baseUrl,
         health: health,
-        state: state
+        state: state,
+        auth: auth
       }
     } else {
       // The user typed in the username or password wrong.
@@ -60,7 +62,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         baseUrl: config.dsb.baseUrl,
         health: health,
         state: state,
-        errorCode: '401'
+        errorCode: '401',
+        auth: auth
       }
     }
   }
@@ -71,7 +74,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 
 // TODO: break into components
-export default function Home({ baseUrl, health, state, errorCode }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home({ baseUrl, health, state, errorCode, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   if (errorCode) {
@@ -109,10 +112,10 @@ export default function Home({ baseUrl, health, state, errorCode }: InferGetServ
           <section className={classes.main}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <GatewayIdentityContainer identity={state.some?.identity} />
+                <GatewayIdentityContainer identity={state.some?.identity} auth = {auth} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <ProxyCertificateContainer certificate={state.some?.certificate} />
+                <ProxyCertificateContainer certificate={state.some?.certificate} auth = {auth}  />
               </Grid>
             </Grid>
           </section>

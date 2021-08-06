@@ -2,22 +2,33 @@ import react, { useState } from 'react'
 import axios from 'axios'
 import { useErrors } from 'hooks/useErrors'
 import { GatewayIdentity } from './GatewayIdentity'
+import { config } from 'config';
 
 type GatewayIdentityContainerProps = {
     identity?: {
         did: string
         publicKey: string
-    }
+    },
+    auth: string 
 }
 
 export const GatewayIdentityContainer = ({
-    identity
+    identity,
+    auth
 }: GatewayIdentityContainerProps) => {
     const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
     const [did, setDid] = useState(identity?.did ?? '')
     const [publicKey, setPublicKey] = useState(identity?.publicKey ?? '')
+
+    
+    const token: string | undefined = auth.split(" ").pop() as string;
+    console.log('token', token)
+
+    if(config.authentication.username && config.authentication.password && !token) {
+        setError(`Error: ${errors('Authentication Required!')}`)
+    }
 
     const handleSubmit = async (privateKey: string) => {
         setError('')
