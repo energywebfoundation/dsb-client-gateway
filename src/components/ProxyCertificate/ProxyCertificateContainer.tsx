@@ -20,9 +20,7 @@ export const ProxyCertificateContainer = ({
     const [error, setError] = useState('')
 
     const token: string | undefined= auth.split(" ").pop() as string;
-    console.log('token', token)
-
-
+  
     if(config.authentication.username && config.authentication.password && !token) {
         setError(`Error: 'Authentication Required!'`)
     }
