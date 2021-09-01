@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { ErrorCode, Result } from '../../../../utils'
 import { isAuthorized } from '../../../../services/auth.service'
-import { withSentry, captureMessage } from "@sentry/nextjs";
+import { withSentry, captureMessage } from "@sentry/nextjs"
 
 const handler = async (
     req: NextApiRequest,
@@ -34,7 +34,7 @@ async function forPOST(
 ) {
     const { clientId, tenantId, clientSecret } = req.body
     if (!clientId || !tenantId || !clientSecret) {
-        captureMessage('clientId, tenantId, clientSecret all required');
+        captureMessage('clientId, tenantId, clientSecret all required')
         return res.status(400).json({ err: 'clientId, tenantId, clientSecret all required' })
     }
     try {
@@ -45,10 +45,10 @@ async function forPOST(
             ok: true
         })
     } catch (err) {
-        captureMessage(`Credentials invalid: ${err.message}`);
+        captureMessage(`Credentials invalid: ${err.message}`)
         res.status(400).json({
             err: `Credentials invalid: ${err.message}`
         })
     }
 }
-export default withSentry(handler);
+export default withSentry(handler)

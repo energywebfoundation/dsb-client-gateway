@@ -5,7 +5,7 @@ import { ErrorCode } from '../../../../utils'
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
-import { withSentry, captureException } from "@sentry/nextjs";
+import { withSentry, captureException } from "@sentry/nextjs"
 
 const handler = async (
     req: NextApiRequest,
@@ -27,7 +27,7 @@ const handler = async (
             res.status(403).end()
         }
     }
-};
+}
 
 async function forPOST(
     req: NextApiRequest,
@@ -43,7 +43,7 @@ async function forPOST(
     const { ok: signature, err: signError } = await signPayload(payload)
 
     if (!signature) {
-        captureException(signError);
+        captureException(signError)
         return res.status(400).send({ err: signError })
     }
     let body = {
@@ -59,10 +59,10 @@ async function forPOST(
     })
 
     if (!sent) {
-        captureException(sendError);
+        captureException(sendError)
         return res.status(400).send({ err: sendError })
     }
     return res.status(200).send(sent)
 
 }
-export default withSentry(handler);
+export default withSentry(handler)

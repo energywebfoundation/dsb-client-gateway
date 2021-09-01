@@ -3,7 +3,7 @@ import { isAuthorized } from '../../../../services/auth.service'
 import { initEnrolment } from '../../../../services/identity.service'
 import { getEnrolment, getIdentity } from '../../../../services/storage.service'
 import { Enrolment, ErrorCode, errorExplainer } from '../../../../utils'
-import { withSentry, captureMessage, captureException } from "@sentry/nextjs";
+import { withSentry, captureMessage, captureException } from "@sentry/nextjs"
 
 type Response = Enrolment | { err: string }
 
@@ -103,9 +103,9 @@ async function forPOST(
             state: newState
         })
     } catch (err) {
-        captureMessage(err.message);
+        captureMessage(err.message)
         const status = errorExplainer[err.message]?.status ?? 500
         res.status(status).send({ err: err.message })
     }
 }
-export default withSentry(handler);
+export default withSentry(handler)
