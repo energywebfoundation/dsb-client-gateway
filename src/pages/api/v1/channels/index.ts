@@ -2,11 +2,12 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { isAuthorized } from "../../../../services/auth.service"
 import { DsbApiService } from "../../../../services/dsb-api.service"
 import { ErrorCode } from "../../../../utils"
+import { withSentry } from "@sentry/nextjs";
 
-export default async function handler(
+const handler = async (
     req: NextApiRequest,
     res: NextApiResponse
-) {
+) => {
     if (req.method !== 'GET') {
         return res.status(405).end()
     }
@@ -28,3 +29,5 @@ export default async function handler(
         }
     }
 }
+
+export default handler;

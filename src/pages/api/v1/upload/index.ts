@@ -5,11 +5,12 @@ import { ErrorCode } from '../../../../utils'
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
+import { withSentry } from "@sentry/nextjs";
 
-export default async function handler(
+const handler = async (
     req: NextApiRequest,
     res: NextApiResponse<Response>
-) {
+) => {
     if (req.method !== 'POST') {
         return res.status(405).end()
     }
@@ -62,3 +63,4 @@ async function forPOST(
     return res.status(200).send(sent)
 
 }
+export default withSentry(handler);

@@ -4,6 +4,7 @@ import { validateBalance, validatePrivateKey } from '../../../../services/identi
 import { deleteEnrolment, getIdentity, writeIdentity } from '../../../../services/storage.service'
 import { isAuthorized } from '../../../../services/auth.service'
 import { BalanceState, ErrorCode, errorExplainer } from '../../../../utils'
+import { withSentry } from "@sentry/nextjs";
 
 type Response = {
     address: string
@@ -11,10 +12,10 @@ type Response = {
     balance: BalanceState,
 } | { err: string }
 
-export default async function handler(
+const handler = async (
     req: NextApiRequest,
     res: NextApiResponse<Response>
-) {
+) => {
     const authHeader = req.headers.authorization
     const { err } = isAuthorized(authHeader)
     if (!err) {
@@ -95,3 +96,4 @@ async function forPOST(
         return res.status(status).send({ err: err.message })
     }
 }
+export default withSentry(handler);

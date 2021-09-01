@@ -3,11 +3,12 @@ import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
 import { ErrorCode } from '../../../../utils'
+import { withSentry, captureMessage, captureException } from "@sentry/nextjs";
 
-export default async function handler(
+const handler = async (
     req: NextApiRequest,
     res: NextApiResponse
-) {
+) => {
     const authHeader = req.headers.authorization
     const { err } = isAuthorized(authHeader)
     if (!err) {
@@ -54,6 +55,7 @@ async function forPOST(
 ): Promise<void> {
     const { ok: signature, err: signError } = await signPayload(req.body.payload)
     if (!signature) {
+        captureException(signError);
         return res.status(400).send({ err: signError })
     }
     const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
@@ -61,7 +63,9 @@ async function forPOST(
         signature
     })
     if (!sent) {
+        captureException(sendError);
         return res.status(400).send({ err: sendError })
     }
     return res.status(200).send(sent)
 }
+export default withSentry(handler);

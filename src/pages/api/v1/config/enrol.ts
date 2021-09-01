@@ -3,13 +3,14 @@ import { isAuthorized } from '../../../../services/auth.service'
 import { initEnrolment } from '../../../../services/identity.service'
 import { getEnrolment, getIdentity } from '../../../../services/storage.service'
 import { Enrolment, ErrorCode, errorExplainer } from '../../../../utils'
+import { withSentry, captureMessage } from "@sentry/nextjs";
 
 type Response = Enrolment | { err: string }
 
-export default async function handler(
+const handler = async (
     req: NextApiRequest,
     res: NextApiResponse<Response>
-) {
+) => {
     const authHeader = req.headers.authorization
     const { err } = isAuthorized(authHeader)
     if (!err) {
@@ -41,10 +42,12 @@ async function forGET(
 ) {
     const { some: identity } = await getIdentity()
     if (!identity) {
+        captureMessage(ErrorCode.ID_NO_PRIVATE_KEY)
         return res.status(400).send({ err: ErrorCode.ID_NO_PRIVATE_KEY })
     }
     const { some: enrolment } = await getEnrolment()
     if (!enrolment || !enrolment.did) {
+        captureMessage(ErrorCode.ID_NO_DID)
         return res.status(400).send({ err: ErrorCode.ID_NO_DID })
     }
     // todo: refresh state
@@ -94,7 +97,9 @@ async function forPOST(
             state: newState
         })
     } catch (err) {
+        captureMessage(err.message);
         const status = errorExplainer[err.message]?.status ?? 500
         res.status(status).send({ err: err.message })
     }
 }
+export default withSentry(handler);

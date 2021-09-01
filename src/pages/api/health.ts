@@ -2,11 +2,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { ErrorCode } from '../../utils'
+import { withSentry } from "@sentry/nextjs";
 
-export default async function handler(
+const handler = async(
   req: NextApiRequest,
   res: NextApiResponse
-) {
+) => {
   try {
     const { ok, err } = await DsbApiService.init().getHealth()
     if (!ok) {
@@ -17,3 +18,4 @@ export default async function handler(
     res.status(503).send({ err: err.message })
   }
 }
+export default withSentry(handler);
