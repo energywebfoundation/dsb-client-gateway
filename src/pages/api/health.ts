@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { ErrorCode } from '../../utils'
-import { withSentry } from "@sentry/nextjs";
+import { withSentry, captureMessage } from "@sentry/nextjs";
 
 const handler = async(
   req: NextApiRequest,
@@ -15,6 +15,7 @@ const handler = async(
     }
     res.status(200).end()
   } catch (err) {
+    captureMessage(err.message)
     res.status(503).send({ err: err.message })
   }
 }

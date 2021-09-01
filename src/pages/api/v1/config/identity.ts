@@ -4,7 +4,7 @@ import { validateBalance, validatePrivateKey } from '../../../../services/identi
 import { deleteEnrolment, getIdentity, writeIdentity } from '../../../../services/storage.service'
 import { isAuthorized } from '../../../../services/auth.service'
 import { BalanceState, ErrorCode, errorExplainer } from '../../../../utils'
-import { withSentry } from "@sentry/nextjs";
+import { withSentry , captureMessage, captureException} from "@sentry/nextjs";
 
 type Response = {
     address: string
@@ -51,6 +51,7 @@ async function forGET(
     }
     const { ok: balance } = await validateBalance(identity.address)
     if (balance === undefined) {
+        captureException(ErrorCode.ID_BALANCE_CHECK_FAILED)
         return res.status(500).send({ err: ErrorCode.ID_BALANCE_CHECK_FAILED })
     }
     return res.status(200).send({
@@ -87,12 +88,14 @@ async function forPOST(
             privateKey
         })
         if (!saved) {
+            captureException(saveError)
             throw saveError
         }
         await deleteEnrolment()
         return res.status(200).send(publicIdentity)
     } catch (err) {
         const status = errorExplainer[err.message]?.status ?? 500
+        captureMessage(err.message);
         return res.status(status).send({ err: err.message })
     }
 }

@@ -3,7 +3,7 @@ import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
 import { ErrorCode } from '../../../../utils'
-import { withSentry, captureMessage, captureException } from "@sentry/nextjs";
+import { withSentry, captureException } from "@sentry/nextjs";
 
 const handler = async (
     req: NextApiRequest,

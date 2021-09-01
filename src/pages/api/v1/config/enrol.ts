@@ -3,7 +3,7 @@ import { isAuthorized } from '../../../../services/auth.service'
 import { initEnrolment } from '../../../../services/identity.service'
 import { getEnrolment, getIdentity } from '../../../../services/storage.service'
 import { Enrolment, ErrorCode, errorExplainer } from '../../../../utils'
-import { withSentry, captureMessage } from "@sentry/nextjs";
+import { withSentry, captureMessage, captureException } from "@sentry/nextjs";
 
 type Response = Enrolment | { err: string }
 
@@ -65,6 +65,7 @@ async function forPOST(
     try {
         const { some: identity } = await getIdentity()
         if (!identity) {
+            captureException(Error(ErrorCode.ID_NO_PRIVATE_KEY))
             throw Error(ErrorCode.ID_NO_PRIVATE_KEY)
         }
         const { ok: requestor, err: initError } = await initEnrolment(identity)
@@ -73,23 +74,28 @@ async function forPOST(
         }
         const { ok: state, err: stateError } = await requestor.getState()
         if (!state) {
+            captureException(stateError)
             throw stateError
         }
         if (state.approved || state.waiting) {
             await requestor.save(state)
+            captureException(Error(ErrorCode.ID_ALREADY_ENROLED))
             throw Error(ErrorCode.ID_ALREADY_ENROLED)
         }
         const { ok: enroled, err: enrolError } = await requestor.handle(state)
         if (!enroled) {
+            captureException(enrolError)
             throw enrolError
         }
         // fetch latest state after enroling
         const { ok: newState, err: newStateError } = await requestor.getState()
         if (!newState) {
+            captureException(newStateError)
             throw newStateError
         }
         const { ok: saved, err: saveError } = await requestor.save(newState)
         if (!saved) {
+            captureException(saveError)
             throw saveError
         }
         return res.status(200).send({

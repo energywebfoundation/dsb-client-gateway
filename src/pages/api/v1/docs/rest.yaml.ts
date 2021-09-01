@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { withSentry } from "@sentry/nextjs";
+import { withSentry, captureMessage} from "@sentry/nextjs";
 
 const handler = async (
     req: NextApiRequest,
@@ -13,6 +13,7 @@ const handler = async (
         res.status(200).setHeader('Content-Type', 'application/yaml')
         res.send(file)
     } catch (err) {
+        captureMessage(err);
         console.log(err)
         res.status(500).end()
     }
