@@ -18,7 +18,7 @@ import { refreshState } from '../services/identity.service'
 import { useErrors } from '../hooks/useErrors'
 import { isAuthorized } from '../services/auth.service'
 import { ErrorCode, Option, Result, serializeError, Storage } from '../utils'
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs"
 
 type Props = {
   health: Result < boolean, string >
@@ -66,7 +66,7 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
 
   useEffect(() => {
     if (health.err) {
-      Sentry.captureMessage(health.err);
+      Sentry.captureMessage(health.err)
       swal('Error', errors(health.err), 'error')
     }
   }, [health, state, errors])
