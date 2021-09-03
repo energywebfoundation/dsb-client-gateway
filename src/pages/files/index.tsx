@@ -17,6 +17,7 @@ import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Option, Result, serializeError, Channel } from '../../utils'
 import { useErrors } from '../../hooks/useErrors'
+import * as Sentry from "@sentry/nextjs"
 
 type Props = {
   health: Result<boolean, string>
@@ -74,6 +75,7 @@ export default function FileUpload({ health, auth }: InferGetServerSidePropsType
       )
       setChannels(res.data)
     } catch (error) {
+      Sentry.captureMessage(error.response.data.err)
       swal('Error', errors(error.response.data.err), 'error')
     }
   }

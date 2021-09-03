@@ -3,6 +3,7 @@ import swal from '@sweetalert/with-react'
 import axios from 'axios'
 import { ProxyCertificate } from './ProxyCertificate'
 import { useErrors } from '../../hooks/useErrors'
+import * as Sentry from "@sentry/nextjs"
 
 type ProxyCertificateContainerProps = {
     certificate?: {
@@ -36,6 +37,7 @@ export const ProxyCertificateContainer = ({
             )
             swal('Success', 'Certificate saved', 'success')
         } catch (err) {
+            Sentry.captureMessage(err.response.data.err)
             swal('Error', errors(err.response.data.err), 'error')
         }
         setIsLoading(false)

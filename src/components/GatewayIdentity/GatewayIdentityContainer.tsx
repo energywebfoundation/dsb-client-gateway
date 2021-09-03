@@ -4,6 +4,7 @@ import swal from '@sweetalert/with-react'
 import { useErrors } from '../../hooks/useErrors'
 import { GatewayIdentity } from './GatewayIdentity'
 import { BalanceState, Enrolment, EnrolmentState, Identity } from '../../utils'
+import * as Sentry from "@sentry/nextjs"
 
 type GatewayIdentityContainerProps = {
     identity?: Identity
@@ -51,6 +52,7 @@ export const GatewayIdentityContainer = ({
                 'success'
             )
         } catch (err) {
+            Sentry.captureMessage(err.response.data.err)
             swal('Error', errors(err.response.data.err), 'error')
         }
         setIsLoading(false)
@@ -75,6 +77,7 @@ export const GatewayIdentityContainer = ({
                 'success'
             )
         } catch (err) {
+            Sentry.captureMessage(err.response.data.err)
             swal('Enrolment Error', errors(err.response.data.err), 'error')
         }
         setIsLoading(false)

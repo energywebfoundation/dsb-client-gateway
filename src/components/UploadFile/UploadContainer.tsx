@@ -4,6 +4,7 @@ import axios from 'axios'
 import swal from '@sweetalert/with-react'
 import { useErrors } from '../../hooks/useErrors'
 import { Channel } from '../../utils'
+import * as Sentry from "@sentry/nextjs"
 
 type UploadContainerProps = {
 	auth?: string,
@@ -32,6 +33,7 @@ export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
 			swal("'Success", "Your file has been uploaded!", "success")
 
 		} catch (err) {
+			Sentry.captureMessage(err.response.data.err)
 			swal('Error', errors(err.response.data.err), 'error')
 			setIsLoading(false)
 		}

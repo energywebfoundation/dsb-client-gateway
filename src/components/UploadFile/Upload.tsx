@@ -13,6 +13,7 @@ import { Info } from '@material-ui/icons'
 import { CustomInput } from '../CustomInput/CustomInput'
 import swal from 'sweetalert'
 import { Channel, Topic } from '../../utils'
+import * as Sentry from "@sentry/nextjs"
 
 type UploadProps = {
 	channels?: Channel[]
@@ -130,9 +131,11 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
 								onClick={() => {
 
 									if (!channelName) {
+										Sentry.captureMessage('Please enter channel name')
 										return swal('Error', 'Please enter channel name', 'error')
 									}
 									if (!file) {
+										Sentry.captureMessage('No file uploaded')
 										return swal('Error', 'No file uploaded', 'error')
 									}
 									onUpload(file, channelName, topicName)

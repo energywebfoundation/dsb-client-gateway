@@ -20,6 +20,7 @@ import { useErrors } from '../../hooks/useErrors'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
 import { getEnrolment } from '../../services/storage.service'
+import * as Sentry from "@sentry/nextjs"
 
 type Props = {
   health: Result<boolean, string>
@@ -77,11 +78,13 @@ export default function Documentation({
 
   useEffect(() => {
     if (channels.err) {
+      Sentry.captureMessage(channels.err)
       swal('Error', errors(channels.err), 'error')
       setChannelErrorText('Error retrieving channels. Make sure your gateway is enroled first.')
     } else {
       const count = channels.ok?.length ?? 0
       if (count === 0) {
+        Sentry.captureMessage('No channels found with publish or subscribe rights.')
         setChannelErrorText('No channels found with publish or subscribe rights.')
       }
     }
