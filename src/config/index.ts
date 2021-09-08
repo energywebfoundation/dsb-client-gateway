@@ -7,7 +7,7 @@ loadEnvConfig(process.cwd(), process.env.NODE_ENV !== 'production')
 
 const defaults = {
     port: '3000',
-    websocket: 'SERVER',
+    websocket: 'NONE',
     chainId: '73799',
     rpcUrl: 'https://volta-rpc.energyweb.org/',
     cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
@@ -63,7 +63,8 @@ export const config = {
         cacheServerUrl: process.env.CACHE_SERVER_URL ?? defaults.cacheServerUrl,
         eventServerUrl: process.env.EVENT_SERVER_URL ?? defaults.eventServerUrl,
         parentNamespace:
-            process.env.PARENT_NAMESPACE ?? defaults.parentNamespace
+            process.env.PARENT_NAMESPACE ?? defaults.parentNamespace,
+        privateKey: process.env.PRIVATE_KEY
     },
     storage: {
         inMemoryDbFile: path.join(

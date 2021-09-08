@@ -62,23 +62,21 @@ export default function FileUpload({ health, auth }: InferGetServerSidePropsType
 	const [channels, setChannels] = useState<Channel[] | undefined>([])
 
   useEffect(() => {
-    loadChannels()
-  }, [])
-
-  const loadChannels = async () => {
-    try {
-      const res = await axios.get(
-        `/api/v1/channels`,
-        auth
-          ? { headers: { 'Authorization': `Bearer ${auth}` } }
-          : undefined
-      )
-      setChannels(res.data)
-    } catch (error) {
-      Sentry.captureMessage(error.response.data.err)
-      swal('Error', errors(error.response.data.err), 'error')
+    const loadChannels = async () => {
+      try {
+        const res = await axios.get(
+          `/api/v1/channels`,
+          auth
+            ? { headers: { 'Authorization': `Bearer ${auth}` } }
+            : undefined
+        )
+        setChannels(res.data)
+      } catch (error) {
+        swal('Error', errors((error as any).response.data.err), 'error')
+      }
     }
-  }
+    loadChannels()
+  }, [auth, errors])
 
   return (
     <div>

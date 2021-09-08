@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
 # DSB Container
-FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:7147f01c-6785-4927-a5fa-a591ce6ca4ee
+FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:3598aac0-11b3-420e-a06b-892baaacd7a6
 
 RUN mkdir -p /var/deployment/apps/dsb-client-gateway
 
@@ -30,6 +30,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/.env.production ./.env.production
+
+RUN echo '{}' > ./in-memory.json
 
 WORKDIR /var/deployment/apps
 
