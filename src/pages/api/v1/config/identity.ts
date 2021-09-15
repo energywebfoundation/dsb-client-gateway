@@ -13,16 +13,17 @@ import {
   UnknownError
 } from '../../../../utils'
 import { captureException } from '@sentry/nextjs'
+import { withSentry } from "@sentry/nextjs"
 
 type Response =
   | {
-      address: string
-      publicKey: string
-      balance: BalanceState
-    }
+    address: string
+    publicKey: string
+    balance: BalanceState
+  }
   | { err: ErrorBody }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Response>) {
+const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   const authHeader = req.headers.authorization
   const { err } = isAuthorized(authHeader)
   if (!err) {
@@ -102,4 +103,5 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>) {
     }
   }
 }
+export default withSentry(handler)
 

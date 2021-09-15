@@ -12,8 +12,9 @@ import {
   UnknownError
 } from '../../../../utils'
 import { captureException } from '@sentry/nextjs'
+import { withSentry } from "@sentry/nextjs"
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const authHeader = req.headers.authorization
   const { err } = isAuthorized(authHeader)
   if (!err) {
@@ -79,3 +80,4 @@ async function forPOST(
     }
   }
 }
+export default withSentry(handler)
