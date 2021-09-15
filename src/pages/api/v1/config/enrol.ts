@@ -11,6 +11,7 @@ import {
   NotEnroledError,
   UnknownError
 } from '../../../../utils'
+import { captureException } from "@sentry/nextjs"
 
 type Response = Enrolment | { err: ErrorBody }
 
@@ -96,6 +97,8 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>) {
     if (err instanceof GatewayError) {
       res.status(err.statusCode).send({ err: err.body })
     } else {
+      const error = new UnknownError(err)
+      captureException(error)
       res.status(500).send({ err: new UnknownError(err).body })
     }
   }

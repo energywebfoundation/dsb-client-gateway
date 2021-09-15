@@ -5,7 +5,7 @@ import { ErrorBody, ErrorCode, GatewayError, SendMessageResult, UnknownError } f
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
-import { withSentry, captureException } from "@sentry/nextjs"
+import { captureException } from "@sentry/nextjs"
 
 type Response = (SendMessageResult & { correlationId: string }) | { err: ErrorBody }
 
@@ -64,6 +64,8 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>): Pro
     if (err instanceof GatewayError) {
       res.status(err.statusCode ?? 500).send({ err: err.body })
     } else {
+      const error = new UnknownError(err)
+      captureException(error)
       res.status(500).send({ err: new UnknownError(err).body })
     }
   }

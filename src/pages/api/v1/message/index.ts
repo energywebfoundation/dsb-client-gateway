@@ -11,6 +11,7 @@ import {
   SendMessageResult,
   UnknownError
 } from '../../../../utils'
+import { captureException } from '@sentry/nextjs'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const authHeader = req.headers.authorization
@@ -72,6 +73,8 @@ async function forPOST(
     if (err instanceof GatewayError) {
       res.status(err.statusCode).send({ err: err.body })
     } else {
+      const error = new UnknownError(err)
+      captureException(error)
       res.status(500).send({ err: new UnknownError(err).body })
     }
   }

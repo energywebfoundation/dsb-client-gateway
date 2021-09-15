@@ -12,7 +12,7 @@ import {
   NoPrivateKeyError,
   UnknownError
 } from '../../../../utils'
-import { captureException, captureMessage } from '@sentry/nextjs'
+import { captureException } from '@sentry/nextjs'
 
 type Response =
   | {

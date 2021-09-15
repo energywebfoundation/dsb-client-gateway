@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { ErrorBody, ErrorCode, Result } from '../../../../utils'
 import { isAuthorized } from '../../../../services/auth.service'
-import { withSentry, captureMessage } from "@sentry/nextjs"
+
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Result<boolean, ErrorBody>>) {
   if (req.method !== 'POST') {
