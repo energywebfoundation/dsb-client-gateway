@@ -227,7 +227,7 @@ This is the name of the project under organization for which sentry is enabled
 
 ### `AUTH_TOKEN` [optional]
 
-If sentry cli is enabled then this token is required else not(currently we have not enabled cli)
+Sentry cli uses this token for authentication while building the project
 
 ### `NEXT_PUBLIC_SENTRY_DSN` [optional]
 
