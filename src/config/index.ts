@@ -21,12 +21,7 @@ const defaults = {
   websocketReconnectTimeout: '10000',
   websocketReconnectMaxRetries: '10',
   eventsMode: 'BULK',
-  eventsPerSecond: '100',
-  sentryUrl:'https://sentry.io/',
-  sentryEnabled: true,
-  sentryOrg:'energy-web',
-  sentryProject:'dsb-client-gateway',
-  sentryDsn:'https://9baea420fdd34148b27363b41f646da9@o517012.ingest.sentry.io/5938887'
+  eventsPerSecond: '100'
 }
 
 const takeIf = <T>(requirement?: any, subject?: T): T | undefined => (requirement ? subject : undefined)
@@ -77,13 +72,5 @@ export const config = {
   events: {
     emitMode: asEnum(['SINGLE', 'BULK'], process.env.EVENTS_EMIT_MODE) ?? defaults.eventsMode,
     maxPerSecond: parseInt(process.env.EVENTS_MAX_PER_SECOND ?? defaults.eventsPerSecond, 10)
-  },
-  sentry: {
-    sentryUrl: process.env.SENTRY_URL ?? defaults.sentryUrl,
-    sentryEnabled: process.env.SENTRY_ENABLED ?? defaults.sentryEnabled,
-    sentryOrg: process.env.SENTRY_ORG ?? defaults.sentryOrg,
-    sentryProject: process.env.SENTRY_PROJECT ?? defaults.sentryProject,
-    authToken: '',
-    sentryDsn: process.env.SENTRY_DSN ?? defaults.sentryDsn
   }
 }
