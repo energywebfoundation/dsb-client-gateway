@@ -114,6 +114,7 @@ export const GatewayIdentity = ({
           disabled={isLoading}
           onClick={() => {
             if (!privateKey) {
+              //for testing purpose
               Sentry.captureMessage('No private key set')
               return swal('Error', 'No private key set', 'error')
             }

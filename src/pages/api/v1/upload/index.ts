@@ -8,9 +8,11 @@ import { signPayload } from '../../../../services/identity.service'
 import { captureException } from "@sentry/nextjs"
 import { withSentry } from "@sentry/nextjs"
 
-type Response = (SendMessageResult & { correlationId: string }) | { err: ErrorBody }
+
+type Response = (SendMessageResult & { transactionId: string }) | { err: ErrorBody }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
+
   if (req.method !== 'POST') {
     return res.status(405).end()
   }
@@ -49,18 +51,18 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>): Pro
       payload: payload
     }
 
-    const correlationId = uuidv4()
+    const transactionId = uuidv4()
 
     const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
       ...body,
-      correlationId,
+      transactionId,
       signature
     })
 
     if (!sent) {
       throw sendError
     }
-    return res.status(200).send({ ...sent, correlationId })
+    return res.status(200).send({ ...sent, transactionId })
   } catch (err) {
     if (err instanceof GatewayError) {
       res.status(err.statusCode ?? 500).send({ err: err.body })
