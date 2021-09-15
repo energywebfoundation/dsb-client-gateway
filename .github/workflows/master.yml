@@ -47,8 +47,12 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
       run: |
-        docker pull 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:canary
+        docker pull $ECR_REGISTRY/ew-dos-dsb-ecr:canary
         docker build -t dsb-client-gateway .
+        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
+        docker push $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
+        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:canary
+        docker push $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:canary
 
     - name: Logout of Amazon ECR
       if: always()
@@ -82,9 +86,9 @@ jobs:
         command: login ${{ secrets.ARGOCD_DEV_URL }}
         options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-    - name: ArgoCD overwrite values.yaml
+    - name: ArgoCD overwrite image tag
       uses: clowdhaus/argo-cd-action/@main
       id: argocd_image_tag_overwrite
       with:
-        command: app set dsb-client-gateway
-        options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
+        command: app set dsb-gateway-dev
+        options: -p dsb-client-gateway.image.tag=${{needs.unique_id.outputs.unique_id}}

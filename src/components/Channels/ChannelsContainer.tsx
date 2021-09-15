@@ -1,4 +1,3 @@
-import React, {useState} from 'react'
 import { Channel as ChannelType } from '../../utils'
 import Channel from './Channels'
 
@@ -8,10 +7,5 @@ type ChannelContainerProps = {
 }
 
 export const ChannelContainer = ({ channel, did }: ChannelContainerProps) => {
-  return (
-    <Channel
-      channel={channel}
-      myDID={did}
-    />
-  )
+  return <Channel channel={channel} myDID={did} />
 }

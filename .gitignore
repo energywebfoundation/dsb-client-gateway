@@ -40,3 +40,12 @@ in-memory.json
 
 /.vscode
 /dist
+
+# Sentry
+.sentryclirc
+
+# Sentry
+.sentryclirc
+
+# Sentry
+.sentryclirc
