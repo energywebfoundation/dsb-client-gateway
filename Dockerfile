@@ -39,7 +39,7 @@ COPY --from=builder /app/sentry.properties ./sentry.properties
 
 RUN echo '{}' > ./in-memory.json
 
-RUN export SENTRY_CLI=./node_modules/.bin/sentry-cli
+#RUN export SENTRY_CLI=./node_modules/.bin/sentry-cli
 
 WORKDIR /var/deployment/apps
 
