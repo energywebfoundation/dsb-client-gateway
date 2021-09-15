@@ -29,7 +29,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env ./.env
-COPY --from=builder /app/.env.local ./.env.local
 COPY --from=builder /app/.env.production ./.env.production
 COPY --from=builder /app/sentry.client.config.js ./sentry.client.config.js
 COPY --from=builder /app/sentry.server.config.js ./sentry.server.config.js
