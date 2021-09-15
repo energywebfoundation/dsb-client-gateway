@@ -92,6 +92,7 @@ create sentry.properties with configuration for sentry-cli (which is used when a
 
 create .sentryclirc with the auth token for sentry-cli (which is automatically added to the .gitignore)
 
+All variables in sentry.properties should be stored in .env.local file which should not be pushed on git.
 
 ## Development
 

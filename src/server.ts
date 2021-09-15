@@ -11,7 +11,6 @@ import { initEnrolment, validateBalance, validatePrivateKey } from './services/i
 import { writeIdentity } from './services/storage.service'
 
 const dev = process.env.NODE_ENV !== 'production'
-console.log({asd: process.env.SENTRY_CLI})
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
