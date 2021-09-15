@@ -76,7 +76,7 @@ yarn add @sentry/nextjs
 ### Configure
 Configuration should happen as early as possible in your application's lifecycle.
 
-Though it's possible to configure everything manually, we have a wizard that will automate the initial steps. To use the wizard, run the following command from the root level of your project:
+Though it's possible to configure everything manually, sentry provides wizard that will automate the initial steps. To use the wizard, run the following command from the root level of your project:
 
 ```
 npx @sentry/wizard -i nextjs
