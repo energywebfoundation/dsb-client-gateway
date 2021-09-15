@@ -7,7 +7,6 @@ import { config } from '../dsb-client-gateway/src/config/index'
 
 if (config.sentry.sentryEnabled) {
   console.log('sentry is initializing')
-  console.log('SENTRY_DSN', config.sentry.sentryDsn)
   Sentry.init({
     dsn: config.sentry.sentryDsn,
     // Adjust this value in production, or use tracesSampler for greater control
