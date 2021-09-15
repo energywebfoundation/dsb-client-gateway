@@ -26,7 +26,7 @@ This will bind the container's `in-memory.json` file to the host filesystem.
 If you want to run sentry in docker image then please include the following environment variables while running the docker container
 
 ```
--e SENTRY_URL=<SENTRY_URL> -e NEXT_PUBLIC_SENTRY_ENABLED=true -e SENTRY_ORG=<SENTRY_ORG> -e SENTRY_PROJECT=<SENTRY_PROJECT> -e NEXT_PUBLIC_SENTRY_DSN=<SENTRY_DSN>
+-e NEXT_PUBLIC_SENTRY_ENABLED=true -e NEXT_PUBLIC_SENTRY_DSN=<SENTRY_DSN>
 ``` 
 
 ### Configuration
@@ -66,34 +66,12 @@ gateway's DSB enrolment is complete.
 
 The gateway supports sentry integration for capturing logs, transactions, Performance Monitoring
 
-### Install
+#### Install
 Sentry captures data by using an SDK within your application’s runtime.
 
 ```
 yarn add @sentry/nextjs
 ```
-
-### Configure
-Configuration should happen as early as possible in your application's lifecycle.
-
-Though it's possible to configure everything manually, sentry provides wizard that will automate the initial steps. To use the wizard, run the following command from the root level of your project:
-
-```
-npx @sentry/wizard -i nextjs
-```
-
-You'll be prompted to log in to Sentry. The wizard will then automatically add these configuration files to your project:
-
-create sentry.client.config.js and sentry.server.config.js with the default Sentry.init
-
-create next.config.js with the default configuration
-
-create sentry.properties with configuration for sentry-cli (which is used when automatically uploading source maps)
-
-create .sentryclirc with the auth token for sentry-cli (which is automatically added to the .gitignore)
-
-All variables in sentry.properties should be stored in .env.local file which should not be pushed on git.
-
 ## Development
 
 Install dependencies:

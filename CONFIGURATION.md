@@ -205,25 +205,33 @@ also check the balance and enrolment state on startup.
 
 Note that this will **overwrite** the current identity stored by the gateway.
 
-### `SENTRY` [optional]
+## `SENTRY` [optional]
 
 Sentry is an optional feature and it is used to capture error capturing logs, transactions, Performance Monitoring.
 
 ### `SENTRY_URL` [optional]
 
-For every partner different sentry url will be same as while doing setup it opens this link on browser to confirm the authentication
+For every partner different sentry url will be same 
+
+**Default**: `https://sentry.io/`
 
 ### `NEXT_PUBLIC_SENTRY_ENABLED` [optional]
 
 This flag will decide if sentry is enabled or disabled
 
+**Default**: `false`
+
 ### `SENTRY_ORG` [optional]
 
 This is the name of the organization for which sentry account is made
 
+**Default**: `energy-web`
+
 ### `SENTRY_PROJECT` [optional]
 
 This is the name of the project under organization for which sentry is enabled
+
+**Default**: `dsb-client-gateway`
 
 ### `AUTH_TOKEN` [optional]
 
