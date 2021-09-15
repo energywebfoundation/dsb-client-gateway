@@ -207,7 +207,7 @@ Note that this will **overwrite** the current identity stored by the gateway.
 
 ### `SENTRY` [optional]
 
-Sentry is an optional feature and it is used to capture error logs, releases 
+Sentry is an optional feature and it is used to capture error capturing logs, transactions, Performance Monitoring.
 
 ### `SENTRY_URL` [optional]
 
@@ -227,7 +227,7 @@ This is the name of the project under organization for which sentry is enabled
 
 ### `AUTH_TOKEN` [optional]
 
-If sentry cli is enabled then this token is required else not
+If sentry cli is enabled then this token is required else not(currently we have not enabled cli)
 
 ### `NEXT_PUBLIC_SENTRY_DSN` [optional]
 
