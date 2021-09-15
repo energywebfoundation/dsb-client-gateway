@@ -85,8 +85,11 @@ npx @sentry/wizard -i nextjs
 You'll be prompted to log in to Sentry. The wizard will then automatically add these configuration files to your project:
 
 create sentry.client.config.js and sentry.server.config.js with the default Sentry.init
+
 create next.config.js with the default configuration
+
 create sentry.properties with configuration for sentry-cli (which is used when automatically uploading source maps)
+
 create .sentryclirc with the auth token for sentry-cli (which is automatically added to the .gitignore)
 
 
