@@ -14,13 +14,12 @@ import {
 } from '../../../../utils'
 import { captureException, withSentry } from '@sentry/nextjs'
 
-
 type Response =
   | {
-    address: string
-    publicKey: string
-    balance: BalanceState
-  }
+      address: string
+      publicKey: string
+      balance: BalanceState
+    }
   | { err: ErrorBody }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
@@ -104,4 +103,3 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>) {
   }
 }
 export default withSentry(handler)
-

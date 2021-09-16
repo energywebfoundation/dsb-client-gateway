@@ -11,12 +11,11 @@ import {
   NotEnroledError,
   UnknownError
 } from '../../../../utils'
-import { captureException, withSentry } from "@sentry/nextjs"
-
+import { captureException, withSentry } from '@sentry/nextjs'
 
 type Response = Enrolment | { err: ErrorBody }
 
-const handler = async(req: NextApiRequest, res: NextApiResponse<Response>) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   const authHeader = req.headers.authorization
   const { err } = isAuthorized(authHeader)
   if (!err) {

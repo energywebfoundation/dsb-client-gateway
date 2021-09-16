@@ -11,8 +11,7 @@ import {
   SendMessageResult,
   UnknownError
 } from '../../../../utils'
-import { captureException, withSentry} from '@sentry/nextjs'
-
+import { captureException, withSentry } from '@sentry/nextjs'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const authHeader = req.headers.authorization

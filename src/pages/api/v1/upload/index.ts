@@ -5,14 +5,11 @@ import { ErrorBody, ErrorCode, GatewayError, SendMessageResult, UnknownError } f
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
-import { captureException, withSentry } from "@sentry/nextjs"
-
-
+import { captureException, withSentry } from '@sentry/nextjs'
 
 type Response = (SendMessageResult & { transactionId: string }) | { err: ErrorBody }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
-
   if (req.method !== 'POST') {
     return res.status(405).end()
   }

@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { withSentry } from "@sentry/nextjs"
+import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -15,4 +15,3 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 export default withSentry(handler)
-

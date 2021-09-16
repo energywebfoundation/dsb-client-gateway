@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { ErrorBody, errorOrElse } from '../../utils'
-import { withSentry } from "@sentry/nextjs"
+import { withSentry } from '@sentry/nextjs'
 
 type Response = void | { err: ErrorBody }
 

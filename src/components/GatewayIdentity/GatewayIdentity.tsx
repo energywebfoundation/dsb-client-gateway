@@ -4,7 +4,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import swal from 'sweetalert'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { EnrolmentState, snip, StringType } from '../../utils'
-import * as Sentry from "@sentry/nextjs"
+import * as Sentry from '@sentry/nextjs'
 
 type GatewayIdentityProps = {
   did?: string

@@ -3,7 +3,6 @@ import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
 import { Channel } from '../../utils'
-import * as Sentry from "@sentry/nextjs"
 
 type UploadContainerProps = {
   auth?: string

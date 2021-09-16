@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { ErrorBody, ErrorCode, Result } from '../../../../utils'
 import { isAuthorized } from '../../../../services/auth.service'
-import { withSentry } from "@sentry/nextjs"
+import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Result<boolean, ErrorBody>>) => {
   if (req.method !== 'POST') {
@@ -52,4 +52,3 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Result<boolean,
 }
 
 export default withSentry(handler)
-

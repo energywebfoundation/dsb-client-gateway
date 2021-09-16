@@ -3,7 +3,6 @@ import axios from 'axios'
 import swal from '@sweetalert/with-react'
 import { GatewayIdentity } from './GatewayIdentity'
 import { BalanceState, Enrolment, EnrolmentState, Identity } from '../../utils'
-import * as Sentry from "@sentry/nextjs"
 
 type GatewayIdentityContainerProps = {
   identity?: Identity

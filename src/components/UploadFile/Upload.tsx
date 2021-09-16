@@ -5,7 +5,6 @@ import { Info } from '@material-ui/icons'
 import { CustomInput } from '../CustomInput/CustomInput'
 import swal from 'sweetalert'
 import { Channel, Topic } from '../../utils'
-import * as Sentry from "@sentry/nextjs"
 
 type UploadProps = {
   channels?: Channel[]

@@ -13,7 +13,6 @@ import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
 import { getEnrolment } from '../../services/storage.service'
 
-
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
   channels: Result<Channel[], ErrorBodySerialized>
