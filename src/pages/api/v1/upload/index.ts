@@ -5,8 +5,8 @@ import { ErrorBody, ErrorCode, GatewayError, SendMessageResult, UnknownError } f
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
-import { captureException } from "@sentry/nextjs"
-import { withSentry } from "@sentry/nextjs"
+import { captureException, withSentry } from "@sentry/nextjs"
+
 
 
 type Response = (SendMessageResult & { transactionId: string }) | { err: ErrorBody }

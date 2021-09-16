@@ -12,7 +12,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
 import { getEnrolment } from '../../services/storage.service'
-import * as Sentry from "@sentry/nextjs"
+
 
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
@@ -72,7 +72,6 @@ export default function Documentation({
     } else {
       const count = channels.ok?.length ?? 0
       if (count === 0) {
-        Sentry.captureMessage('No channels found with publish or subscribe rights.')
         setChannelErrorText('No channels found with publish or subscribe rights.')
       }
     }

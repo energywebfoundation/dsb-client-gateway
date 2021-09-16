@@ -11,8 +11,8 @@ import {
   NotEnroledError,
   UnknownError
 } from '../../../../utils'
-import { captureException } from "@sentry/nextjs"
-import { withSentry } from "@sentry/nextjs"
+import { captureException, withSentry } from "@sentry/nextjs"
+
 
 type Response = Enrolment | { err: ErrorBody }
 
