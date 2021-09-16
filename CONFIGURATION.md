@@ -205,7 +205,7 @@ also check the balance and enrolment state on startup.
 
 Note that this will **overwrite** the current identity stored by the gateway.
 
-## `SENTRY` [optional]
+## Sentry
 
 Sentry is an optional feature and it is used to capture error capturing logs, transactions, Performance Monitoring.
 

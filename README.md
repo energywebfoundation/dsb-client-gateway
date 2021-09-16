@@ -62,7 +62,7 @@ Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
 With wscat running, you should be able to start receiving messages once the
 gateway's DSB enrolment is complete.
 
-### Sentry [optional]
+### Sentry
 
 The gateway supports sentry integration for capturing logs, transactions, Performance Monitoring
 
