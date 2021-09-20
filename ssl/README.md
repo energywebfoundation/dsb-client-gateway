@@ -83,7 +83,7 @@ services:
 
 This will spin up the gateway and Nginx containers side-by-side, using an
 `.env` file to (automatically) load the environment variables. An
-[`.env.example`](./env.example) file has been provided, wich can be copied to `.env`:
+[`.env.example`](./.env.example) file has been provided, wich can be copied to `.env`:
 
 ```
 cp .env.example .env
