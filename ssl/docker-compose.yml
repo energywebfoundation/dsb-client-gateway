@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  gateway:
+    image: aemocontainerregistry.azurecr.io/dsb/client-gateway:canary
+    # enable data persistence
+    # https://github.com/energywebfoundation/dsb-client-gateway#persisting-data
+    # volumes:
+    #   - ../in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
+    environment:
+      - PORT=${NGINX_PROXY_PORT}
+      - DSB_BASE_URL=https://dsb-dev.energyweb.org
+  nginx:
+    image: nginx:stable
+    volumes:
+      - ./templates:/etc/nginx/templates
+      - ./server.crt:/etc/nginx/server.crt
+      - ./server.key:/etc/nginx/server.key
+    ports:
+      - 443:443
+    environment:
+      - NGINX_SERVER_NAME=${NGINX_SERVER_NAME}
+      - NGINX_PROXY_HOST=${NGINX_PROXY_HOST}
+      - NGINX_PROXY_PORT=${NGINX_PROXY_PORT}

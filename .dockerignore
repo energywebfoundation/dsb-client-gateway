@@ -5,3 +5,4 @@ docker-compose*
 /.next/
 in-memory.json
 README.md
+/ssl/
