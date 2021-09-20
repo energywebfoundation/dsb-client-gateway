@@ -109,20 +109,22 @@ There are a few things to note here:
 - The gateway container does not expose any ports publicly (note how there is
 no `services.gateway.port`). All traffic goes through Nginx (port 443).
 - In the example configuration, the network created with docker compose allows
-us to simply specify `gateway` as our `NGINX_PROXY_HOST`, which points to the
+us to simply specify `gateway` as our `NGINX_PROXY_HOST`. This points to the
 private IP of the service in `services.gateway` (i.e. DNS lookup).
 - In this configuration, we have a self-signed certificate for local testing.
 For this reason, the `NGINX_SERVER_NAME` is `localhost`, such that we can
-access `https://localhost`. This should be replaced with your own server host
-name.
+access `https://localhost`.
 - The mounts specified in `services.nginx.volumes` follow the format
 `{HOST}:{CONTAINER}`. The paths must correctly point to the host `template`
 directory and your own public certificate (e.g. `server.crt`) and
 private key (`server.key`).
 
-In summary, you should now have a setup that looks like so:
+In summary, you should now have a setup that consists of the compose file,
+the public SSL certificate and private key, the Nginx configuration
+template, and the environment variables:
 ```
 .
+├── .env
 ├── docker-compose.yml
 ├── server.crt
 ├── server.key
