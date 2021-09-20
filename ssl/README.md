@@ -16,7 +16,7 @@ which requires the root CA to be loaded into the macOS "keychain".
 
 ## 2. Configure your SSL settings
 
-A [template](./docker/nginx/templates/default.conf.template) has been provided
+A [template](./templates/default.conf.template) has been provided
 which will be loaded into the Nginx docker container:
 
 ```nginx
