@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.8'
 
 services:
   gateway:
@@ -6,7 +6,7 @@ services:
     # enable data persistence
     # https://github.com/energywebfoundation/dsb-client-gateway#persisting-data
     # volumes:
-    #   - ../in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
+    #  - ../in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
     environment:
       - PORT=${NGINX_PROXY_PORT}
       - DSB_BASE_URL=https://dsb-dev.energyweb.org
