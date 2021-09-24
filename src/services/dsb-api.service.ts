@@ -32,6 +32,7 @@ export class DsbApiService {
    */
   public static init(): DsbApiService {
     if (!DsbApiService.instance) {
+      console.log('Connecting to', config.dsb.baseUrl)
       DsbApiService.instance = new DsbApiService()
     }
     return DsbApiService.instance
@@ -120,8 +121,7 @@ export class DsbApiService {
       switch (res.status) {
         case 200:
           return {
-            ok: (await res.json())
-              .map((msg: any) => this.translateIdempotencyKey(msg, false))
+            ok: (await res.json()).map((msg: any) => this.translateIdempotencyKey(msg, false))
           }
         case 401:
           // not logged in
@@ -308,10 +308,7 @@ export class DsbApiService {
    * @param outgoing if message is outgoing (send to message broker)
    * @returns
    */
-  private translateIdempotencyKey(
-    body: { transactionId?: string, correlationId?: string },
-    outgoing: boolean
-  ): any {
+  private translateIdempotencyKey(body: { transactionId?: string; correlationId?: string }, outgoing: boolean): any {
     if (outgoing) {
       const correlationId = body.transactionId
       delete body.transactionId

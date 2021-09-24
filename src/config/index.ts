@@ -1,6 +1,5 @@
 import { loadEnvConfig } from '@next/env'
 import path from 'path'
-import { DsbControlType } from '../utils/types'
 
 // manually load config because we have a custom server
 loadEnvConfig(process.cwd(), process.env.NODE_ENV !== 'production')
@@ -10,13 +9,11 @@ const defaults = {
   websocket: 'NONE',
   chainId: '73799',
   rpcUrl: 'https://volta-rpc.energyweb.org/',
-  cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
+  cacheServerUrl: 'https://identitycache-dev.energyweb.org/v1/',
   eventServerUrl: 'https://identityevents-dev.energyweb.org/',
   inMemoryDbFilename: 'in-memory.json',
   parentNamespace: 'dsb.apps.energyweb.iam.ewc',
-  dsbBaseUrl: 'http://dsb-dev.energyweb.org',
-  dsbProcessName: 'dsb-message-broker',
-  dsbBinPath: '../dsb-message-broker/bin/dsb-message-broker',
+  dsbBaseUrl: 'https://dsb-demo.energyweb.org',
   websocketReconnect: 'true',
   websocketReconnectTimeout: '10000',
   websocketReconnectMaxRetries: '10',
@@ -58,12 +55,7 @@ export const config = {
   },
   dsb: {
     baseUrl: process.env.DSB_BASE_URL ?? defaults.dsbBaseUrl,
-    controllable: asBool(process.env.DSB_CONTROLLABLE),
-    controlType: takeIf(process.env.DSB_CONTROLLABLE, process.env.DSB_CONTROL_TYPE),
-    pm2: takeIf(process.env.DSB_CONTROL_TYPE === DsbControlType.PM2, {
-      processName: process.env.DSB_PM2_PROCESS_NAME ?? defaults.dsbProcessName,
-      dsbBinPath: process.env.DSB_PM2_BIN_PATH ?? defaults.dsbBinPath
-    })
+    // controllable: asBool(process.env.DSB_CONTROLLABLE),
   },
   auth: {
     username: process.env.USERNAME,
