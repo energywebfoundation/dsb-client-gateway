@@ -1,0 +1,57 @@
+dsb-client-gateway:
+  replicaCount: 1
+
+  clientgateway:
+    config:
+      nats_js_url: nats://20.83.92.252:4222
+      # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
+      dsb_base_url: http://dsb-dev.energyweb.org
+      # -- This allows the DSB Message Broker to be controlled by the DSB Client Gateway. In this situation, the identities of both components are shared. This means that a single private key is used for each component and, in addition to the user DSB role, the gateway will enrol itself as a messagebroker. If a DSB_CONTROL_TYPE is also provided, the gateway may spawn a process with the chosen method, in order to configure it (i.e. setting the same private key).
+  image:
+    repository: aemocontainerregistry.azurecr.io/dsb/client-gateway
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: latest
+
+  imagePullSecrets: []
+  nameOverride: "dsb-client-gateway-sb"
+  fullnameOverride: "dsb-client-gateway-sb"
+
+  service:
+    type: NodePort
+    port: 80
+
+  ingress:
+    enabled: true
+    className: ""
+    annotations:
+      kubernetes.io/ingress.class: alb
+      # cert-manager.io/cluster-issuer: selfsigned-issuer
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      # alb.ingress.kubernetes.io/target-type: ip
+      # alb.ingress.kubernetes.io/tags: createdBy=aws-controller
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+      alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+      # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:124847487737:certificate/6fe6edc6-d1e5-47ff-b0f3-612bf626dba1
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: dsb-client-gateway.energyweb.org
+        paths:
+        - path: "/"
+          pathType: Prefix
+          backend:
+            serviceName: ssl-redirect
+            servicePort: use-annotation
+        - path: "/"
+          pathType: Prefix
+          backend:
+            service:
+              name: dsb-client-gateway-sb
+              port:
+                number: 80
+    tls:
+    - secretName: dsb-tls-self-signed
+      hosts:
+        - dsb-client-gateway.energyweb.org
+
