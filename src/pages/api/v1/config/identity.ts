@@ -12,14 +12,14 @@ import {
   NoPrivateKeyError,
   UnknownError
 } from '../../../../utils'
-import { captureException, withSentry } from '@sentry/nextjs'
+import { captureException, withSentry, captureMessage } from '@sentry/nextjs'
 
 type Response =
   | {
-      address: string
-      publicKey: string
-      balance: BalanceState
-    }
+    address: string
+    publicKey: string
+    balance: BalanceState
+  }
   | { err: ErrorBody }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
@@ -96,8 +96,10 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>) {
     if (err instanceof GatewayError) {
       res.status(err.statusCode ?? 500).send({ err: err.body })
     } else {
-      const error = new UnknownError(err)
-      captureException(error)
+      if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_ERROR === 'true') {
+        const error = new UnknownError(err)
+        captureException(error)
+      }
       res.status(500).send({ err: new UnknownError(err).body })
     }
   }

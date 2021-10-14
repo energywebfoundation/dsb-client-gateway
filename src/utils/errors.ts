@@ -52,6 +52,7 @@ export enum ErrorCode {
   FORBIDDEN = 'FORBIDDEN',
   BAD_REQUEST = 'BAD_REQUEST',
   UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  INVALID_FILE = 'INVALID_FILE',
 
   // SIGNATURE ERRORS
   SIGNATURE_CHECK_FAILED = 'SIG::CHECK_FAILED',
@@ -237,7 +238,7 @@ export class DSBPayloadError extends GatewayError {
   constructor(errorMessage: any[]) {
     const [reason, error] = errorMessage
     super({
-      statusCode: HttpError.BAD_REQUEST,
+      statusCode: HttpError.UNPROCESSABLE_ENTITY,
       code: ErrorCode.DSB_INVALID_PAYLOAD,
       reason,
       additionalInformation: error

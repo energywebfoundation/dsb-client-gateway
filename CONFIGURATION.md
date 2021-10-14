@@ -145,14 +145,14 @@ transactions to. Should match the network given in `CHAIN_ID`.
 Sets the Energy Web IAM cache server URL, used to cache identities (as it
 can be expensive to rely only on querying smart contract data).
 
-**Default**: `https://identitycache-dev.energyweb.org/v1/`
+**Default**: `https://volta-identitycache.energyweb.org/v1/`
 
 ### `EVENT_SERVER_URL` [optional]
 
 Sets the Energy Web IAM events server URL, used to receive notification of
 approved DSB role claims.
 
-**Default**: `https://identityevents-dev.energyweb.org/`
+**Default**: `https://volta-identityevents.energyweb.org/`
 
 ### `PARENT_NAMESPACE` [optional]
 
@@ -205,3 +205,15 @@ Sentry cli uses this token for authentication while building the project
 Data Source Name (DSN) when you create a project to start monitoring events in your app.
 
 A DSN tells a Sentry SDK where to send events so the events are associated with the correct project.
+
+### `SENTRY_LOG_MESSAGE` [optional]
+
+By setting this flag true messages going to channels can be logged in Sentry
+
+**Default**: `false`
+
+### `SENTRY_LOG_ERROR` [optional]
+
+By setting this flag true errors can be logged in sentry
+
+**Default**: `false`
