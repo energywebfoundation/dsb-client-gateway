@@ -4,7 +4,7 @@ info:
   description: The DSB Client Gateway acts as a client to the Energy Web Decentralized Service Bus (DSB), allowing it to publish and subscribe to messages on particular channels.
   contact:
     email: dsb@energyweb.org
-  version: 0.5.0
+  version: 0.5.1
 tags:
   - name: Config
     description: Manage the DSB Client Gateway as admin
@@ -210,6 +210,14 @@ paths:
           description: Amount of messages that should be retrieved
           schema:
             type: number
+        - in: query
+          name: from
+          required: false
+          example: '2021-09-06T00:00:00Z'
+          description: Timstamp stating from which point messages should be read
+            (ISO 8601 UTC Datetime)
+          schema:
+            type: string
       responses:
         '200':
           description: The array of messages
