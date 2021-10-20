@@ -47,3 +47,9 @@ jobs:
 
     - name: Run tests
       run: yarn test
+
+    - name: Scan project
+      uses: anchore/scan-action@v3
+      with:
+        path: "."
+        severity-cutoff: critical

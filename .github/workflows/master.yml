@@ -37,6 +37,24 @@ jobs:
       run: |
         echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" > .env.local
 
+    - name: Build docker image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
+      run: |
+        docker build -t dsb-client-gateway .
+        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
+        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:canary
+
+    - name: Scan local docker image
+      uses: anchore/scan-action@v3
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      with:
+        image: $ECR_REGISTRY/dsb-message-broker:canary
+        fail-build: true
+        severity-cutoff: critical
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -48,15 +66,12 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build docker image and push (AWS)
+    - name: Push docker image to AWS
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
       run: |
-        docker build -t dsb-client-gateway .
-        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
         docker push $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
-        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:canary
         docker push $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:canary
 
     - name: Logout of Amazon ECR
