@@ -38,3 +38,7 @@ dsb-client-gateway:
       - secretName: dsb-tls-secret
         hosts:
           - dsb-gateway.energyweb.org
+
+  pvc:
+    enabled: true
+    mountPath: /var/deployment/apps/dsb-client-gateway/data
