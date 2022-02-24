@@ -81,6 +81,7 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
                       {topic.namespace}
                     </MenuItem>
                   ))}
+
                 </Select>
               </FormControl>
             </div>

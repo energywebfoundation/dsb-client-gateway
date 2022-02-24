@@ -33,6 +33,9 @@ export default function Header() {
             <Link href="/docs">
               <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
             </Link>
+            <Link href="/topics">
+              <a className={clsx(classes.navLink, isActive('/topics'))}>Topics</a>
+            </Link>
           </div>
           <p className={classes.divider}>•</p>
           <Typography>EW-DSB Client Gateway</Typography>
