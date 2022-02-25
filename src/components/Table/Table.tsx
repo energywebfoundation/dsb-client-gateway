@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useCallback, useEffect } from "react"
 // @material-ui/icons
 import Dvr from "@material-ui/icons/Dvr"
 import Favorite from "@material-ui/icons/Favorite"
@@ -6,7 +6,7 @@ import Close from "@material-ui/icons/Close"
 import Dropdown from "react-bootstrap/Dropdown"
 // import "bootstrap/dist/css/bootstrap.min.css"
 
-import { Icon, Theme, Typography, MenuItem } from "@material-ui/core"
+import { Icon, Theme, Typography, MenuItem, MenuList, Paper, Select, Menu } from "@material-ui/core"
 import { makeStyles } from '@material-ui/styles'
 import ThreeDRotation from '@material-ui/icons/ThreeDRotation'
 
@@ -20,31 +20,16 @@ const options = [{
     name: 'Vikas'
 },
 {
-    id: 1,
+    id: 2,
     name: 'Vikas'
 
 }]
 
-function showMenu() {
-
-    alert('clicked!')
-    return (
-        <div >
-            {options?.map((topic) => (
-                <MenuItem key={topic.id} value={topic.name}>
-                    {topic.name}
-                </MenuItem>
-            ))}
-        </div>
-    )
-}
-
 function TopicTable({ ...props }) {
 
+    const [openMenu, setOpenMenu] = useState(false)
     const classes = useStyles()
-
     const data = React.useMemo(() => dataRows, [])
-
 
     const columns = React.useMemo(
         () => [
@@ -71,7 +56,9 @@ function TopicTable({ ...props }) {
             {
                 id: 'edit',
                 accessor: '',
-                Cell: ({ value }) => (<button onClick={() => showMenu()}> More Options</button >)
+                Cell: ({ value }) => (<button onClick={() => {
+                    setOpenMenu(true)
+                }}> More Options</button >)
             },
         ],
         []
@@ -91,7 +78,7 @@ function TopicTable({ ...props }) {
         page, // Instead of using 'rows', we'll use page,
         // which has only the rows for the active page
 
-        // The rest of these things are super handy, too ;)
+        // The rest of these things are super handy, too )
         canPreviousPage,
         canNextPage,
         pageOptions,
@@ -103,7 +90,6 @@ function TopicTable({ ...props }) {
         state: { pageIndex, pageSize },
 
     } = useTable({ columns, data, initialState: { pageIndex: 0, pageSize: 3 }, }, useSortBy, usePagination)
-
 
 
 
@@ -144,6 +130,7 @@ function TopicTable({ ...props }) {
                     ))}
                 </thead>
                 <tbody {...getTableBodyProps()}>
+
                     {page.map((row, index) => {
                         prepareRow(row)
                         return (
@@ -176,8 +163,26 @@ function TopicTable({ ...props }) {
                             </tr>
                         )
                     })}
+
+
+
                 </tbody>
+
             </table>
+
+            <Menu
+                key="menu"
+                open={openMenu}
+                onClose={e => setOpenMenu(false)}
+                style={{ marginLeft: 'auto' }}>
+
+                {options?.map((topic) => (
+                    <MenuItem key={topic.id} value={topic.name}>
+                        {topic.name}
+                    </MenuItem>
+                ))}
+            </Menu>
+
             <br />
 
             <div className="pagination">
@@ -245,3 +250,4 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 export default TopicTable
+
