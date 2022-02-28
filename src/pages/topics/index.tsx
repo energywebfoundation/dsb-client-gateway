@@ -94,7 +94,7 @@ export default function FileUpload({ health, channels, topics, auth }:
                     </section>
                     <div style={{ display: "flex" }}>
                         <section className={classes.searchText}>
-                            <Typography variant="h4">Search </Typography>
+                            {/* <Typography variant="h4">Search </Typography>
                             <TextField
                                 style={{
                                     width: 300,
@@ -113,7 +113,7 @@ export default function FileUpload({ health, channels, topics, auth }:
                                         </IconButton>
                                     ),
                                 }}
-                            />
+                            /> */}
                             <Button style={{ justifyContent: 'flex-end' }} className={classes.connectionStatusPaper}>
                                 Create
                             </Button>

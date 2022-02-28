@@ -1,18 +1,17 @@
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useEffect, useState } from "react"
+import 'regenerator-runtime/runtime'
 // @material-ui/icons
-import Dvr from "@material-ui/icons/Dvr"
-import Favorite from "@material-ui/icons/Favorite"
-import Close from "@material-ui/icons/Close"
-import Dropdown from "react-bootstrap/Dropdown"
+
+import matchSorter from 'match-sorter'
 // import "bootstrap/dist/css/bootstrap.min.css"
 
-import { Icon, Theme, Typography, MenuItem, MenuList, Paper, Select, Menu } from "@material-ui/core"
+import { MenuItem, Menu, Theme } from "@material-ui/core"
 import { makeStyles } from '@material-ui/styles'
-import ThreeDRotation from '@material-ui/icons/ThreeDRotation'
+
 
 // core components
 //import Button from "components/CustomButtons/Button.js"
-import { useTable, useSortBy, usePagination } from 'react-table'
+import { useTable, useSortBy, usePagination, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table'
 import dataRows from "../TableInput/TableInput"
 
 const options = [{
@@ -25,9 +24,122 @@ const options = [{
 
 }]
 
+function fuzzyTextFilterFn(rows, id, filterValue) {
+    return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
+}
+
+
+// Define a default UI for filtering
+function GlobalFilter({
+    preGlobalFilteredRows,
+    globalFilter,
+    setGlobalFilter,
+}) {
+    const count = preGlobalFilteredRows.length
+    const [value, setValue] = React.useState(globalFilter)
+    const onChange = useAsyncDebounce(value => {
+        setGlobalFilter(value || undefined)
+    }, 200)
+
+    useEffect(() => {
+
+    }, [])
+
+    return (
+        <span>
+            Search:{' '}
+            <input
+                value={value || ""}
+                onChange={e => {
+                    setValue(e.target.value)
+                    onChange(e.target.value)
+                }}
+                placeholder={`${count} records...`}
+                style={{
+                    fontSize: '1.1rem',
+                    border: '0',
+                }}
+            />
+        </span>
+    )
+}
+
+// Define a default UI for filtering
+function DefaultColumnFilter({
+    column: { filterValue, preFilteredRows, setFilter },
+}) {
+    const count = preFilteredRows.length
+
+    return (
+        <input
+            value={filterValue || ''}
+            onChange={e => {
+                setFilter(e.target.value || '') // Set undefined to remove the filter entirely
+            }}
+            placeholder={`Search ${count} records...`}
+        />
+    )
+}
+
+const Tags = ({ values }) => {
+    const classes = useStyles()
+
+    // Loop through the array and create a badge-like component instead of a comma-separated string
+    return (
+        <>
+            {values.map((tag, idx) => {
+                return (
+                    <span key={idx} className={classes.span}>
+                        {tag}
+                    </span>
+                )
+            })}
+        </>
+    )
+}
+
+// Let the table remove the filter if the string is empty
+fuzzyTextFilterFn.autoRemove = val => !val
+
 function TopicTable({ ...props }) {
 
     const [openMenu, setOpenMenu] = useState(false)
+    const [filterInput, setFilterInput] = useState("")
+
+    const filterTypes = React.useMemo(
+        () => ({
+            // Add a new fuzzyTextFilterFn filter type.
+            fuzzyText: fuzzyTextFilterFn,
+            // Or, override the default text filter to use
+            // "startWith"
+            text: (rows, id, filterValue) => {
+                return rows.filter(row => {
+                    const rowValue = row.values[id]
+                    return rowValue !== undefined
+                        ? String(rowValue)
+                            .toLowerCase()
+                            .startsWith(String(filterValue).toLowerCase())
+                        : true
+                })
+            },
+        }),
+        []
+    )
+
+    const defaultColumn = React.useMemo(
+        () => ({
+            // Let's set up our default Filter UI
+            Filter: DefaultColumnFilter,
+        }),
+        []
+    )
+
+
+    const handleFilterChange = e => {
+        const value = e.target.value || undefined
+        setFilterInput(value)
+    }
+
     const classes = useStyles()
     const data = React.useMemo(() => dataRows, [])
 
@@ -36,26 +148,33 @@ function TopicTable({ ...props }) {
             {
                 Header: 'VERSION',
                 accessor: 'version',
+                filter: 'includes',
             },
             {
                 Header: 'TOPIC NAME',
                 accessor: 'name',
+                filter: 'fuzzyText',
             },
             {
                 Header: 'SCHEMA TYPE',
                 accessor: 'schemaType',
+                filter: 'fuzzyText',
             },
             {
                 Header: 'TAGS',
                 accessor: 'tags',
+                filter: 'fuzzyText',
+                Cell: ({ value }) => <Tags values={value} />
             },
             {
                 Header: 'UPDATED DATE',
                 accessor: 'updatedDate',
+                filter: 'includes',
             },
             {
                 id: 'edit',
                 accessor: '',
+                filter: 'includes',
                 Cell: ({ value }) => (<button onClick={() => {
                     setOpenMenu(true)
                 }}> More Options</button >)
@@ -68,11 +187,10 @@ function TopicTable({ ...props }) {
         getTableProps,
         getTableBodyProps,
         headerGroups,
-        // rows,
+        rows,
         prepareRow,
-        state: {
-            sorting,
-        },
+        state,
+
         onSortingChange: setSorting,
 
         page, // Instead of using 'rows', we'll use page,
@@ -87,17 +205,46 @@ function TopicTable({ ...props }) {
         nextPage,
         previousPage,
         setPageSize,
-        state: { pageIndex, pageSize },
+        // state: { pageIndex, pageSize, },
+        preGlobalFilteredRows,
+        setGlobalFilter,
+        visibleColumns
 
-    } = useTable({ columns, data, initialState: { pageIndex: 0, pageSize: 3 }, }, useSortBy, usePagination)
-
-
+    } = useTable({
+        defaultColumn, // Be sure to pass the defaultColumn option
+        filterTypes,
+        columns,
+        data,
+        initialState: { pageIndex: 0, pageSize: 3 },
+    },
+        useFilters,
+        useGlobalFilter,
+        useSortBy,
+        usePagination,
+    )
 
     return (
 
         <div>
             <table className={classes.table}  {...getTableProps()}>
+
                 <thead>
+                    <tr>
+                        <th
+                            colSpan={visibleColumns.length}
+                            style={{
+                                textAlign: 'left',
+                            }}
+                        >
+
+                            <GlobalFilter
+                                preGlobalFilteredRows={preGlobalFilteredRows}
+                                globalFilter={state.globalFilter}
+                                setGlobalFilter={setGlobalFilter}
+                            />
+                        </th>
+                    </tr>
+
                     {headerGroups.map((headerGroup, index) => (
                         <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map((column, key) => (
@@ -128,6 +275,7 @@ function TopicTable({ ...props }) {
                             ))}
                         </tr>
                     ))}
+
                 </thead>
                 <tbody {...getTableBodyProps()}>
 
@@ -194,7 +342,7 @@ function TopicTable({ ...props }) {
                 <span style={{ color: '#C6C9CE', }}>
                     Page{' '}
                     <strong>
-                        {pageIndex + 1} of {pageOptions.length}
+                        {state.pageIndex + 1} of {pageOptions.length}
                     </strong>{' '}
                 </span>
 
@@ -205,7 +353,7 @@ function TopicTable({ ...props }) {
             </div>
 
             <br />
-            <div style={{ color: '#C6C9CE', }}>Showing the first {pageSize} results of {page.length} rows</div>
+            <div style={{ color: '#C6C9CE', }}>Showing the first {state.pageSize} results of {page.length} rows</div>
 
         </div >
 
@@ -244,6 +392,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         height: '5px',
         'background-color': 'black',
         'margin': '6px 0'
+    },
+    span: {
+        color: 'darkolivegreen',
+        background: theme.palette.secondary.main,
     }
 
 

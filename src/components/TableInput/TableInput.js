@@ -4,7 +4,7 @@ const dataRows = [
         version: '1.0.0',
         name: 'Topic Name 1',
         schemaType: 'Schema type',
-        tags: 'Aggregator',
+        tags: ['Aggregator'],
         updatedDate: '12/21/2021'
     },
     {
@@ -12,7 +12,7 @@ const dataRows = [
         version: '1.0.0',
         name: 'Topic Name 2',
         schemaType: 'Schema type',
-        tags: 'Aggregator',
+        tags: ['Aggregator'],
         updatedDate: '12/21/2021'
     },
     {
@@ -20,7 +20,7 @@ const dataRows = [
         version: '1.0.0',
         name: 'TopicName',
         schemaType: 'Schema type',
-        tags: 'Aggregator',
+        tags: ['Aggregator'],
         updatedDate: '12/21/2021'
     },
     {
@@ -28,7 +28,7 @@ const dataRows = [
         version: '1.0.0',
         name: 'TopicName',
         schemaType: 'Schema type',
-        tags: 'Aggregator',
+        tags: ['Aggregator'],
         updatedDate: '12/21/2021'
     },
     {
@@ -36,7 +36,7 @@ const dataRows = [
         version: '1.0.0',
         name: 'TopicName',
         schemaType: 'Schema type',
-        tags: 'Aggregator',
+        tags: ['Aggregator'],
         updatedDate: '12/21/2021'
     },
     {
@@ -44,7 +44,7 @@ const dataRows = [
         version: '1.0.0',
         name: 'TopicName',
         schemaType: 'Schema type',
-        tags: 'Aggregator',
+        tags: ['Aggregator'],
         updatedDate: '12/21/2021'
     }
 

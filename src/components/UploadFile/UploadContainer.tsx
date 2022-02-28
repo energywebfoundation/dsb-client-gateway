@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
-import { Channel } from '../../utils'
+import { Channel, Topic } from '../../utils'
 
 type UploadContainerProps = {
   auth?: string
-  channels: Channel[] | undefined
+  channels: Channel[] | undefined,
+  topics: Topic[] | undefined
 }
 
 export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
