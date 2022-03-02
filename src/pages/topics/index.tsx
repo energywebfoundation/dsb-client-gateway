@@ -1,5 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import Head from 'next/head'
+import clsx from 'clsx'
+import { useRouter } from 'next/router'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
 import { Typography, Container, Divider, Theme, TextField, IconButton, Button } from '@material-ui/core'
@@ -13,6 +16,10 @@ import Header from '../../components/Header/Header'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
+
+import SimpleDialog from '../createtopics'
+
+const emails = ['username@gmail.com', 'user02@gmail.com']
 
 type Props = {
     health: Result<boolean, ErrorBodySerialized>
@@ -57,9 +64,27 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     }
 }
 
-export default function FileUpload({ health, channels, topics, auth }:
+
+
+
+export default function ListTopics({ health, channels, topics, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
+    const router = useRouter()
+    const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
+
+    const [open, setOpen] = useState(false)
+    const selectedValue = 'vikaskum660@gmail.com'
+
+
+    const handleClickOpen = () => {
+        setOpen(true)
+    }
+
+    const handleClose = (value) => {
+        setOpen(false)
+
+    }
 
     // useEffect(() => {
     //     if (health.err) {
@@ -94,30 +119,20 @@ export default function FileUpload({ health, channels, topics, auth }:
                     </section>
                     <div style={{ display: "flex" }}>
                         <section className={classes.searchText}>
-                            {/* <Typography variant="h4">Search </Typography>
-                            <TextField
-                                style={{
-                                    width: 300,
-                                    borderWidth: 2,
-                                    borderColor: "#CED1D5",
-                                    paddingLeft: '2rem'
-                                }}
-                                fullWidth
-                                id="standard-bare"
-                                variant="outlined"
-                                defaultValue="How can we help"
-                                InputProps={{
-                                    endAdornment: (
-                                        <IconButton>
-                                            <SearchOutlined />
-                                        </IconButton>
-                                    ),
-                                }}
-                            /> */}
-                            <Button style={{ justifyContent: 'flex-end' }} className={classes.connectionStatusPaper}>
+
+                            <Button style={{ justifyContent: 'flex-end' }}
+                                className={classes.connectionStatusPaper}
+                                onClick={handleClickOpen}>
                                 Create
                             </Button>
+
                         </section>
+
+                        <SimpleDialog
+                            selectedValue={selectedValue}
+                            open={open}
+                            onClose={handleClose}
+                        />
                     </div>
 
                     <section className={classes.table}>
@@ -126,7 +141,7 @@ export default function FileUpload({ health, channels, topics, auth }:
 
                 </Container>
             </main>
-        </div>
+        </div >
     )
 }
 
@@ -176,5 +191,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     table: {
         marginTop: '1rem',
+    },
+    navLink: {
+        fontSize: '1rem',
+
+        '&:hover': {
+            textDecorationLine: 'underline',
+            color: theme.palette.secondary.main
+        }
+    },
+    active: {
+        color: theme.palette.secondary.main
     }
 }))
