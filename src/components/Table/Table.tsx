@@ -254,11 +254,11 @@ function TopicTable({ ...props }) {
 
                                         background: '#343E55',
                                         color: '#C6C9CE',
-                                        'text-align': 'left',
+                                        'textAlign': 'left',
                                         'padding': '1em',
-                                        'font-size': '12px',
-                                        'line-height': '14px',
-                                        'letter- spacing': '0.08em'
+                                        'fontSize': '12px',
+                                        'lineHeight': '14px',
+                                        'letterSpacing': '0.08em'
                                     }}
                                 >
                                     {column.render('Header')}
@@ -291,14 +291,14 @@ function TopicTable({ ...props }) {
                                             style={{
                                                 color: '#C6C9CE',
                                                 background: '#2A3044',
-                                                'text-align': 'left',
-                                                'font- family': 'Sequel Sans',
-                                                'font- style': 'normal',
-                                                'font-weight': 'normal',
-                                                'font- size': '14px',
-                                                'line- height': '17px',
-                                                'border- collapse': 'separate',
-                                                'border- spacing': '0 1em',
+                                                'textAlign': 'left',
+                                                'fontFamily': 'Sequel Sans',
+                                                'fontStyle': 'normal',
+                                                'fontWeight': 'normal',
+                                                'fontSize': '14px',
+                                                'lineHeight': '17px',
+                                                'borderCollapse': 'separate',
+                                                'borderSpacing': '0 1em',
                                                 'padding': '1em'
 
                                             }}

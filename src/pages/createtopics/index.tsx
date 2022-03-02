@@ -18,6 +18,7 @@ import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
 
 
+
 const emails = ['username@gmail.com', 'user02@gmail.com']
 
 export default function SimpleDialog(props) {
@@ -105,7 +106,13 @@ export default function SimpleDialog(props) {
                                     <JSONInput
                                         placeholder={sampleObject} // data to display
                                         theme="dark_vscode_tribute"
+                                        // onKeyPressUpdate='false'
+                                        // waitAfterKeyPress='1'
                                         locale={locale}
+                                        colors={{
+                                            error: "#DAA520"
+                                            // overrides theme colors with whatever color value you want
+                                        }}
                                         onChange={(event: any) => setSchema(event.json)}
                                         height="550px"
                                     />
