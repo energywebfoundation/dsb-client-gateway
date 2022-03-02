@@ -54,8 +54,6 @@ export class StorageService {
     return null;
   }
 
-  public deleteEnrolment(): void {}
-
   public getIdentity(): Identity | null {
     this.createCollectionIfNotExists(COLLECTIONS.IDENTITY);
 

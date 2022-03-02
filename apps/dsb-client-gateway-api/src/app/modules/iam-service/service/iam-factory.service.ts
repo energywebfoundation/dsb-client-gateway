@@ -27,20 +27,24 @@ export class IamFactoryService {
     const { connectToCacheServer, signerService } = await initWithPrivateKeySigner(privateKey, rpcUrl);
 
     setChainConfig(73799, {
-      claimManagerAddress: '0xC3dD7ED75779b33F5Cfb709E0aB02b71fbFA3210'
+      claimManagerAddress: '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031'
     })
 
     setCacheConfig(chainId, {
       url: cacheServerUrl
     });
 
-    const { cacheClient, connectToDidRegistry } = await connectToCacheServer();
+    try {
+      const { cacheClient, connectToDidRegistry } = await connectToCacheServer();
 
-    const { claimsService, didRegistry } = await connectToDidRegistry();
+      const { claimsService, didRegistry } = await connectToDidRegistry();
 
-    await didRegistry.init();
-    await claimsService.init();
+      await didRegistry.init();
+      await claimsService.init();
 
-    return { cacheClient, claimsService, didRegistry, signerService };
+      return { cacheClient, claimsService, didRegistry, signerService };
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

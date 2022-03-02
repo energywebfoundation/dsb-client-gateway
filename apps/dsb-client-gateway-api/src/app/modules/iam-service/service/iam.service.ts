@@ -63,6 +63,8 @@ export class IamService {
   }
 
   public getClaimById(id: string): Promise<Claim> {
+    this.cacheClient.getApplicationsByOwner()
+
     return this.claimsService.getClaimById(id);
   }
 
@@ -81,7 +83,6 @@ export class IamService {
   public async publishPublicClaim(token: string): Promise<void> {
     await this.claimsService.publishPublicClaim({
       token
-      // registrationTypes: [RegistrationTypes.OnChain, RegistrationTypes.OffChain]
     });
   }
 
@@ -103,7 +104,16 @@ export class IamService {
     });
   }
 
-  public getDIDAddress() {
+  public getDIDAddress(): string | null {
+    if (!this.signerService) {
+      return null;
+    }
+
     return this.signerService.did;
   }
 }
+
+/**
+ *
+ * can you get list of DIDs based on role/roles - ask Jakub
+ */

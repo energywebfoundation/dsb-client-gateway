@@ -2,7 +2,7 @@ import { Controller, Get, Post } from '@nestjs/common';
 import { EnrolmentService } from './service/enrolment.service';
 import { Enrolment } from '../storage/storage.interface';
 
-@Controller('enrolment')
+@Controller('enrol')
 export class EnrolmentController {
   constructor(
     protected readonly enrolmentService: EnrolmentService,

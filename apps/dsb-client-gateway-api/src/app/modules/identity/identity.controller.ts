@@ -15,8 +15,9 @@ export class IdentityController {
   }
 
   @Post('')
-  @HttpCode(HttpStatus.CREATED)
-  public async post(@Body() { privateKey }: CreateIdentityDto): Promise<void> {
+  public async post(@Body() { privateKey }: CreateIdentityDto): Promise<Identity> {
     await this.identityService.createIdentity(privateKey);
+
+    return this.identityService.getIdentity();
   }
 }

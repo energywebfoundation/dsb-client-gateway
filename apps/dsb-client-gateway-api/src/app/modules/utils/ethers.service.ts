@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BigNumber, providers, utils, Wallet } from 'ethers';
 import { BalanceState } from './balance.const';
 import { parseEther } from 'ethers/lib/utils';
@@ -56,7 +56,7 @@ export class EthersService {
 
   public getWalletFromPrivateKey(privateKey: string): Wallet {
     if (!this.validatePrivateKey(privateKey)) {
-      throw new Error('Invalid private key');
+      throw new BadRequestException('Invalid private key');
     }
 
     return new Wallet(privateKey);

@@ -46,6 +46,6 @@ export class IdentityService {
     await this.secretsEngineService.setPrivateKey(privateKey);
     await this.iamService.setup(privateKey);
 
-    await this.storageService.deleteEnrolment();
+    await this.storageService.removeEnrolment();
   }
 }

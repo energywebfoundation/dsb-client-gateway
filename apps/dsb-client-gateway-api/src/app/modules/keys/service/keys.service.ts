@@ -24,6 +24,22 @@ export class KeysService implements OnModuleInit {
   }
 
   public async generateMasterHDKey(): Promise<void> {
+    if (!this.iamService.getDIDAddress()) {
+      this.logger.warn('Skipping keys as IAM is not initialized');
+
+      return;
+    }
+
+    const currentKeys = await this.secretsEngineService.getEncryptionKeys();
+
+    if (currentKeys) {
+      this.logger.log('Master keys already exists');
+
+      await this.deriveKeys();
+
+      return;
+    }
+
     this.logger.log('Generating master BIP32 keys');
 
     const mnemonic = generateMnemonic();
@@ -45,9 +61,18 @@ export class KeysService implements OnModuleInit {
   public async deriveKeys() {
     this.logger.log('Deriving keys');
 
-    const { createdAt, privateMasterKey, publicMasterKey } = await this.secretsEngineService.getEncryptionKeys();
+    const keys = await this.secretsEngineService.getEncryptionKeys();
+
+    if(!keys) {
+      this.logger.log('No secrets found');
+
+      return;
+    }
+
+    const { createdAt, privateMasterKey, publicMasterKey } = keys;
 
     const masterSeed = HDKEY.fromMasterSeed(Buffer.from(privateMasterKey, 'hex'));
+
     const iteration = moment().diff(createdAt, 'days');
 
     this.logger.log(`KDF iteration ${iteration}`);

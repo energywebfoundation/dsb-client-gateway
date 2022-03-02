@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EthersService } from '../../utils/ethers.service';
 import { BalanceState } from '../../utils/balance.const';
 import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-balance.exception';
@@ -7,15 +7,54 @@ import { NatsListenerService } from './nats-listener.service';
 import { Enrolment } from '../../storage/storage.interface';
 import { StorageService } from '../../storage/service/storage.service';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class EnrolmentService {
+export class EnrolmentService implements OnModuleInit {
+  private readonly logger = new Logger(EnrolmentService.name);
+  private parentNamespace: string;
+  private userRole: string;
+
   constructor(
     protected readonly ethersService: EthersService,
     protected readonly iamService: IamService,
     protected readonly natsListenerService: NatsListenerService,
     protected readonly storageService: StorageService,
-  ) {
+    protected readonly configService: ConfigService,
+  ) {}
+
+  public async onModuleInit(): Promise<void> {
+    this.parentNamespace = this.configService.get<string>('PARENT_NAMESPACE', 'dsb.apps.energyweb.iam.ewc');
+    this.userRole = `user.roles.${this.parentNamespace}`;
+
+    const did = this.iamService.getDIDAddress();
+
+    if (!did) {
+      this.logger.log('IAM not initialized to get enrolment');
+
+      return;
+    }
+
+    const claims = await this.iamService.getClaimsByRequester(
+      did,
+      this.parentNamespace
+    );
+
+    const state = await this.natsListenerService.getStateFromClaims(claims);
+
+    await this.storageService.writeEnrolment({
+      did,
+      state,
+    });
+
+    if(state.waiting) {
+      this.logger.log('Initializing enrolment on bootstrap');
+
+      await this.initEnrolment()
+        .catch((e) => {
+          this.logger.error('Error during enrolment', e);
+        })
+    }
   }
 
   public async getEnrolment(): Promise<Enrolment> {

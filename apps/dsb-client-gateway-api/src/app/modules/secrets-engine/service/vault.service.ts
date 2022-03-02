@@ -72,6 +72,8 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .catch((err) => {
         this.logger.error(err.message);
 
+        this.logger.error(err);
+
         return null;
       });
   }
@@ -83,6 +85,8 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async setPrivateKey(key: string): Promise<void> {
+    this.logger.log('Attempting to write private key');
+
     await this.client.write(PATHS.IDENTITY_PRIVATE_KEY, { key });
 
     this.logger.log('Writing private key');

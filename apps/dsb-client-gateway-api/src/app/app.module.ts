@@ -8,6 +8,10 @@ import { MulterModule } from '@nestjs/platform-express';
 import { DsbClientModule } from './modules/dsb-client/dsb-client.module';
 import { KeysModule } from './modules/keys/keys.module';
 import { SecretsEngineModule } from './modules/secrets-engine/secrets-engine.module';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './modules/utils/all-exceptions.filter';
+import { TerminusModule } from '@nestjs/terminus';
+import { HealthController } from './modules/health/health.controller';
 
 @Module({
   imports: [
@@ -24,6 +28,12 @@ import { SecretsEngineModule } from './modules/secrets-engine/secrets-engine.mod
     DsbClientModule,
     KeysModule,
     SecretsEngineModule,
+    TerminusModule,
   ],
+  providers: [{
+    provide: APP_FILTER,
+    useClass: AllExceptionsFilter
+  }],
+  controllers: [HealthController]
 })
 export class AppModule {}
