@@ -1,25 +1,13 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
-import Avatar from '@material-ui/core/Avatar'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemAvatar from '@material-ui/core/ListItemAvatar'
-import ListItemText from '@material-ui/core/ListItemText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Dialog from '@material-ui/core/Dialog'
-import PersonIcon from '@material-ui/icons/Person'
-import AddIcon from '@material-ui/icons/Add'
 import { Typography, Theme, Grid, Select, FormControl, MenuItem } from '@material-ui/core'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
-import { blue } from '@material-ui/core/colors'
 import { makeStyles } from '@material-ui/styles'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
-
-
-
-const emails = ['username@gmail.com', 'user02@gmail.com']
 
 export default function SimpleDialog(props) {
     const { onClose, selectedValue, open } = props
@@ -163,8 +151,6 @@ export default function SimpleDialog(props) {
                     </Grid>
                 </Grid>
             </div>
-
-
 
         </Dialog >
     )
