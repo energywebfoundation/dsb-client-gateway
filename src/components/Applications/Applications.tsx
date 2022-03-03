@@ -1,43 +1,30 @@
 import { makeStyles } from '@material-ui/styles'
 import {
-    Accordion,
-    AccordionDetails,
     AccordionSummary as MuiAccordionSummary,
     Theme,
-    Typography,
-    withStyles,
-    withWidth
 } from '@material-ui/core'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import { Topic as TopicType } from '../../utils'
-import { JsonView, defaultStyles } from 'react-json-view-lite'
+import { Application as ApplicationType } from '../../utils'
 import 'react-json-view-lite/dist/index.css'
 import TopicTable from '../Table/Table'
-import dataRows from "../TableInput/TableInput"
 
-import { TOPIC_HEADERS as topicHeaders } from '../../utils'
+import { APPLICATIONS_HEADERS as applicationHeaders } from '../../utils/constants'
 
 type TopicProps = {
-    applicationName?: string
-    topics: TopicType[] | undefined
+    applications: ApplicationType[] | undefined
     myDID?: string
 }
 
-export default function Topic({ topics, myDID }: TopicProps) {
+// take this data by calling API made by chris
+
+
+export default function Topic({ applications, myDID }: TopicProps) {
     const classes = useStyles()
-
-    const isPubSub = () => {
-        if (!myDID) {
-            return
-        }
-    }
-
     return (
         <div >
             {/* <div className={classes.navbar}></div> */}
             <TopicTable
-                headers={topicHeaders}
-                dataRows={dataRows}
+                headers={applicationHeaders}
+                dataRows={applications}
             />
         </div>
     )

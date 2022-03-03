@@ -3,16 +3,18 @@ import 'regenerator-runtime/runtime'
 // @material-ui/icons
 
 import matchSorter from 'match-sorter'
-// import "bootstrap/dist/css/bootstrap.min.css"
 
 import { MenuItem, Menu, Theme } from "@material-ui/core"
 import { makeStyles } from '@material-ui/styles'
 
-
-// core components
-//import Button from "components/CustomButtons/Button.js"
 import { useTable, useSortBy, usePagination, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table'
-import dataRows from "../TableInput/TableInput"
+
+
+import {
+    ApplicationHeader as ApplicationHeaderType,
+    Application as ApplicationType,
+    TopicList as TopicType
+} from '../../utils'
 
 const options = [{
     id: 1,
@@ -101,7 +103,14 @@ const Tags = ({ values }) => {
 // Let the table remove the filter if the string is empty
 fuzzyTextFilterFn.autoRemove = val => !val
 
-function TopicTable({ ...props }) {
+type TableProps = {
+    headers: ApplicationHeaderType[] | undefined
+    dataRows: ApplicationType[] | TopicType[] | undefined
+}
+
+function TopicTable({ headers, dataRows }: TableProps) {
+
+
 
     const [openMenu, setOpenMenu] = useState(false)
     const [filterInput, setFilterInput] = useState("")
@@ -141,46 +150,14 @@ function TopicTable({ ...props }) {
     }
 
     const classes = useStyles()
-    const data = React.useMemo(() => dataRows, [])
+    const data = React.useMemo(() => dataRows, [dataRows])
+
 
     const columns = React.useMemo(
-        () => [
-            {
-                Header: 'VERSION',
-                accessor: 'version',
-                filter: 'includes',
-            },
-            {
-                Header: 'TOPIC NAME',
-                accessor: 'name',
-                filter: 'fuzzyText',
-            },
-            {
-                Header: 'SCHEMA TYPE',
-                accessor: 'schemaType',
-                filter: 'fuzzyText',
-            },
-            {
-                Header: 'TAGS',
-                accessor: 'tags',
-                filter: 'fuzzyText',
-                Cell: ({ value }) => <Tags values={value} />
-            },
-            {
-                Header: 'UPDATED DATE',
-                accessor: 'updatedDate',
-                filter: 'includes',
-            },
-            {
-                id: 'edit',
-                accessor: '',
-                filter: 'includes',
-                Cell: ({ value }) => (<button onClick={() => {
-                    setOpenMenu(true)
-                }}> More Options</button >)
-            },
-        ],
-        []
+        () => {
+            return headers
+        },
+        [headers]
     )
 
     const {

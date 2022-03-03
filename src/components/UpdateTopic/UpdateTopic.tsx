@@ -38,7 +38,6 @@ export default function UpdateTopic({ topic, myDID }: Props) {
 
     const handleClose = (value) => {
         setOpen(false)
-
     }
 
     return (

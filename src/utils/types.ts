@@ -82,6 +82,35 @@ export type Channel = {
   modifiedDateTime?: string
 }
 
+export type ApplicationHeader = {
+  id?: string
+  Header?: string
+  accessor: string
+  filter?: string
+  Cell?: any
+}
+
+
+
+export type Application = {
+  applicationLogo: string
+  applicationName: string
+  applicationNameSpace: string
+  topicsCount: number
+  modifiedDateTime?: string
+}
+
+export type TopicList = {
+  id: number
+  version: string
+  name: string
+  schemaType: string
+  tags: string[]
+  updatedDate: string
+  schema?: object | string
+}
+
+
 export type Topic = {
   namespace: string
   schema: object | string
