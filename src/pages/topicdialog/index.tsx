@@ -9,13 +9,22 @@ import { makeStyles } from '@material-ui/styles'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
 
-export default function SimpleDialog(props) {
-    const { onClose, selectedValue, open, dialogTitle, dialogText, data } = props
-    let topicName = data.topicName ? data.topicName : ''
-    let version = data.version ? data.version : ''
-    let tags = data.tags ? data.tags : []
-    let schemaType = data.schemaType ? data.schemaType : ''
-    let jsonSchema = data.jsonSchema ? data.jsonSchema : {}
+type Props = {
+    data: { dialogTitle: string, dialogText: string }
+    onClose: any,
+    selectedValue: string
+    open: boolean
+}
+
+export default function SimpleDialog(props: Props) {
+    const { onClose, selectedValue, open, data } = props
+    let topicName = ''
+    let version = ''
+    let tags = []
+    let schemaType = ''
+    let jsonSchema = {}
+    let dialogText = data.dialogText
+    let dialogTitle = data.dialogTitle
 
     const [schema, setSchema] = React.useState({})
 
@@ -30,8 +39,8 @@ export default function SimpleDialog(props) {
     return (
         <Dialog className={classes.dialog} onClose={handleClose} open={open}>
 
-            <DialogTitle>Create Topic</DialogTitle>
-            <Typography>Provide topic data with this form</Typography>
+            <DialogTitle>{dialogTitle}</DialogTitle>
+            <Typography>{dialogText}</Typography>
             <div className={classes.form}>
                 <Grid container>
                     <Grid item xs={12} sm={7} md={6}>
@@ -58,7 +67,7 @@ export default function SimpleDialog(props) {
                             <div className={classes.formGroup}>
                                 <Typography variant="caption">Tags</Typography>
                                 <CustomInput
-                                    placeholder={tags.length > 0 ? tags : 'Tags'}
+                                    placeholder='Tags'
                                     fullWidth />
                             </div>
                         </Grid>

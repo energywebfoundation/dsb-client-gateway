@@ -1,14 +1,9 @@
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import Head from 'next/head'
-import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
 import { Typography, Container, Divider, Theme, TextField, IconButton, Button } from '@material-ui/core'
-import { SearchOutlined, MoreVertOutlined } from '@material-ui/icons'
-
-
 import swal from '@sweetalert/with-react'
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
 import Header from '../../components/Header/Header'
@@ -17,9 +12,7 @@ import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 
-import SimpleDialog from '../createtopics'
-
-const emails = ['username@gmail.com', 'user02@gmail.com']
+import SimpleDialog from '../topicdialog'
 
 type Props = {
     health: Result<boolean, ErrorBodySerialized>
@@ -76,6 +69,11 @@ export default function ListTopics({ health, channels, topics, auth }:
     const [open, setOpen] = useState(false)
     const selectedValue = 'vikaskum660@gmail.com'
 
+    let data = {
+        dialogTitle: 'Create Topic',
+        dialogText: 'Provide Topic data with this form'
+    }
+
 
     const handleClickOpen = () => {
         setOpen(true)
@@ -129,9 +127,10 @@ export default function ListTopics({ health, channels, topics, auth }:
                         </section>
 
                         <SimpleDialog
+                            data={data}
+                            onClose={handleClose}
                             selectedValue={selectedValue}
                             open={open}
-                            onClose={handleClose}
                         />
                     </div>
 
