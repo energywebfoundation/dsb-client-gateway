@@ -110,10 +110,19 @@ type TableProps = {
 
 function TopicTable({ headers, dataRows }: TableProps) {
 
-
-
     const [openMenu, setOpenMenu] = useState(false)
     const [filterInput, setFilterInput] = useState("")
+
+    const newHeaders = headers?.map((header) => header) //shallow copy
+
+    newHeaders?.push({
+        id: 'edit',
+        accessor: '',
+        filter: 'includes',
+        Cell: ({ value }) => (<button onClick={() => {
+            setOpenMenu(true)
+        }}> More Options</button >)
+    })
 
     const filterTypes = React.useMemo(
         () => ({
@@ -154,10 +163,8 @@ function TopicTable({ headers, dataRows }: TableProps) {
 
 
     const columns = React.useMemo(
-        () => {
-            return headers
-        },
-        [headers]
+        () => newHeaders,
+        []
     )
 
     const {
