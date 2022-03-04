@@ -25,6 +25,7 @@ export default function Topic({ applications, myDID }: TopicProps) {
             <TopicTable
                 headers={applicationHeaders}
                 dataRows={applications}
+                location='Application'
             />
         </div>
     )

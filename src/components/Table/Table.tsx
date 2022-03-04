@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from "react"
 import 'regenerator-runtime/runtime'
-// @material-ui/icons
-
 import matchSorter from 'match-sorter'
-
-import { MenuItem, Menu, Theme } from "@material-ui/core"
+import { MenuItem, Menu, Theme, Icon } from "@material-ui/core"
 import { makeStyles } from '@material-ui/styles'
-
 import { useTable, useSortBy, usePagination, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table'
-
-
 import {
     ApplicationHeader as ApplicationHeaderType,
     Application as ApplicationType,
     TopicList as TopicType
 } from '../../utils'
+import { useRouter } from 'next/router'
+import clsx from 'clsx'
+import Link from 'next/link'
 
 const options = [{
     id: 1,
@@ -103,25 +100,44 @@ const Tags = ({ values }) => {
 // Let the table remove the filter if the string is empty
 fuzzyTextFilterFn.autoRemove = val => !val
 
+
+
 type TableProps = {
     headers: ApplicationHeaderType[] | undefined
     dataRows: ApplicationType[] | TopicType[] | undefined
+    location?: string | undefined
 }
 
-function TopicTable({ headers, dataRows }: TableProps) {
+function TopicTable({ headers, dataRows, location }: TableProps) {
+
+    const router = useRouter()
+
+    const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
 
     const [openMenu, setOpenMenu] = useState(false)
     const [filterInput, setFilterInput] = useState("")
 
-    const newHeaders = headers?.map((header) => header) //shallow copy
+    //shallow copy to avoid duplicate headers as using React.useMemo
+    const newHeaders = headers?.map((header) => header)
 
     newHeaders?.push({
         id: 'edit',
         accessor: '',
-        filter: 'includes',
-        Cell: ({ value }) => (<button onClick={() => {
-            setOpenMenu(true)
-        }}> More Options</button >)
+        filter: 'false',
+        Cell: ({ value }) => {
+
+            let name = 'Application 1'
+            if (location === 'Application') {
+                return <Link href={`/topics?applicationName=${name}`}>
+                    {<a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDots</Icon></a>}
+                </Link >
+            } else {
+                return (<button onClick={() => {
+                    setOpenMenu(true)
+                }}> More Options</button >)
+            }
+        }
+
     })
 
     const filterTypes = React.useMemo(
@@ -220,7 +236,6 @@ function TopicTable({ headers, dataRows }: TableProps) {
                                 textAlign: 'left',
                             }}
                         >
-
                             <GlobalFilter
                                 preGlobalFilteredRows={preGlobalFilteredRows}
                                 globalFilter={state.globalFilter}
@@ -295,9 +310,6 @@ function TopicTable({ headers, dataRows }: TableProps) {
                             </tr>
                         )
                     })}
-
-
-
                 </tbody>
 
             </table>
@@ -380,9 +392,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     span: {
         color: 'darkolivegreen',
         background: theme.palette.secondary.main,
+    },
+    navLink: {
+        fontSize: '1rem',
+
+        '&:hover': {
+            textDecorationLine: 'underline',
+            color: theme.palette.secondary.main
+        }
+    },
+    active: {
+        color: theme.palette.secondary.main
     }
-
-
 }))
 
 export default TopicTable

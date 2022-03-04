@@ -24,6 +24,8 @@ type Props = {
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
     props: Props
 }> {
+
+
     const authHeader = context.req.headers.authorization
     const { err } = isAuthorized(authHeader)
     if (!err) {
@@ -64,7 +66,8 @@ export default function ListTopics({ health, channels, topics, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
     const router = useRouter()
-    const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
+    const { applicationName } = router.query
+    console.log('applicationName', applicationName)
 
     const [open, setOpen] = useState(false)
     const selectedValue = 'vikaskum660@gmail.com'
