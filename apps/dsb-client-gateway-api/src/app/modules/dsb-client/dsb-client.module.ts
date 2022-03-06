@@ -11,6 +11,8 @@ import { KeysModule } from '../keys/keys.module';
 import { DsbMessagesController } from './controller/dsb-messages.controller';
 import { DsbMessagePoolingService } from './service/dsb-message-pooling.service';
 import { MessageModule } from '../message/message.module';
+import { DsbTopicsController } from './controller/dsb-topics.controller';
+import { DsbFilesController } from './controller/dsb-files.controller';
 
 @Module({
   imports: [
@@ -36,6 +38,11 @@ import { MessageModule } from '../message/message.module';
     MessageModule,
   ],
   providers: [DsbApiService, TlsAgentService, DsbMessagePoolingService],
-  controllers: [DsbChannelsController, DsbMessagesController],
+  controllers: [
+    DsbChannelsController,
+    DsbMessagesController,
+    DsbTopicsController,
+    DsbFilesController,
+  ],
 })
 export class DsbClientModule {}

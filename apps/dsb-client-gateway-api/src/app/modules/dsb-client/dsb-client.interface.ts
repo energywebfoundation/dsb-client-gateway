@@ -3,6 +3,15 @@ export interface Topic {
   schema: object | string;
 }
 
+export interface TopicData {
+  id: string;
+  namespace: string;
+  owner: string;
+  schema: string;
+  schemaType: string;
+  version: string;
+}
+
 export interface Channel {
   fqcn: string;
   topics?: Topic[];

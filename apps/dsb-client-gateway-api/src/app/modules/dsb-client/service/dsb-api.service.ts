@@ -12,11 +12,13 @@ import {
   Message,
   SendMessageData,
   SendMessageResult,
+  TopicData,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { KeysService } from '../../keys/service/keys.service';
 import { v4 as uuidv4 } from 'uuid';
 import promiseRetry from 'promise-retry';
+import FormData from 'form-data';
 
 @Injectable()
 export class DsbApiService {
@@ -40,6 +42,61 @@ export class DsbApiService {
       'DSB_BASE_URL',
       'https://dsb-dev.energyweb.org'
     );
+  }
+
+  public async uploadFile(
+    file: Express.Multer.File,
+    fileName: string,
+    fqcn: string,
+    signature: string,
+    topicId: string
+  ): Promise<void> {
+    try {
+      const formData = new FormData();
+
+      formData.append('file', file.buffer);
+      formData.append('fileName', fileName);
+      formData.append('fqcn', fqcn);
+      formData.append('signature', signature);
+      formData.append('topicId', topicId);
+
+      const { data } = await promiseRetry(async (retry, attempt) => {
+        return lastValueFrom(
+          this.httpService.post(
+            'https://ddhub-dev.energyweb.org/message/upload',
+            formData,
+            {
+              maxContentLength: Infinity,
+              maxBodyLength: Infinity,
+              httpsAgent: this.getTLS(),
+              headers: {
+                Authorization: `Bearer ${this.authToken}`,
+                ...formData.getHeaders(),
+              },
+            }
+          )
+        ).catch((err) => this.handleRequestWithRetry(err, retry));
+      });
+
+      console.log(data);
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  public async getTopics(): Promise<TopicData[]> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get('https://ddhub-dev.energyweb.org/topic/list', {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.authToken}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data;
   }
 
   public async getMessages(
@@ -109,9 +166,15 @@ export class DsbApiService {
   }
 
   protected async handleRequestWithRetry(e, retry): Promise<any> {
+    console.log(e);
     const { status } = e.response;
 
-    if (status === HttpStatus.UNAUTHORIZED) {
+    this.logger.error(e);
+
+    if (
+      status === HttpStatus.UNAUTHORIZED ||
+      status === HttpStatus.INTERNAL_SERVER_ERROR
+    ) {
       this.logger.log('Unauthorized, attempting to login');
 
       await this.login();

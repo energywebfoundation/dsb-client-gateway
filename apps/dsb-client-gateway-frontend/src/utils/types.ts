@@ -88,8 +88,11 @@ export type Channel = {
 };
 
 export type Topic = {
+  id: string;
   namespace: string;
   schema: object | string;
+  schemaType: string;
+  version: string;
 };
 
 export enum RoleState {

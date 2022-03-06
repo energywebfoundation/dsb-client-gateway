@@ -116,7 +116,10 @@ export class DsbMessagePoolingService implements OnModuleInit {
       this.logger.log(`Found ${messages.length} in ${subscription.fqcn}`);
 
       if (messages && messages.length > 0) {
-        await this.messageService.sendMessages(messages, subscription.fqcn);
+        await this.messageService.sendMessagesToSubscribers(
+          messages,
+          subscription.fqcn
+        );
         // const emitMode: EventEmitMode = this.configService.get(
         //   'EVENT_EMIT_MODE',
         //   EventEmitMode.BULK

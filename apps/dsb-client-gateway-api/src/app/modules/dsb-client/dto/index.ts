@@ -6,14 +6,18 @@ import {
   IsString,
 } from 'class-validator';
 
-export class FileUploadQueryDto {
+export class FileUploadBodyDto {
   @IsString()
   @IsNotEmpty()
   public fqcn: string;
 
   @IsString()
   @IsNotEmpty()
-  public topic: string;
+  public topicId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public fileName: string;
 }
 
 export class SendMessageBodyDto {

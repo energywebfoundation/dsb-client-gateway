@@ -15,7 +15,10 @@ export class MessageService {
     protected readonly configService: ConfigService
   ) {}
 
-  public async sendMessages(messages: Message[], fqcn: string): Promise<void> {
+  public async sendMessagesToSubscribers(
+    messages: Message[],
+    fqcn: string
+  ): Promise<void> {
     const emitMode: EventEmitMode = this.configService.get(
       'EVENTS_EMIT_MODE',
       EventEmitMode.BULK

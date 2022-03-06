@@ -1,30 +1,45 @@
-import { useEffect } from 'react'
-import Head from 'next/head'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme } from '@material-ui/core'
-import swal from '@sweetalert/with-react'
-import { UploadContainer } from '../../components/UploadFile/UploadContainer'
-import Header from '../../components/Header/Header'
-import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
-import { DsbApiService } from '../../services/dsb-api.service'
-import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized } from '../../utils'
+import { useEffect } from 'react';
+import Head from 'next/head';
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next';
+import { makeStyles } from '@material-ui/styles';
+import { Container, Divider, Theme, Typography } from '@material-ui/core';
+import swal from '@sweetalert/with-react';
+import { UploadContainer } from '../../components/UploadFile/UploadContainer';
+import Header from '../../components/Header/Header';
+import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer';
+import { DsbApiService } from '../../services/dsb-api.service';
+import { isAuthorized } from '../../services/auth.service';
+import {
+  Channel,
+  ErrorBodySerialized,
+  ErrorCode,
+  Option,
+  Result,
+  serializeError,
+  Topic,
+} from '../../utils';
 
 type Props = {
-  health: Result<boolean, ErrorBodySerialized>
-  channels: Result<Channel[], ErrorBodySerialized>
-  auth: Option<string>
-}
+  health: Result<boolean, ErrorBodySerialized>;
+  channels: Result<Channel[], ErrorBodySerialized>;
+  topics: Result<Topic[], ErrorBodySerialized>;
+  auth: Option<string>;
+};
 
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-  props: Props
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<{
+  props: Props;
 }> {
-  const authHeader = context.req.headers.authorization
-  const { err } = isAuthorized(authHeader)
+  const authHeader = context.req.headers.authorization;
+  const { err } = isAuthorized(authHeader);
   if (!err) {
-    const health = await DsbApiService.init().getHealth()
-    const channels = await DsbApiService.init().getChannels()
+    const health = await DsbApiService.init().getHealth();
+    const channels = await DsbApiService.init().getChannels();
+    const topics = await DsbApiService.init().getTopics();
 
     console.log(health, channels);
 
@@ -32,37 +47,52 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
       props: {
         health: serializeError(health),
         channels: serializeError(channels),
-        auth: authHeader ? { some: authHeader } : { none: true }
-      }
-    }
+        topics: serializeError(topics),
+        auth: authHeader ? { some: authHeader } : { none: true },
+      },
+    };
   } else {
     if (err.message === ErrorCode.UNAUTHORIZED) {
-      context.res.statusCode = 401
-      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
+      context.res.statusCode = 401;
+      context.res.setHeader(
+        'WWW-Authenticate',
+        'Basic realm="Authorization Required"'
+      );
     } else {
-      context.res.statusCode = 403
+      context.res.statusCode = 403;
     }
     return {
       props: {
         health: {},
         channels: {},
-        auth: { none: true }
-      }
-    }
+        topics: {},
+        auth: { none: true },
+      },
+    };
   }
 }
 
-export default function FileUpload({ health, channels, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
+export default function FileUpload({
+  health,
+  channels,
+  auth,
+  topics,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const classes = useStyles();
 
   useEffect(() => {
     if (health.err) {
-      return swal('Error', health.err.reason, 'error')
+      return swal('Error', health.err.reason, 'error');
     }
     if (channels.err) {
-      return swal('Error', channels.err.reason, 'error')
+      return swal('Error', channels.err.reason, 'error');
     }
-  }, [health, channels])
+
+    if (topics.err) {
+      console.log('channels.err', channels.err);
+      return swal('Error', topics.err.reason, 'error');
+    }
+  }, [health, channels, topics]);
 
   return (
     <div>
@@ -78,7 +108,10 @@ export default function FileUpload({ health, channels, auth }: InferGetServerSid
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
-            <Typography variant="caption" className={classes.connectionStatusPaper}>
+            <Typography
+              variant="caption"
+              className={classes.connectionStatusPaper}
+            >
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography>
           </section>
@@ -89,7 +122,11 @@ export default function FileUpload({ health, channels, auth }: InferGetServerSid
             <Typography className={classes.textWhite} variant="h4">
               File Upload{' '}
             </Typography>
-            <UploadContainer auth={auth.some} channels={channels.ok} />
+            <UploadContainer
+              auth={auth.some}
+              channels={channels.ok}
+              topics={topics.ok}
+            />
           </section>
 
           <Divider className={classes.divider} />
@@ -103,7 +140,7 @@ export default function FileUpload({ health, channels, auth }: InferGetServerSid
         </Container>
       </main>
     </div>
-  )
+  );
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -113,8 +150,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: '0 2rem',
 
     '& *': {
-      color: '#fff'
-    }
+      color: '#fff',
+    },
   },
   connectionStatusPaper: {
     padding: '.5rem 1rem',
@@ -122,16 +159,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     background: theme.palette.secondary.main,
     borderRadius: '1rem',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   divider: {
     background: '#fff',
-    margin: '3rem 0'
+    margin: '3rem 0',
   },
   main: {
-    padding: '0 2rem'
+    padding: '0 2rem',
   },
   textWhite: {
-    color: '#fff'
-  }
-}))
+    color: '#fff',
+  },
+}));

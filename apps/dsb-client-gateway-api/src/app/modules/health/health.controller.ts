@@ -7,9 +7,9 @@ import { DigestGuard } from '../utils/guards/digest.guard';
 export class HealthController {
   @Get()
   @HealthCheck()
-  public check(): { status: 'healthy ' } {
+  public check(): { status: 'healthy' } {
     return {
-      status: 'healthy ',
+      status: 'healthy',
     };
   }
 }

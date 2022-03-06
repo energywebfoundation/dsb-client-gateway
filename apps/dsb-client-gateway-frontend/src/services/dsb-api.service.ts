@@ -14,6 +14,7 @@ import {
   Result,
   SendMessageData,
   SendMessageResult,
+  Topic,
 } from '../utils';
 import { getEnrolment } from './storage.service';
 import { captureMessage } from '@sentry/nextjs';
@@ -210,6 +211,34 @@ export class DsbApiService {
       }
     } catch (err) {
       return this.handleError(err, async () => this.getMessages(options));
+    }
+  }
+
+  public async getTopics(): Promise<Result<Topic[]>> {
+    try {
+      const res = await this.api.get('/api/v1/dsb/topics', {
+        httpsAgent: this.httpsAgent,
+        headers: {
+          Authorization: `Bearer ${this.authToken}`,
+        },
+      });
+
+      console.log(res.data);
+
+      switch (res.status) {
+        case 200:
+          return { ok: res.data };
+        case 401:
+          throw Error(ErrorCode.DSB_UNAUTHORIZED);
+        case 403:
+          throw new DSBForbiddenError(
+            `Must be enroled as a DSB user to access messages`
+          );
+        default:
+          throw new DSBRequestError(`${res.status} ${res.statusText}`);
+      }
+    } catch (err) {
+      return this.handleError(err, async () => this.getTopics());
     }
   }
 
