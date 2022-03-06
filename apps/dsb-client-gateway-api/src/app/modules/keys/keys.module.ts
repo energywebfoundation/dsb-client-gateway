@@ -7,7 +7,8 @@ import { KeysController } from './keys.controller';
 @Module({
   imports: [StorageModule, SecretsEngineModule],
   providers: [KeysService],
-  controllers: [KeysController]
+  controllers: [KeysController],
+  exports: [KeysService]
 })
 export class KeysModule {
 

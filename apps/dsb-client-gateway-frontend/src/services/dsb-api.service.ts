@@ -1,34 +1,30 @@
-import { config } from '../config'
+import { config } from '../config';
 import {
+  Channel,
+  DSBChannelNotFoundError,
+  DSBChannelUnauthorizedError,
+  DSBForbiddenError,
+  DSBPayloadError,
+  DSBRequestError,
   ErrorCode,
+  EventEmitMode,
+  GatewayError,
   GetMessageOptions,
   Message,
   Result,
   SendMessageData,
   SendMessageResult,
-  EventEmitMode,
-  Channel,
-  GatewayError,
-  DSBRequestError,
-  DSBHealthError,
-  DSBPayloadError,
-  DSBLoginError,
-  DSBForbiddenError,
-  DSBChannelNotFoundError,
-  DSBChannelUnauthorizedError,
-  isGatewayError,
-} from '../utils'
-import { signProof } from './identity.service'
-import { getCertificate, getEnrolment } from './storage.service'
-import { captureMessage } from '@sentry/nextjs'
-import { Agent } from 'https'
-import axios, { AxiosInstance } from 'axios'
+} from '../utils';
+import { getEnrolment } from './storage.service';
+import { captureMessage } from '@sentry/nextjs';
+import { Agent } from 'https';
+import axios, { AxiosInstance } from 'axios';
 
 export class DsbApiService {
-  private static instance?: DsbApiService
-  private api: AxiosInstance
-  private authToken?: string
-  private httpsAgent?: Agent
+  private static instance?: DsbApiService;
+  private api: AxiosInstance;
+  private authToken?: string;
+  private httpsAgent?: Agent;
 
   /**
    * Initialize the DsbAPIService
@@ -37,24 +33,24 @@ export class DsbApiService {
    */
   public static init(): DsbApiService {
     if (!DsbApiService.instance) {
-      console.log('Connecting to', config.dsb.backendUrl)
-      DsbApiService.instance = new DsbApiService()
+      console.log('Connecting to', config.dsb.backendUrl);
+      DsbApiService.instance = new DsbApiService();
     }
-    return DsbApiService.instance
+    return DsbApiService.instance;
   }
 
   constructor() {
     this.api = axios.create({
       baseURL: config.dsb.backendUrl,
-      validateStatus: () => true // no throw
-    })
+      validateStatus: () => true, // no throw
+    });
   }
 
   /**
    * In case TLS request does not work, reset
    */
   public removeTLS() {
-    this.httpsAgent = undefined
+    this.httpsAgent = undefined;
   }
 
   /**
@@ -70,15 +66,19 @@ export class DsbApiService {
       console.log(res.status);
 
       if (res.status === 200) {
-        return { ok: true }
+        return { ok: true };
       }
       return {
-        err: new DSBForbiddenError(`Cannot access message broker: ${res.status} ${res.statusText} - ${res.data}`)
-      }
+        err: new DSBForbiddenError(
+          `Cannot access message broker: ${res.status} ${res.statusText} - ${res.data}`
+        ),
+      };
     } catch (err) {
       return {
-        err: new DSBRequestError(err instanceof Error ? err.message : (err as any))
-      }
+        err: new DSBRequestError(
+          err instanceof Error ? err.message : (err as any)
+        ),
+      };
     }
   }
 
@@ -87,11 +87,13 @@ export class DsbApiService {
    *
    * @returns
    */
-  public async sendMessage(data: SendMessageData): Promise<Result<SendMessageResult>> {
+  public async sendMessage(
+    data: SendMessageData
+  ): Promise<Result<SendMessageResult>> {
     // await this.useTLS()
     try {
       if (!this.authToken) {
-        throw Error(ErrorCode.DSB_UNAUTHORIZED)
+        throw Error(ErrorCode.DSB_UNAUTHORIZED);
       }
       const res = await this.api.request({
         url: '/message',
@@ -99,102 +101,115 @@ export class DsbApiService {
         httpsAgent: this.httpsAgent,
         headers: {
           Authorization: `Bearer ${this.authToken}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        data: JSON.stringify(this.translateIdempotencyKey(data, true))
-      })
+        data: JSON.stringify(this.translateIdempotencyKey(data, true)),
+      });
       switch (res.status) {
         case 201:
-          if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
+          if (
+            process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' &&
+            process.env.SENTRY_LOG_MESSAGE === 'true'
+          ) {
             const messagePayload = {
               fcqn: data.fqcn,
               topic: data.topic,
               transactionId: data.transactionId,
               id: res.data,
-            }
-            captureMessage(JSON.stringify(messagePayload))
+            };
+            captureMessage(JSON.stringify(messagePayload));
           }
-          return { ok: { id: res.data } }
+          return { ok: { id: res.data } };
         case 400:
-          const { message: payloadErrorMessage } = await res.data
-          throw new DSBPayloadError(payloadErrorMessage)
+          const { message: payloadErrorMessage } = await res.data;
+          throw new DSBPayloadError(payloadErrorMessage);
         case 401:
-          const unauthorizedMessage = res.data.message
+          const unauthorizedMessage = res.data.message;
           // login error
           if (unauthorizedMessage === 'Unauthorized') {
-            throw Error(ErrorCode.DSB_UNAUTHORIZED)
+            throw Error(ErrorCode.DSB_UNAUTHORIZED);
           }
           // channel not authorized
           else {
-            throw new DSBChannelUnauthorizedError(unauthorizedMessage)
+            throw new DSBChannelUnauthorizedError(unauthorizedMessage);
           }
         case 403:
-          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+          throw new DSBForbiddenError(
+            `Must be enroled as a DSB user to access messages`
+          );
         case 404:
-          throw new DSBChannelNotFoundError(res.data.message)
+          throw new DSBChannelNotFoundError(res.data.message);
         default:
-          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+          throw new DSBRequestError(`${res.status} ${res.statusText}`);
       }
     } catch (err) {
-      return this.handleError(err, async () => this.sendMessage(data))
+      return this.handleError(err, async () => this.sendMessage(data));
     }
   }
 
-  public async getMessages(options: GetMessageOptions): Promise<Result<Message[]>> {
+  public async getMessages(
+    options: GetMessageOptions
+  ): Promise<Result<Message[]>> {
     // await this.useTLS()
     try {
       if (!this.authToken) {
-        throw Error(ErrorCode.DSB_UNAUTHORIZED)
+        throw Error(ErrorCode.DSB_UNAUTHORIZED);
       }
       const res = await this.api.get('/message', {
         params: options,
         httpsAgent: this.httpsAgent,
         headers: {
-          Authorization: `Bearer ${this.authToken}`
-        }
-      })
+          Authorization: `Bearer ${this.authToken}`,
+        },
+      });
       switch (res.status) {
         case 200:
-          const response = (res.data).map((msg: any) => this.translateIdempotencyKey(msg, false))
+          const response = res.data.map((msg: any) =>
+            this.translateIdempotencyKey(msg, false)
+          );
 
-          if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
-
-            let responseForSentry = JSON.parse(JSON.stringify(response)) // to deep clone array of objects
+          if (
+            process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' &&
+            process.env.SENTRY_LOG_MESSAGE === 'true'
+          ) {
+            let responseForSentry = JSON.parse(JSON.stringify(response)); // to deep clone array of objects
 
             responseForSentry = responseForSentry.map((res) => {
-              delete res.payload
-              delete res.signature
-              return res
-            })
+              delete res.payload;
+              delete res.signature;
+              return res;
+            });
 
             const messageResponsePayload = {
               query: options,
-              messages: responseForSentry
-            }
-            captureMessage(JSON.stringify(messageResponsePayload))
+              messages: responseForSentry,
+            };
+            captureMessage(JSON.stringify(messageResponsePayload));
           }
           return {
-            ok: response
-          }
+            ok: response,
+          };
         case 401:
           // not logged in
-          const unauthorizedMessage = res.data.message
+          const unauthorizedMessage = res.data.message;
           if (unauthorizedMessage === 'Unauthorized') {
-            throw Error(ErrorCode.DSB_UNAUTHORIZED)
+            throw Error(ErrorCode.DSB_UNAUTHORIZED);
           }
           // cannot access channel
           else {
-            throw new DSBChannelUnauthorizedError(unauthorizedMessage)
+            throw new DSBChannelUnauthorizedError(unauthorizedMessage);
           }
         case 403:
-          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+          throw new DSBForbiddenError(
+            `Must be enroled as a DSB user to access messages`
+          );
         case 404:
-          throw new DSBChannelNotFoundError(res.data.message)
+          throw new DSBChannelNotFoundError(res.data.message);
         default:
-          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+          throw new DSBRequestError(`${res.status} ${res.statusText}`);
       }
     } catch (err) {
-      return this.handleError(err, async () => this.getMessages(options))
+      return this.handleError(err, async () => this.getMessages(options));
     }
   }
 
@@ -206,28 +221,29 @@ export class DsbApiService {
   public async getChannels(): Promise<Result<Channel[]>> {
     // await this.useTLS()
     try {
-      if (!this.authToken) {
-        throw Error(ErrorCode.DSB_UNAUTHORIZED)
-      }
-
       const res = await this.api.get('/api/v1/dsb/channels', {
         httpsAgent: this.httpsAgent,
         headers: {
-          Authorization: `Bearer ${this.authToken}`
-        }
-      })
+          Authorization: `Bearer ${this.authToken}`,
+        },
+      });
+
+      console.log(res.data);
+
       switch (res.status) {
         case 200:
-          return { ok: res.data }
+          return { ok: res.data };
         case 401:
-          throw Error(ErrorCode.DSB_UNAUTHORIZED)
+          throw Error(ErrorCode.DSB_UNAUTHORIZED);
         case 403:
-          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+          throw new DSBForbiddenError(
+            `Must be enroled as a DSB user to access messages`
+          );
         default:
-          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+          throw new DSBRequestError(`${res.status} ${res.statusText}`);
       }
     } catch (err) {
-      return this.handleError(err, async () => this.getChannels())
+      return this.handleError(err, async () => this.getChannels());
     }
   }
 
@@ -241,66 +257,76 @@ export class DsbApiService {
    * @param fqcn
    * @param callback
    */
-  public async pollForNewMessages(callback: (message: Message | Message[]) => void): Promise<void> {
-    let interval = 60
+  public async pollForNewMessages(
+    callback: (message: Message | Message[]) => void
+  ): Promise<void> {
+    let interval = 60;
 
     const job = async () => {
       // console.log(`Attempt to start listening for messages [${interval}s]`)
-      const { some: enrolment } = await getEnrolment()
+      const { some: enrolment } = await getEnrolment();
       if (!enrolment?.state.approved) {
-        console.log('User not enroled. Waiting for enrolment... (60s)')
-        interval = 60
-        return
+        console.log('User not enroled. Waiting for enrolment... (60s)');
+        interval = 60;
+        return;
       }
-      const { ok: channels, err: fetchErr } = await this.getChannels()
+      const { ok: channels, err: fetchErr } = await this.getChannels();
       if (!channels) {
-        console.log('Error fetching available channels:', fetchErr?.message ? fetchErr.message : fetchErr)
-        interval = 60
-        return { err: fetchErr }
+        console.log(
+          'Error fetching available channels:',
+          fetchErr?.message ? fetchErr.message : fetchErr
+        );
+        interval = 60;
+        return { err: fetchErr };
       }
       const subscriptions = channels.filter(
         // take by default, but if subscribers present check the list
-        ({ subscribers }) => (subscribers ? subscribers?.includes(enrolment.did) : true)
-      )
+        ({ subscribers }) =>
+          subscribers ? subscribers?.includes(enrolment.did) : true
+      );
       if (subscriptions.length === 0) {
-        console.log('No subscriptions found. Push messages are enabled when the DID is added to a channel... (60s)')
-        interval = 60
-        return { err: new Error(ErrorCode.DSB_NO_SUBSCRIPTIONS) }
+        console.log(
+          'No subscriptions found. Push messages are enabled when the DID is added to a channel... (60s)'
+        );
+        interval = 60;
+        return { err: new Error(ErrorCode.DSB_NO_SUBSCRIPTIONS) };
       }
 
-      interval = 1
+      interval = 1;
 
       for (const sub of subscriptions) {
         const { ok: messages, err } = await this.getMessages({
           fqcn: sub.fqcn,
           amount: config.events.maxPerSecond,
-          clientId: 'wsconsumer'
-        })
+          clientId: 'wsconsumer',
+        });
         if (err) {
-          console.log('Error fetching messages:', err.message)
-          interval = 60
-          break
+          console.log('Error fetching messages:', err.message);
+          interval = 60;
+          break;
         }
         if (messages && messages?.length > 0) {
-          console.log(`Received new messages - count: ${messages.length}`)
+          console.log(`Received new messages - count: ${messages.length}`);
           if (config.events.emitMode === EventEmitMode.BULK) {
-            return callback(messages.map((msg) => ({ ...msg, fqcn: sub.fqcn })))
+            return callback(
+              messages.map((msg) => ({ ...msg, fqcn: sub.fqcn }))
+            );
           }
           for (const message of messages) {
             callback({
               ...message,
-              fqcn: sub.fqcn
-            })
+              fqcn: sub.fqcn,
+            });
           }
         }
       }
-    }
+    };
     // use setTimeout instead of setInterval so we can control the interval
     const runner = async () => {
-      await job()
-      setTimeout(runner, interval * 1000)
-    }
-    runner()
+      await job();
+      setTimeout(runner, interval * 1000);
+    };
+    runner();
   }
 
   /**
@@ -355,7 +381,7 @@ export class DsbApiService {
     //     err: new DSBRequestError(err.message)
     //   }
     // } else {
-      return { err: new GatewayError(err as any) }
+    return { err: new GatewayError(err as any) };
     // }
   }
 
@@ -367,38 +393,24 @@ export class DsbApiService {
    * @param outgoing if message is outgoing (send to message broker)
    * @returns
    */
-  private translateIdempotencyKey(body: { transactionId?: string; correlationId?: string }, outgoing: boolean): any {
+  private translateIdempotencyKey(
+    body: { transactionId?: string; correlationId?: string },
+    outgoing: boolean
+  ): any {
     if (outgoing) {
-      const correlationId = body.transactionId
-      delete body.transactionId
+      const correlationId = body.transactionId;
+      delete body.transactionId;
       return {
         ...body,
-        correlationId
-      }
+        correlationId,
+      };
     } else {
-      const transactionId = body.correlationId
-      delete body.correlationId
+      const transactionId = body.correlationId;
+      delete body.correlationId;
       return {
         ...body,
-        transactionId
-      }
-    }
-  }
-
-  /**
-   * Loads client certificates
-   */
-  private async useTLS(): Promise<void> {
-    if (this.httpsAgent) {
-      return
-    }
-    const { some: tls } = await getCertificate()
-    if (tls) {
-      this.httpsAgent = new Agent({
-        cert: tls.cert.value,
-        key: tls.key?.value,
-        ca: tls.ca?.value
-      })
+        transactionId,
+      };
     }
   }
 }

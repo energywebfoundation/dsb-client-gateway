@@ -1,167 +1,161 @@
-import { GatewayError } from './errors'
+import { GatewayError } from './errors';
 
 export type Result<T = boolean, E = GatewayError> = {
-  ok?: T
-  err?: E
-}
+  ok?: T;
+  err?: E;
+};
 
 export type Option<T> = {
-  some?: T
-  none?: boolean
-}
+  some?: T;
+  none?: boolean;
+};
 
 export type Identity = {
-  address: string
-  publicKey: string
-  privateKey: string
-  balance: BalanceState
-}
+  address: string;
+  publicKey: string;
+  privateKey: string;
+  balance: BalanceState;
+};
 
 export type Enrolment = {
-  did: string
-  state: EnrolmentState
-}
+  did: string;
+  state: EnrolmentState;
+};
 
 export type File = {
-  name: string
-  value: string
-}
+  name: string;
+  value: string;
+};
 
 export type CertificateFiles = {
-  cert: File
-  key?: File
-  ca?: File
-}
+  cert: File;
+  key?: File;
+  ca?: File;
+};
 
 export type Encryption = {
-  publicKey: string
-  privateRSAKey: string
-}
+  publicKey: string;
+  privateRSAKey: string;
+};
 
 export type Storage = {
-  identity?: Identity
-  enrolment?: Enrolment
-  certificate?: CertificateFiles
-}
+  identity?: Identity;
+  enrolment?: Enrolment;
+  certificate?: CertificateFiles;
+};
 
 export type SendMessageData = {
-  fqcn: string
-  topic: string
-  payload: string
-  transactionId?: string
-  signature: string
-}
+  fqcn: string;
+  topic: string;
+  payload: string;
+  transactionId?: string;
+  signature: string;
+};
 
 export type SendMessageResult = {
-  id: string
-}
+  id: string;
+};
 
 export type GetMessageOptions = {
-  fqcn: string
-  amount?: number
-  clientId?: string
-}
+  fqcn: string;
+  amount?: number;
+  clientId?: string;
+};
 
 export type Message = {
-  id: string
-  fqcn?: string
-  topic: string
-  payload: string
-  sender: string
-  signature: string
-  timestampNanos: number
-  transactionId?: string
-}
+  id: string;
+  fqcn?: string;
+  topic: string;
+  payload: string;
+  sender: string;
+  signature: string;
+  timestampNanos: number;
+  transactionId?: string;
+};
 
 export type Channel = {
-  fqcn: string
-  topics?: Topic[]
-  admins?: string[]
-  publishers?: string[]
-  subscribers?: string[]
-  maxMsgAge?: number
-  maxMsgSize?: number
-  createdBy: string
-  createdDateTime: string
-  modifiedBy?: string
-  modifiedDateTime?: string
-}
+  fqcn: string;
+  topics?: Topic[];
+  admins?: string[];
+  publishers?: string[];
+  subscribers?: string[];
+  maxMsgAge?: number;
+  maxMsgSize?: number;
+  createdBy: string;
+  createdDateTime: string;
+  modifiedBy?: string;
+  modifiedDateTime?: string;
+};
 
 export type Topic = {
-  namespace: string
-  schema: object | string
-}
+  namespace: string;
+  schema: object | string;
+};
 
 export enum RoleState {
   NO_CLAIM = 'NO_CLAIM',
   AWAITING_APPROVAL = 'AWAITING_APPROVAL',
   APPROVED = 'APPROVED',
-  NOT_WANTED = 'NOT_WANTED' // if gateway is not controlling message broker
+  NOT_WANTED = 'NOT_WANTED', // if gateway is not controlling message broker
 }
 
 export enum BalanceState {
   NONE = 'NONE',
   LOW = 'LOW',
-  OK = 'OK'
+  OK = 'OK',
 }
 
 export type EnrolmentState = {
-  approved: boolean
-  waiting: boolean
+  approved: boolean;
+  waiting: boolean;
   roles: {
-    user: RoleState
+    user: RoleState;
     // messagebroker: RoleState
-  }
-}
+  };
+};
 
 export enum StringType {
   STANDARD,
   HEX,
   HEX_COMPRESSED,
-  DID
-}
-
-export enum WebSocketImplementation {
-  NONE = 'NONE',
-  SERVER = 'SERVER',
-  CLIENT = 'CLIENT'
+  DID,
 }
 
 export type WebSocketClientOptions = {
-  url: string
-  protocol?: string
-  reconnect?: boolean
-  reconnectTimeout?: number
-  reconnectMaxRetries?: number
-}
+  url: string;
+  protocol?: string;
+  reconnect?: boolean;
+  reconnectTimeout?: number;
+  reconnectMaxRetries?: number;
+};
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
-  BULK = 'BULK'
+  BULK = 'BULK',
 }
 
 export type EnrolmentManager = {
   /**
    * Decentralized Identifer (DID) belonging to gateway identity
    */
-  did: string
+  did: string;
   /**
    * Get enrolment status of the configured DID
    *
    * @returns individual state of messagebroker and user roles
    */
-  getState: () => Promise<Result<EnrolmentState>>
+  getState: () => Promise<Result<EnrolmentState>>;
   /**
    * Creates enrolment claims (messagebroker and user) for gateway identity
    *
    * @param state current state, retreived from getEnrolmentState
    * @returns ok (boolean) or error code
    */
-  handle: (state: EnrolmentState) => Promise<Result>
+  handle: (state: EnrolmentState) => Promise<Result>;
   /**
    * Persists gateway identity to json file
    *
    * @returns ok (boolean) or error code
    */
-  save: (state: EnrolmentState) => Promise<Result>
-}
+  save: (state: EnrolmentState) => Promise<Result>;
+};

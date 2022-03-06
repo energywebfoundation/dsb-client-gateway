@@ -63,8 +63,6 @@ export class IamService {
   }
 
   public getClaimById(id: string): Promise<Claim> {
-    this.cacheClient.getApplicationsByOwner()
-
     return this.claimsService.getClaimById(id);
   }
 

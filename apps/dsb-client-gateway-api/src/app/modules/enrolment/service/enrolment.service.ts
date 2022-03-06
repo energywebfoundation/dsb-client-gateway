@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { EthersService } from '../../utils/ethers.service';
+import { EthersService } from '../../utils/service/ethers.service';
 import { BalanceState } from '../../utils/balance.const';
 import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-balance.exception';
 import { IamService } from '../../iam-service/service/iam.service';
@@ -20,11 +20,14 @@ export class EnrolmentService implements OnModuleInit {
     protected readonly iamService: IamService,
     protected readonly natsListenerService: NatsListenerService,
     protected readonly storageService: StorageService,
-    protected readonly configService: ConfigService,
+    protected readonly configService: ConfigService
   ) {}
 
   public async onModuleInit(): Promise<void> {
-    this.parentNamespace = this.configService.get<string>('PARENT_NAMESPACE', 'dsb.apps.energyweb.iam.ewc');
+    this.parentNamespace = this.configService.get<string>(
+      'PARENT_NAMESPACE',
+      'dsb.apps.energyweb.iam.ewc'
+    );
     this.userRole = `user.roles.${this.parentNamespace}`;
 
     const did = this.iamService.getDIDAddress();
@@ -47,28 +50,26 @@ export class EnrolmentService implements OnModuleInit {
       state,
     });
 
-    if(state.waiting) {
+    if (state.waiting) {
       this.logger.log('Initializing enrolment on bootstrap');
 
-      await this.initEnrolment()
-        .catch((e) => {
-          this.logger.error('Error during enrolment', e);
-        })
+      await this.initEnrolment().catch((e) => {
+        this.logger.error('Error during enrolment', e);
+      });
     }
   }
 
   public async getEnrolment(): Promise<Enrolment> {
     const enrolment = await this.storageService.getEnrolment();
 
-    if(!enrolment) {
+    if (!enrolment) {
       await this.initEnrolment();
     }
 
     return this.storageService.getEnrolment();
   }
 
-  public async initEnrolment(
-  ): Promise<any> {
+  public async initEnrolment(): Promise<any> {
     const { address } = await this.storageService.getIdentity();
     const did = this.iamService.getDIDAddress();
 
@@ -96,7 +97,7 @@ export class EnrolmentService implements OnModuleInit {
       return {
         did,
         state,
-      }
+      };
     }
 
     await this.natsListenerService.createClaim();
@@ -111,6 +112,6 @@ export class EnrolmentService implements OnModuleInit {
     return {
       did,
       state,
-    }
+    };
   }
 }

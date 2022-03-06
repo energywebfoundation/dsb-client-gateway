@@ -1,13 +1,12 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { EnrolmentService } from './service/enrolment.service';
 import { Enrolment } from '../storage/storage.interface';
+import { DigestGuard } from '../utils/guards/digest.guard';
 
 @Controller('enrol')
+@UseGuards(DigestGuard)
 export class EnrolmentController {
-  constructor(
-    protected readonly enrolmentService: EnrolmentService,
-  ) {
-  }
+  constructor(protected readonly enrolmentService: EnrolmentService) {}
 
   @Get('')
   public async get(): Promise<Enrolment> {

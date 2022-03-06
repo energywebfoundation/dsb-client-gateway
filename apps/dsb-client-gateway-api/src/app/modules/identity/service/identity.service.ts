@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { EthersService } from '../../utils/ethers.service';
+import { Injectable } from '@nestjs/common';
+import { EthersService } from '../../utils/service/ethers.service';
 import { StorageService } from '../../storage/service/storage.service';
 import { Identity } from '../../storage/storage.interface';
-import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
@@ -12,9 +11,8 @@ export class IdentityService {
     protected readonly ethersService: EthersService,
     protected readonly storageService: StorageService,
     protected readonly secretsEngineService: SecretsEngineService,
-    protected readonly iamService: IamService,
-  ) {
-  }
+    protected readonly iamService: IamService
+  ) {}
 
   public async getIdentity(): Promise<Identity> {
     const identity = this.storageService.getIdentity();
@@ -22,14 +20,12 @@ export class IdentityService {
     const balanceState = await this.ethersService.getBalance(identity.address);
 
     return {
-      ... identity,
+      ...identity,
       balance: balanceState,
-    }
+    };
   }
 
-  public async createIdentity(
-    privateKey?: string,
-  ): Promise<void> {
+  public async createIdentity(privateKey?: string): Promise<void> {
     privateKey = privateKey || this.ethersService.createPrivateKey();
 
     const wallet = this.ethersService.getWalletFromPrivateKey(privateKey);

@@ -1,14 +1,22 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
-import { EthersService } from '../../utils/ethers.service';
+import { EthersService } from '../../utils/service/ethers.service';
 import { StorageService } from '../../storage/service/storage.service';
 import { IamService } from '../../iam-service/service/iam.service';
 import { lastValueFrom } from 'rxjs';
-import { Channel } from '../dsb-client.interface';
+import {
+  Channel,
+  Message,
+  SendMessageData,
+  SendMessageResult,
+} from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
+import { KeysService } from '../../keys/service/keys.service';
+import { v4 as uuidv4 } from 'uuid';
+import promiseRetry from 'promise-retry';
 
 @Injectable()
 export class DsbApiService {
@@ -25,50 +33,116 @@ export class DsbApiService {
     protected readonly ethersService: EthersService,
     protected readonly storageService: StorageService,
     protected readonly iamService: IamService,
-    protected readonly secretsEngineService: SecretsEngineService
+    protected readonly secretsEngineService: SecretsEngineService,
+    protected readonly keysService: KeysService
   ) {
-    this.baseUrl = this.configService.get<string>('DSB_BASE_URL', 'https://dsb-dev.energyweb.org');
+    this.baseUrl = this.configService.get<string>(
+      'DSB_BASE_URL',
+      'https://dsb-dev.energyweb.org'
+    );
+  }
+
+  public async getMessages(
+    fqcn: string,
+    from?: string,
+    clientId?: string,
+    amount?: number
+  ): Promise<Message[]> {
+    try {
+      const { data } = await promiseRetry(async (retry, attempt) => {
+        return lastValueFrom(
+          this.httpService.get(this.baseUrl + '/message', {
+            httpsAgent: this.getTLS(),
+            params: {
+              fqcn,
+              from,
+              clientId,
+              amount,
+            },
+            headers: {
+              Authorization: `Bearer ${this.authToken}`,
+            },
+          })
+        ).catch((err) => this.handleRequestWithRetry(err, retry));
+      });
+
+      return data;
+    } catch (e) {
+      this.logger.error(e);
+
+      return [];
+    }
+  }
+
+  public async sendMessage(
+    fqcn: string,
+    topic: string,
+    payload: object
+  ): Promise<SendMessageResult> {
+    const signature = 'asd';
+    const transactionId: string = uuidv4();
+
+    const messageData: SendMessageData = {
+      topic,
+      fqcn,
+      payload: JSON.stringify(payload),
+      transactionId,
+      signature,
+    };
+
+    const requestData = this.translateIdempotencyKey(messageData, true);
+
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.post(this.baseUrl + '/message', requestData, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.authToken}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return {
+      id: data,
+    };
+  }
+
+  protected async handleRequestWithRetry(e, retry): Promise<any> {
+    const { status } = e.response;
+
+    if (status === HttpStatus.UNAUTHORIZED) {
+      this.logger.log('Unauthorized, attempting to login');
+
+      await this.login();
+
+      return retry();
+    }
+
+    if (status === HttpStatus.FORBIDDEN) {
+      this.logger.error(`Request forbidden`);
+
+      throw new Error();
+    }
+
+    return retry();
   }
 
   public async getChannels(): Promise<Channel[]> {
     await this.enableTLS();
 
-    if (!this.authToken) {
-      await this.login();
-    }
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get(this.baseUrl + '/channel/pubsub', {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.authToken}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
 
-    const res = await lastValueFrom(this.httpService.get(this.baseUrl + '/channel/pubsub', {
-      httpsAgent: this.getTLS(),
-      headers: {
-        Authorization: `Bearer ${this.authToken}`
-      }
-    }))
-      .then(({ data }) => data)
-      .catch((err) => {
-        return this.retry(err, this.getChannels);
-      });
-
-    return res;
-  }
-
-  private async retry<T>(
-    err: any,
-    retryFn: () => Promise<T>
-  ): Promise<T> {
-    this.logger.error(err.message);
-    this.logger.error(err.response.data);
-
-    if (err.response.status === 401) {
-      await this.login();
-    }
-
-    if (err.response.status === 403) {
-      throw err;
-    }
-
-    const bounded = retryFn.bind(this);
-
-    return bounded();
+    return data;
   }
 
   public async login(): Promise<void> {
@@ -82,11 +156,17 @@ export class DsbApiService {
       this.iamService.getDIDAddress()
     );
 
-    const res = await lastValueFrom(this.httpService.post(this.baseUrl + '/auth/login', {
-      identityToken: proof
-    }, {
-      httpsAgent: this.getTLS()
-    })).catch((e) => {
+    const res = await lastValueFrom(
+      this.httpService.post(
+        this.baseUrl + '/auth/login',
+        {
+          identityToken: proof,
+        },
+        {
+          httpsAgent: this.getTLS(),
+        }
+      )
+    ).catch((e) => {
       this.logger.error('Login failed');
 
       this.logger.error(e.message);
@@ -100,12 +180,12 @@ export class DsbApiService {
     this.authToken = res.data.token;
   }
 
-  public async health(): Promise<{ statusCode: number, message?: string }> {
+  public async health(): Promise<{ statusCode: number; message?: string }> {
     await this.enableTLS();
 
     try {
       await this.httpService.get('/health', {
-        httpsAgent: this.getTLS()
+        httpsAgent: this.getTLS(),
       });
 
       return { statusCode: 200 };
@@ -116,7 +196,28 @@ export class DsbApiService {
 
       return {
         statusCode: e.response.status,
-        message: e.response.data
+        message: e.response.data,
+      };
+    }
+  }
+
+  protected translateIdempotencyKey(
+    body: { transactionId?: string; correlationId?: string },
+    outgoing: boolean
+  ): any {
+    if (outgoing) {
+      const correlationId = body.transactionId;
+      delete body.transactionId;
+      return {
+        ...body,
+        correlationId,
+      };
+    } else {
+      const transactionId = body.correlationId;
+      delete body.correlationId;
+      return {
+        ...body,
+        transactionId,
       };
     }
   }

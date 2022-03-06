@@ -9,9 +9,11 @@ import { DsbClientModule } from './modules/dsb-client/dsb-client.module';
 import { KeysModule } from './modules/keys/keys.module';
 import { SecretsEngineModule } from './modules/secrets-engine/secrets-engine.module';
 import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './modules/utils/all-exceptions.filter';
+import { AllExceptionsFilter } from './modules/utils/filter/all-exceptions.filter';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './modules/health/health.controller';
+import { ScheduleModule } from '@nestjs/schedule';
+import { UtilsModule } from './modules/utils/utils.module';
 
 @Module({
   imports: [
@@ -29,11 +31,15 @@ import { HealthController } from './modules/health/health.controller';
     KeysModule,
     SecretsEngineModule,
     TerminusModule,
+    ScheduleModule.forRoot(),
+    UtilsModule,
   ],
-  providers: [{
-    provide: APP_FILTER,
-    useClass: AllExceptionsFilter
-  }],
-  controllers: [HealthController]
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
+  controllers: [HealthController],
 })
 export class AppModule {}

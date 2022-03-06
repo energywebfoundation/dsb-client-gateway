@@ -1,8 +1,7 @@
-
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -22,14 +21,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    console.error(exception);
-    console.error(exception.resopnse.body.warnings);
-
     const responseBody = {
       err: {
         reason: exception.message,
         statusCode: httpStatus,
-
       },
       statusCode: httpStatus,
       timestamp: new Date().toISOString(),
@@ -38,4 +33,3 @@ export class AllExceptionsFilter implements ExceptionFilter {
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }
-
