@@ -204,7 +204,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         justifyContent: 'flex-end'
     },
     divider: {
-        background: '#fff',
+        background: '#1E263C',
         margin: '3rem 0'
     },
     main: {
