@@ -53,7 +53,7 @@ export const GatewayIdentity = ({
     <div className={classes.credentials}>
       <div className={classes.formGroup}>
         <div className={classes.credentialsHeader}>
-          <Typography variant="h6">GATEWAY IDENTITY</Typography>
+          <Typography variant="h6">Gateway Identity</Typography>
           <Tooltip
             title="Configure and enrol the gateway as a DSB user using Energy Web Switchboard. You need
                         to do this before the gateway can publish/subscribe to messages."
@@ -78,15 +78,15 @@ export const GatewayIdentity = ({
         )}
 
         <div className={classes.formGroup}>
-          <Typography variant="caption">PRIVATE KEY</Typography>
+          <Typography variant="caption">Private key</Typography>
           <CustomInput fullWidth value={privateKey} onChange={(e) => setPrivatekey(e.target.value)} />
         </div>
       </div>
       <div className={classes.buttonGroup}>
         {showEnrolButton && (
           <Button
-            variant="outlined"
-            color="secondary"
+            variant="contained"
+            color="primary"
             fullWidth
             disabled={isLoading}
             onClick={() => onEnrol()} // tood: need to "resume" i.e. use a different private key
@@ -96,8 +96,8 @@ export const GatewayIdentity = ({
         )}
 
         <Button
-          variant="outlined"
-          color="secondary"
+          variant="contained"
+          color="primary"
           fullWidth
           disabled={isLoading}
           onClick={() => {
@@ -108,8 +108,8 @@ export const GatewayIdentity = ({
           Generate Keys
         </Button>
         <Button
-          variant="outlined"
-          color="secondary"
+          variant="contained"
+          color="primary"
           fullWidth
           disabled={isLoading}
           onClick={() => {
@@ -129,7 +129,8 @@ export const GatewayIdentity = ({
 
 const useStyles = makeStyles((theme: Theme) => ({
   credentials: {
-    border: '1px solid #fff',
+    borderRadius: '6px',
+    background: theme.palette.primary.dark, 
     padding: '2rem',
     height: '550px',
     display: 'flex',

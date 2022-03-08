@@ -101,13 +101,13 @@ export default function Documentation({
             <Typography variant="h4">API Documentation </Typography>
             <div className={classes.apiDocsLink}>
               <Link href="/docs/rest" passHref={true}>
-                <Button variant="outlined" color="secondary">
+                <Button variant="contained" color="primary">
                   REST API
                 </Button>
               </Link>
 
               <Link href="/docs/ws" passHref={true}>
-                <Button variant="outlined" color="secondary">
+                <Button variant="contained" color="primary">
                   WEBSOCKET API
                 </Button>
               </Link>
@@ -150,13 +150,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   connectionStatusPaper: {
     padding: '.5rem 1rem',
     marginLeft: '1rem',
-    background: theme.palette.secondary.main,
+    background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
     alignItems: 'center'
   },
   divider: {
-    background: '#fff',
+    background: '#1E263C',
     margin: '3rem 0'
   },
   main: {

@@ -44,7 +44,7 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
         <Grid container>
           <Grid item xs={12} sm={7} md={9}>
             <div className={classes.formGroup}>
-              <Typography variant="caption">CHANNEL NAME</Typography>
+              <Typography variant="caption">Channel name</Typography>
               <FormControl>
                 <Select
                   labelId="channelLabel"
@@ -66,7 +66,7 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
 
           <Grid item xs={12} sm={7} md={9}>
             <div className={classes.formGroup}>
-              <Typography variant="caption">TOPIC NAME</Typography>
+              <Typography variant="caption">Topic name</Typography>
               <FormControl>
                 <Select
                   labelId="channelLabel"
@@ -90,20 +90,20 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={7} md={9}>
               <div className={classes.formGroup}>
-                <Typography variant="caption">FILE</Typography>
+                <Typography variant="caption">File</Typography>
                 <CustomInput placeholder={fileName ? fileName : 'No file chosen'} fullWidth disabled />
               </div>
             </Grid>
             <Grid item xs={12} sm={5} md={3}>
-              <Button variant="outlined" color="secondary" fullWidth className={classes.fileButton} component="label">
+              <Button variant="contained" color="primary" fullWidth className={classes.fileButton} component="label">
                 Browse
                 <input type="file" hidden accept=".txt, .xml, .csv, .json" onClick={uploadToClient} />
               </Button>
             </Grid>
             <Grid item xs={6} sm={5}>
               <Button
-                variant="outlined"
-                color="secondary"
+                variant="contained"
+                color="primary"
                 fullWidth
                 onClick={() => {
                   if (!channelName) {
@@ -127,7 +127,8 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
 
 const useStyles = makeStyles((theme: Theme) => ({
   upload: {
-    border: '1px solid #fff',
+    borderRadius: '6px',
+    background: theme.palette.primary.dark, 
     padding: theme.spacing(6),
     margin: theme.spacing(3, 1)
   },

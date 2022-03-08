@@ -129,13 +129,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   connectionStatusPaper: {
     padding: '.5rem 1rem',
     marginLeft: '1rem',
-    background: theme.palette.secondary.main,
+    background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
     alignItems: 'center'
   },
   divider: {
-    background: '#fff',
+    background: '#1E263C',
     margin: '3rem 0'
   },
   main: {

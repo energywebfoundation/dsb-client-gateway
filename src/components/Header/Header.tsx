@@ -53,14 +53,14 @@ export default function Header() {
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
-    background: '#000',
+    background: theme.palette.primary.dark,
     '& *': {
-      color: '#fff'
+      color: theme.palette.text.primary
     },
     marginBottom: '3rem'
   },
   active: {
-    color: theme.palette.secondary.main
+    color: theme.palette.primary.main
   },
   toolbar: {
     display: 'flex',
@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: '.3rem .8rem',
     color: '#fff',
     fontSize: '.7rem',
-    background: theme.palette.secondary.main
+    background: theme.palette.info.main
   },
   divider: {
     margin: '0 1rem'
@@ -96,7 +96,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
     '&:hover': {
       textDecorationLine: 'underline',
-      color: theme.palette.secondary.main
+      color: theme.palette.primary.main
     }
   }
 }))

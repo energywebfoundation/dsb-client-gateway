@@ -25,7 +25,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
         <Grid container>
           <Grid item xs={12} sm={7} md={9}>
             <div className={classes.formGroup}>
-              <Typography variant="caption">CHANNEL NAME</Typography>
+              <Typography variant="caption">Channel name</Typography>
               <FormControl>
                 <Select
                   labelId="channelLabel"
@@ -47,7 +47,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
 
           <Grid container spacing={2}>
             <Grid item xs={6} sm={5}>
-              <Button variant="outlined" color="secondary" fullWidth
+              <Button variant="contained" color="primary" fullWidth
                 onClick={() => {
                   if (!channelName) {
                     return swal('Error', 'Please enter channel name', 'error')
@@ -67,7 +67,8 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
 
 const useStyles = makeStyles((theme: Theme) => ({
   download: {
-    border: '1px solid #fff',
+    borderRadius: '6px',
+    background: theme.palette.primary.dark, 
     padding: theme.spacing(6),
     margin: theme.spacing(3, 1)
   },
