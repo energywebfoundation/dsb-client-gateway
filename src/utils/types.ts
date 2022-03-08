@@ -46,9 +46,28 @@ export type SendMessageData = {
   transactionId?: string
   signature: string
 }
+export type SendTopicData = {
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  signature: string
+  owner: string
+  tags: string[]
+}
 
 export type SendMessageResult = {
   id: string
+}
+
+export type PostTopicResult = {
+  id: string
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  owner: string,
+  tags: string[]
 }
 
 export type GetMessageOptions = {
@@ -56,6 +75,15 @@ export type GetMessageOptions = {
   amount?: number
   clientId?: string
 }
+
+export type GetTopicsOptions = {
+  limit?: number
+  name: string
+  owner: string
+  page?: number
+  tags?: string[]
+}
+
 
 export type Message = {
   id: string

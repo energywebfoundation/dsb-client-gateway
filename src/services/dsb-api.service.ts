@@ -19,7 +19,12 @@ import {
   DSBFileUploadError,
   DSBFileDownloadError,
   isGatewayError,
-  Topic
+  Topic,
+  GetTopicsOptions,
+  DSBTopicNotFoundError,
+  DSBTopicUnauthorizedError,
+  SendTopicData,
+  PostTopicResult
 } from '../utils'
 import { signProof } from './identity.service'
 import { getCertificate, getEnrolment } from './storage.service'
@@ -186,9 +191,6 @@ export class DsbApiService {
 
 
   public async downloadFile(fileId: string): Promise<Result<string>> {
-
-    console.log('dsb service called')
-
     try {
       const res = await this.api.get(`/message/download?fileId=${fileId}`)
 
@@ -303,14 +305,20 @@ export class DsbApiService {
     }
   }
 
-  public async getTopics(): Promise<Result<Topic[]>> {
+  public async getTopics(options?: GetTopicsOptions): Promise<Result<Topic[]>> {
 
     await this.useTLS()
-    try {
-      const res = await this.api.get('/topic/list', {
-        httpsAgent: this.httpsAgent,
-      })
+    console.log('authToken', this.authToken)
 
+    try {
+      const res = await this.api.get('/topic', {
+        httpsAgent: this.httpsAgent,
+        headers: {
+          // eslint-disable-next-line max-len
+          Authorization: `Bearer ${this.authToken}`
+        },
+        params: options
+      })
       switch (res.status) {
         case 200:
           return { ok: res.data }
@@ -322,7 +330,60 @@ export class DsbApiService {
           throw new DSBRequestError(`${res.status} ${res.statusText}`)
       }
     } catch (err) {
-      return this.handleError(err, async () => this.getTopics())
+      return this.handleError(err, async () => this.getTopics(options))
+    }
+  }
+
+  /**
+ * Sends a POST /postTopics request to the broker
+ *
+ * @returns
+ */
+  public async postTopics(data: SendTopicData): Promise<Result<PostTopicResult>> {
+    console.log('post topic dsb service ')
+    await this.useTLS()
+    try {
+      // if (!this.authToken) {
+      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      // }
+      const res = await this.api.request({
+        url: '/topic',
+        method: 'POST',
+        httpsAgent: this.httpsAgent,
+        headers: {
+          // eslint-disable-next-line max-len
+          Authorization: `Bearer ${this.authToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: data
+      })
+      switch (res.status) {
+        case 200:
+          return {
+            ok: res.data
+          }
+        case 400:
+          const { message: payloadErrorMessage } = await res.data
+          throw new DSBPayloadError(payloadErrorMessage)
+        case 401:
+          const unauthorizedMessage = res.data.message
+          // login error
+          if (unauthorizedMessage === 'Unauthorized') {
+            throw Error(ErrorCode.DSB_UNAUTHORIZED)
+          }
+          // topic not authorized
+          else {
+            throw new DSBTopicUnauthorizedError(unauthorizedMessage)
+          }
+        case 403:
+          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+        case 404:
+          throw new DSBTopicNotFoundError(res.data.message)
+        default:
+          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+      }
+    } catch (err) {
+      return this.handleError(err, async () => this.postTopics(data))
     }
   }
 

@@ -31,6 +31,7 @@ export enum ErrorCode {
   DSB_UNAUTHORIZED = 'DSB::UNAUTHORIZED',
   DSB_FORBIDDEN_RESOURCE = 'DSB::FORBIDDEN_RESOURCE',
   DSB_CHANNEL_UNAUTHORIZED = 'DSB::CHANNEL_UNAUTHORIZED',
+  DSB_TOPIC_UNAUTHORIZED = 'DSB::TOPIC_UNAUTHORIZED',
   DSB_CHANNEL_NOT_FOUND = 'DSB::CHANNEL_NOT_FOUND',
   DSB_NO_SUBSCRIPTIONS = 'DSB::NO_SUBSCRIPTIONS',
   DSB_INVALID_PAYLOAD = 'DSB::INVALID_PAYLOAD',
@@ -276,11 +277,31 @@ export class DSBChannelNotFoundError extends GatewayError {
   }
 }
 
+export class DSBTopicNotFoundError extends GatewayError {
+  constructor(reason: string) {
+    super({
+      statusCode: HttpError.NOT_FOUND,
+      code: ErrorCode.DSB_CHANNEL_NOT_FOUND,
+      reason
+    })
+  }
+}
+
 export class DSBChannelUnauthorizedError extends GatewayError {
   constructor(reason: string) {
     super({
       statusCode: HttpError.UNAUTHORIZED,
       code: ErrorCode.DSB_CHANNEL_UNAUTHORIZED,
+      reason
+    })
+  }
+}
+
+export class DSBTopicUnauthorizedError extends GatewayError {
+  constructor(reason: string) {
+    super({
+      statusCode: HttpError.UNAUTHORIZED,
+      code: ErrorCode.DSB_TOPIC_UNAUTHORIZED,
       reason
     })
   }

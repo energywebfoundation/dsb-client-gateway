@@ -17,7 +17,7 @@ import SimpleDialog from '../topicdialog'
 type Props = {
     health: Result<boolean, ErrorBodySerialized>
     channels: Result<Channel[], ErrorBodySerialized>
-    topics: Result<Topic[], ErrorBodySerialized>
+    // topics: Result<Topic[], ErrorBodySerialized>
     auth: Option<string>
 }
 
@@ -76,13 +76,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     if (!err) {
         const health = await DsbApiService.init().getHealth()
         const channels = await DsbApiService.init().getChannels()
-        const topics = await DsbApiService.init().getTopics()
+        // const topics = await DsbApiService.init().getTopics()
 
         return {
             props: {
                 health: serializeError(health),
                 channels: serializeError(channels),
-                topics: serializeError(topics),
+                // topics: serializeError(topics),
                 auth: authHeader ? { some: authHeader } : { none: true }
             }
         }
@@ -97,7 +97,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
             props: {
                 health: {},
                 channels: {},
-                topics: {},
+                // topics: {},
                 auth: { none: true }
             }
         }
@@ -107,7 +107,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 
 
 
-export default function ListApplications({ health, channels, topics, auth }:
+export default function ListApplications({ health, channels, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
     const router = useRouter()

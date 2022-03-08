@@ -108,11 +108,13 @@ type TableProps = {
     location?: string | undefined
 }
 
+
 function TopicTable({ headers, dataRows, location }: TableProps) {
 
     const router = useRouter()
 
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
+    const [cellValue, setCellValue] = useState('')
 
     const [openMenu, setOpenMenu] = useState(false)
     const [filterInput, setFilterInput] = useState("")
@@ -124,20 +126,28 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         id: 'edit',
         accessor: '',
         filter: 'false',
-        Cell: ({ value }) => {
+        Cell: ({ row }) => {
 
-            let name = 'Application 1'
+            // console.log('row value', row)
+            console.log('cell value', cellValue)
+
+
             if (location === 'Application') {
-                return <Link href={`/topics?applicationName=${name}`}>
-                    {<a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDots</Icon></a>}
-                </Link >
+
+                console.log('req came from application',)
+
+                return < div >
+                    {cellValue ? <Link href={`/topics?applicationName=${cellValue}`}>
+                        <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>
+                    </Link > :
+                        <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>}
+                </div >
             } else {
                 return (<button onClick={() => {
                     setOpenMenu(true)
                 }}> More Options</button >)
             }
         }
-
     })
 
     const filterTypes = React.useMemo(
@@ -183,6 +193,13 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         []
     )
 
+    // Function to get cell value
+    const getCellValue = (cell) => {
+        console.log('cell', cell.row.values)
+        setCellValue('cell rows stored')
+    }
+
+
     const {
         getTableProps,
         getTableBodyProps,
@@ -215,7 +232,7 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         filterTypes,
         columns,
         data,
-        initialState: { pageIndex: 0, pageSize: 3 },
+        initialState: { pageIndex: 0, pageSize: 3 }
     },
         useFilters,
         useGlobalFilter,
@@ -226,6 +243,7 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
     return (
 
         <div>
+            <h3>Selected Cell Value: {JSON.stringify(cellValue)}</h3>
             <table className={classes.table}  {...getTableProps()}>
 
                 <thead>
@@ -286,6 +304,7 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
                                 {row.cells.map((cell, key) => {
                                     return (
                                         <td key={key}
+                                            onClick={() => getCellValue(cell)}
                                             {...cell.getCellProps()}
                                             style={{
                                                 color: '#C6C9CE',
