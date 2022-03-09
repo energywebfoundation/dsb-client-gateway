@@ -12,7 +12,6 @@ import {
     UnknownError,
     Topic
 } from '../../../../utils'
-import { captureException, withSentry } from '@sentry/nextjs'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const authHeader = req.headers.authorization
@@ -24,6 +23,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 return forGET(req, res)
             case 'POST':
                 return forPOST(req, res)
+            case 'PATCH':
+                return forPATCH(req, res)
             default:
                 return res.status(405).end()
         }
@@ -58,11 +59,34 @@ async function forPOST(
     req: NextApiRequest,
     res: NextApiResponse<SendMessageResult | { err: ErrorBody }>
 ): Promise<void> {
-
-    console.log('post called')
     try {
-
         const { ok: sent, err: sendError } = await DsbApiService.init().postTopics({
+            ...req.body
+        })
+        if (!sent) {
+            throw sendError
+        }
+        return res.status(200).send(sent)
+    } catch (err) {
+        if (err instanceof GatewayError) {
+            res.status(err.statusCode).send({ err: err.body })
+        } else {
+            const error = new UnknownError(err)
+            res.status(500).send({ err: error.body })
+        }
+    }
+}
+
+
+/**
+ * Handles the POST /messages request
+ */
+async function forPATCH(
+    req: NextApiRequest,
+    res: NextApiResponse<SendMessageResult | { err: ErrorBody }>
+): Promise<void> {
+    try {
+        const { ok: sent, err: sendError } = await DsbApiService.init().updateTopics({
             ...req.body
         })
         if (!sent) {
@@ -87,4 +111,4 @@ export const config = {
     }
 }
 
-export default withSentry(handler)
+export default handler
