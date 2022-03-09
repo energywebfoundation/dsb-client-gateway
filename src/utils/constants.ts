@@ -48,6 +48,5 @@ export const APPLICATIONS_HEADERS = [
         Header: 'UPDATED DATE',
         accessor: 'modeifiedDateTime',
         filter: 'includes',
-    },
-
+    }
 ]

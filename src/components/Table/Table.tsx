@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import 'regenerator-runtime/runtime'
 import matchSorter from 'match-sorter'
 import { MenuItem, Menu, Theme, Icon } from "@material-ui/core"
@@ -40,10 +40,6 @@ function GlobalFilter({
         setGlobalFilter(value || undefined)
     }, 200)
 
-    useEffect(() => {
-
-    }, [])
-
     return (
         <span>
             Search:{' '}
@@ -80,27 +76,8 @@ function DefaultColumnFilter({
     )
 }
 
-const Tags = ({ values }) => {
-    const classes = useStyles()
-
-    // Loop through the array and create a badge-like component instead of a comma-separated string
-    return (
-        <>
-            {values.map((tag, idx) => {
-                return (
-                    <span key={idx} className={classes.span}>
-                        {tag}
-                    </span>
-                )
-            })}
-        </>
-    )
-}
-
 // Let the table remove the filter if the string is empty
 fuzzyTextFilterFn.autoRemove = val => !val
-
-
 
 type TableProps = {
     headers: ApplicationHeaderType[] | undefined
@@ -108,14 +85,10 @@ type TableProps = {
     location?: string | undefined
 }
 
-
 function TopicTable({ headers, dataRows, location }: TableProps) {
 
     const router = useRouter()
-
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
-    const [cellValue, setCellValue] = useState('')
-
     const [openMenu, setOpenMenu] = useState(false)
     const [filterInput, setFilterInput] = useState("")
 
@@ -126,22 +99,15 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         id: 'edit',
         accessor: '',
         filter: 'false',
-        Cell: ({ row }) => {
-
-            // console.log('row value', row)
-            console.log('cell value', cellValue)
-
-
+        Cell: (props) => {
+            let applicatioNameSpace = props.cell.row.values.applicationName
             if (location === 'Application') {
-
-                console.log('req came from application',)
-
-                return < div >
-                    {cellValue ? <Link href={`/topics?applicationName=${cellValue}`}>
+                return <div>
+                    {applicatioNameSpace ? <Link href={`/topics?applicationName=${applicatioNameSpace}`}>
                         <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>
-                    </Link > :
+                    </Link> :
                         <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>}
-                </div >
+                </div>
             } else {
                 return (<button onClick={() => {
                     setOpenMenu(true)
@@ -178,7 +144,6 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         []
     )
 
-
     const handleFilterChange = e => {
         const value = e.target.value || undefined
         setFilterInput(value)
@@ -192,12 +157,6 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         () => newHeaders,
         []
     )
-
-    // Function to get cell value
-    const getCellValue = (cell) => {
-        console.log('cell', cell.row.values)
-        setCellValue('cell rows stored')
-    }
 
 
     const {
@@ -243,7 +202,6 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
     return (
 
         <div>
-            <h3>Selected Cell Value: {JSON.stringify(cellValue)}</h3>
             <table className={classes.table}  {...getTableProps()}>
 
                 <thead>
@@ -300,11 +258,9 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
                         prepareRow(row)
                         return (
                             <tr key={index} {...row.getRowProps()}>
-
                                 {row.cells.map((cell, key) => {
                                     return (
                                         <td key={key}
-                                            onClick={() => getCellValue(cell)}
                                             {...cell.getCellProps()}
                                             style={{
                                                 color: '#C6C9CE',

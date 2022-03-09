@@ -308,8 +308,6 @@ export class DsbApiService {
   public async getTopics(options?: GetTopicsOptions): Promise<Result<Topic[]>> {
 
     await this.useTLS()
-    console.log('authToken', this.authToken)
-
     try {
       const res = await this.api.get('/topic', {
         httpsAgent: this.httpsAgent,

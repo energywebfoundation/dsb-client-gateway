@@ -84,7 +84,6 @@ export default function ListTopics({ health, channels, topics, auth }:
 
     const handleClose = (value) => {
         setOpen(false)
-
     }
 
     // useEffect(() => {
