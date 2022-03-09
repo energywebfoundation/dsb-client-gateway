@@ -39,7 +39,7 @@ COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/.env.production ./.env.production
 COPY --from=builder /app/sentry.client.config.js ./sentry.client.config.js
 COPY --from=builder /app/sentry.server.config.js ./sentry.server.config.js
-COPY --chown=dsb:nodejs --from=builder /app/data ./data
+RUN mkdir -p data && echo "{}" > data/in-memory.json && chown -R dsb:nodejs data
 
 #COPY --from=builder /app/.sentryclirc ./.sentryclirc
 RUN chmod +x "./dist/index.js"
