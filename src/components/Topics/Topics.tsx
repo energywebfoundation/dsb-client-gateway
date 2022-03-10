@@ -1,40 +1,74 @@
 import { makeStyles } from '@material-ui/styles'
+import { useState } from 'react'
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary as MuiAccordionSummary,
     Theme,
     Typography,
     withStyles,
-    withWidth
+    Button
+
 } from '@material-ui/core'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { Topic as TopicType } from '../../utils'
 import { JsonView, defaultStyles } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
 import TopicTable from '../Table/Table'
-import dataRows from "../TableInput/TableInput"
+import SimpleDialog from '../../pages/topicdialog'
 
 import { TOPIC_HEADERS as topicHeaders } from '../../utils'
 
 type TopicProps = {
-    applicationName?: string
+    applicationName: string | string[] | undefined
     topics: TopicType[] | undefined
-    myDID?: string
+    myDID?: string,
+    handlePostTopic: (body: TopicType) => void
 }
 
-export default function Topic({ topics, myDID }: TopicProps) {
+export default function Topic({ applicationName, topics, myDID, handlePostTopic }: TopicProps) {
     const classes = useStyles()
+    const [open, setOpen] = useState(false)
 
-    const isPubSub = () => {
-        if (!myDID) {
-            return
-        }
+
+    let data = {
+        dialogTitle: 'Create Topic',
+        dialogText: 'Provide Topic data with this form'
+    }
+    const selectedValue = 'vikaskum660@gmail.com'
+
+    const handleClickOpen = () => {
+        setOpen(true)
+    }
+
+    const handleClose = (value) => {
+        setOpen(false)
     }
 
     return (
-        <div >
+        <div>
             {/* <div className={classes.navbar}></div> */}
+
+            <section className={classes.connectionStatus}>
+                <Typography variant="h4">{applicationName}</Typography>
+            </section>
+            <div style={{ display: "flex" }}>
+                <section className={classes.searchText}>
+
+                    <Button style={{ justifyContent: 'flex-end' }}
+                        className={classes.connectionStatusPaper}
+                        onClick={handleClickOpen}>
+                        Create
+                    </Button>
+
+                </section>
+
+                <SimpleDialog
+                    data={data}
+                    onClose={handleClose}
+                    selectedValue={selectedValue}
+                    open={open}
+                    handlePostTopic={handlePostTopic}
+                />
+            </div>
+
             <TopicTable
                 headers={topicHeaders}
                 dataRows={topics}
@@ -96,7 +130,36 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     jsonContainer: {
         fontFamily: 'monospace'
-    }
+    },
+    connectionStatus: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 2rem',
+
+        '& *': {
+            color: '#fff'
+        }
+    },
+    searchText: {
+        display: 'flex',
+        paddingTop: '1rem',
+        alignItems: 'center',
+        'font-size': '8 px',
+        '& *': {
+            color: '#6E6B7B'
+        }
+    },
+    connectionStatusPaper: {
+        padding: '.5rem 1rem',
+        marginLeft: '1rem',
+        background: theme.palette.secondary.main,
+        borderRadius: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        color: '#FFFFFF',
+        justifyContent: 'flex-end'
+
+    },
 }))
 
 

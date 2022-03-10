@@ -8,25 +8,37 @@ import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { makeStyles } from '@material-ui/styles'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
+import { Topic as TopicType } from '../../utils'
+import swal from '@sweetalert/with-react'
+import { json } from 'stream/consumers'
 
 type Props = {
     data: { dialogTitle: string, dialogText: string }
-    onClose: any,
     selectedValue: string
+    onClose: any
     open: boolean
+    handlePostTopic: (body: TopicType) => void
 }
 
+let schemaTypes = [
+    { id: 1, schema: 'JSD7' },
+    { id: 2, schema: 'JSD8' }
+]
+
 export default function SimpleDialog(props: Props) {
-    const { onClose, selectedValue, open, data } = props
-    let topicName = ''
-    let version = ''
-    let tags = []
-    let schemaType = ''
-    let jsonSchema = {}
+    const { onClose, handlePostTopic, open, data, selectedValue } = props
+
+
+
+
     let dialogText = data.dialogText
     let dialogTitle = data.dialogTitle
 
-    const [schema, setSchema] = React.useState({})
+    const [jsonSchema, setJsonSchema] = React.useState({})
+    const [topicName, setTopicName] = React.useState('')
+    const [version, setVersion] = React.useState('')
+    const [tags, setTags] = React.useState([])
+    const [schemaType, setSchemaType] = React.useState('')
 
     const classes = useStyles()
 
@@ -48,6 +60,8 @@ export default function SimpleDialog(props: Props) {
                             <Typography variant="caption">Topic Name</Typography>
                             <CustomInput
                                 placeholder={topicName ? topicName : 'Topic Name'}
+                                value={topicName}
+                                onChange={(event: any) => setTopicName(event.target.value)}
                             />
                         </div>
                     </Grid>
@@ -57,6 +71,8 @@ export default function SimpleDialog(props: Props) {
                             <Typography variant="caption">Version</Typography>
                             <CustomInput
                                 placeholder={version ? version : 'Version'}
+                                value={version}
+                                onChange={(event: any) => setVersion(event.target.value)}
                                 fullWidth />
                         </div>
                     </Grid>
@@ -68,6 +84,8 @@ export default function SimpleDialog(props: Props) {
                                 <Typography variant="caption">Tags</Typography>
                                 <CustomInput
                                     placeholder='Tags'
+                                    value={tags}
+                                    onChange={(event: any) => setTags(event.target.value)}
                                     fullWidth />
                             </div>
                         </Grid>
@@ -80,16 +98,16 @@ export default function SimpleDialog(props: Props) {
                                     <Select
                                         labelId="channelLabel"
                                         id="demo-customized-select"
-                                        // value={topicName}
-                                        // onChange={(event: any) => setTopicName(event.target.value)}
+                                        value={schemaType}
+                                        onChange={(event: any) => setSchemaType(event.target.value)}
                                         input={<CustomInput />}
                                         fullWidth
                                     >
-                                        {/* {topics?.map((topic) => (
-                                        <MenuItem key={topic.namespace} value={topic.namespace}>
-                                            {topic.namespace}
-                                        </MenuItem>
-                                    ))} */}
+                                        {schemaTypes?.map((schemaType) => (
+                                            <MenuItem key={schemaType.id} value={schemaType.schema}>
+                                                {schemaType.schema}
+                                            </MenuItem>
+                                        ))}
 
                                     </Select>
                                 </FormControl>
@@ -102,7 +120,7 @@ export default function SimpleDialog(props: Props) {
 
                                 <div style={{ maxWidth: "1400px", maxHeight: "100%" }}>
                                     <JSONInput
-                                        placeholder={jsonSchema} // data to display
+                                        placeholder={{}} // data to display
                                         theme="dark_vscode_tribute"
                                         // onKeyPressUpdate='false'
                                         // waitAfterKeyPress='1'
@@ -111,7 +129,7 @@ export default function SimpleDialog(props: Props) {
                                             error: "#DAA520"
                                             // overrides theme colors with whatever color value you want
                                         }}
-                                        onChange={(event: any) => setSchema(event.json)}
+                                        onChange={(event: any) => setJsonSchema(event.json)}
                                         height="550px"
                                     />
                                 </div>
@@ -138,13 +156,35 @@ export default function SimpleDialog(props: Props) {
                                 color="secondary"
                                 fullWidth
                                 onClick={() => {
-                                    // if (!channelName) {
-                                    //     return swal('Error', 'Please enter channel name', 'error')
+                                    if (!topicName) {
+                                        return swal('Error', 'Please enter topic name', 'error')
+                                    }
+                                    if (!version) {
+                                        return swal('Error', 'Please enter version', 'error')
+                                    }
+
+                                    // if (!schemaType) {
+                                    //     return swal('Error', 'Please enter schema type', 'error')
                                     // }
-                                    // if (!file) {
-                                    //     return swal('Error', 'No file uploaded', 'error')
-                                    // }
-                                    // onUpload(file, channelName, topicName)
+
+                                    if (!tags) {
+                                        return swal('Error', 'Please enter tags', 'error')
+                                    }
+
+                                    if (!jsonSchema) {
+                                        return swal('Error', 'Please enter Json Schema', 'error')
+                                    }
+
+                                    let data = {
+                                        name: topicName,
+                                        schemaType: 'JSD7',
+                                        schema: JSON.stringify(jsonSchema),
+                                        version: version,
+                                        owner: topicName,
+                                        tags: ["vikas6"]
+                                    }
+
+                                    handlePostTopic(data)
                                 }}
                             >
                                 Save

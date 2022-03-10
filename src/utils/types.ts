@@ -139,7 +139,7 @@ export type TopicList = {
 }
 
 export type Topic = {
-  id: string
+  id?: string
   name: string
   owner: string
   schema: {}

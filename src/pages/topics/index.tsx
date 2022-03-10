@@ -3,17 +3,17 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme, TextField, IconButton, Button } from '@material-ui/core'
+import { Container, Theme, } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
 import Header from '../../components/Header/Header'
-import axios from 'axios'
+
+
 
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 
-import SimpleDialog from '../topicdialog'
 
 type Props = {
     health: Result<boolean, ErrorBodySerialized>
@@ -68,27 +68,7 @@ export default function ListTopics({ health, channels, topics, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
     const router = useRouter()
-    const { applicationNameSpace } = router.query
-
-    const [open, setOpen] = useState(false)
-
-
-
-    const selectedValue = 'vikaskum660@gmail.com'
-
-    let data = {
-        dialogTitle: 'Create Topic',
-        dialogText: 'Provide Topic data with this form'
-    }
-
-
-    const handleClickOpen = () => {
-        setOpen(true)
-    }
-
-    const handleClose = (value) => {
-        setOpen(false)
-    }
+    const { owner } = router.query
 
     // useEffect(() => {
     //     if (health.err) {
@@ -116,32 +96,12 @@ export default function ListTopics({ health, channels, topics, auth }:
 
             <main>
                 <Header />
-
                 <Container maxWidth="lg">
-                    <section className={classes.connectionStatus}>
-                        <Typography variant="h4">{applicationNameSpace}</Typography>
-                    </section>
-                    <div style={{ display: "flex" }}>
-                        <section className={classes.searchText}>
-
-                            <Button style={{ justifyContent: 'flex-end' }}
-                                className={classes.connectionStatusPaper}
-                                onClick={handleClickOpen}>
-                                Create
-                            </Button>
-
-                        </section>
-
-                        <SimpleDialog
-                            data={data}
-                            onClose={handleClose}
-                            selectedValue={selectedValue}
-                            open={open}
-                        />
-                    </div>
-
                     <section className={classes.table}>
-                        <TopicContainer auth={auth.some} topics={topics.ok} />
+                        <TopicContainer
+                            applicationNameSpace={owner}
+                            auth={auth.some}
+                            topics={topics.ok} />
                     </section>
 
                 </Container>
