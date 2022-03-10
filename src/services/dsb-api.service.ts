@@ -313,7 +313,7 @@ export class DsbApiService {
         httpsAgent: this.httpsAgent,
         headers: {
           // eslint-disable-next-line max-len
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkaWQiOiJkaWQ6ZXRocjoweGZkNmI4MDlCODFjQUViYzNFQUIwZDMzZjAyMTFFNTkzNDYyMWIyRDIiLCJ2ZXJpZmllZFJvbGVzIjpbeyJuYW1lIjoidXNlciIsIm5hbWVzcGFjZSI6InVzZXIucm9sZXMuZHNiLmFwcHMuZW5lcmd5d2ViLmlhbS5ld2MifSx7Im5hbWUiOiJjaGFubmVsY3JlYXRpb24iLCJuYW1lc3BhY2UiOiJjaGFubmVsY3JlYXRpb24ucm9sZXMuZHNiLmFwcHMuZW5lcmd5d2ViLmlhbS5ld2MifV0sImlhdCI6MTYzMjgyMDQ5Mn0.NgqMMfVMDwRMnCua98gihHNpQARCVEfn57GENea2N_w`
+          Authorization: `Bearer ${this.authToken}`
         },
         params: options
       })
@@ -349,7 +349,7 @@ export class DsbApiService {
         httpsAgent: this.httpsAgent,
         headers: {
           // eslint-disable-next-line max-len
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkaWQiOiJkaWQ6ZXRocjoweGZkNmI4MDlCODFjQUViYzNFQUIwZDMzZjAyMTFFNTkzNDYyMWIyRDIiLCJ2ZXJpZmllZFJvbGVzIjpbeyJuYW1lIjoidXNlciIsIm5hbWVzcGFjZSI6InVzZXIucm9sZXMuZHNiLmFwcHMuZW5lcmd5d2ViLmlhbS5ld2MifSx7Im5hbWUiOiJjaGFubmVsY3JlYXRpb24iLCJuYW1lc3BhY2UiOiJjaGFubmVsY3JlYXRpb24ucm9sZXMuZHNiLmFwcHMuZW5lcmd5d2ViLmlhbS5ld2MifV0sImlhdCI6MTYzMjgyMDQ5Mn0.NgqMMfVMDwRMnCua98gihHNpQARCVEfn57GENea2N_w`,
+          Authorization: `Bearer ${this.authToken}`,
           'Content-Type': 'application/json'
         },
         data: data
