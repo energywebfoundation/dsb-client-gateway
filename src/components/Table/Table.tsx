@@ -7,7 +7,7 @@ import { useTable, useSortBy, usePagination, useFilters, useGlobalFilter, useAsy
 import {
     ApplicationHeader as ApplicationHeaderType,
     Application as ApplicationType,
-    TopicList as TopicType
+    Topic as TopicType
 } from '../../utils'
 import { useRouter } from 'next/router'
 import clsx from 'clsx'
@@ -100,10 +100,10 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         accessor: '',
         filter: 'false',
         Cell: (props) => {
-            let applicatioNameSpace = props.cell.row.values.applicationName
+            let owner = props.cell.row.values.applicationName
             if (location === 'Application') {
                 return <div>
-                    {applicatioNameSpace ? <Link href={`/topics?applicationName=${applicatioNameSpace}`}>
+                    {owner ? <Link href={`/topics?owner=test`}>
                         <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>
                     </Link> :
                         <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>}

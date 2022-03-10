@@ -7,6 +7,7 @@ import { Typography, Container, Divider, Theme, TextField, IconButton, Button } 
 import swal from '@sweetalert/with-react'
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
 import Header from '../../components/Header/Header'
+import axios from 'axios'
 
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
@@ -25,13 +26,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     props: Props
 }> {
 
-
     const authHeader = context.req.headers.authorization
+    const owner = context.req['__NEXT_INIT_QUERY']
     const { err } = isAuthorized(authHeader)
     if (!err) {
+
         const health = await DsbApiService.init().getHealth()
         const channels = await DsbApiService.init().getChannels()
-        const topics = await DsbApiService.init().getTopics()
+        const topics = await DsbApiService.init().getTopics(owner)
+
+
 
         return {
             props: {
@@ -60,16 +64,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 }
 
 
-
-
 export default function ListTopics({ health, channels, topics, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
     const router = useRouter()
-    const { applicationName } = router.query
-    console.log('applicationName', applicationName)
+    const { applicationNameSpace } = router.query
 
     const [open, setOpen] = useState(false)
+
+
+
     const selectedValue = 'vikaskum660@gmail.com'
 
     let data = {
@@ -115,7 +119,7 @@ export default function ListTopics({ health, channels, topics, auth }:
 
                 <Container maxWidth="lg">
                     <section className={classes.connectionStatus}>
-                        <Typography variant="h4">Application name 1 </Typography>
+                        <Typography variant="h4">{applicationNameSpace}</Typography>
                     </section>
                     <div style={{ display: "flex" }}>
                         <section className={classes.searchText}>

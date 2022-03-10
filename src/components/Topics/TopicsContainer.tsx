@@ -8,5 +8,6 @@ type TopicContainerProps = {
 }
 
 export const TopicContainer = ({ auth, topics, did }: TopicContainerProps) => {
+
     return <Topic topics={topics} myDID={did} />
 }

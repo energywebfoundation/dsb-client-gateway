@@ -33,9 +33,6 @@ export default function Header() {
             <Link href="/docs">
               <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
             </Link>
-            <Link href="/topics">
-              <a className={clsx(classes.navLink, isActive('/topics'))}>Topics</a>
-            </Link>
             <Link href="/applications">
               <a className={clsx(classes.navLink, isActive('/applications'))}>Applications</a>
             </Link>

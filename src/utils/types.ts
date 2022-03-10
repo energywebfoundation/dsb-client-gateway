@@ -138,11 +138,17 @@ export type TopicList = {
   schema?: object | string
 }
 
-
 export type Topic = {
-  namespace: string
-  schema: object | string
+  id: string
+  name: string
+  owner: string
+  schema: {}
+  schemaType: string
+  tags: string[]
+  version: string
 }
+
+
 
 export enum RoleState {
   NO_CLAIM = 'NO_CLAIM',

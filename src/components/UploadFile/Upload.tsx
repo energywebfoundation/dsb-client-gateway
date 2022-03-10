@@ -77,8 +77,8 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
                   fullWidth
                 >
                   {topics?.map((topic) => (
-                    <MenuItem key={topic.namespace} value={topic.namespace}>
-                      {topic.namespace}
+                    <MenuItem key={topic.owner} value={topic.owner}>
+                      {topic.owner}
                     </MenuItem>
                   ))}
 
@@ -128,7 +128,7 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
 const useStyles = makeStyles((theme: Theme) => ({
   upload: {
     borderRadius: '6px',
-    background: theme.palette.primary.dark, 
+    background: theme.palette.primary.dark,
     padding: theme.spacing(6),
     margin: theme.spacing(3, 1)
   },

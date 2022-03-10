@@ -37,7 +37,7 @@ export default function Topic({ topics, myDID }: TopicProps) {
             {/* <div className={classes.navbar}></div> */}
             <TopicTable
                 headers={topicHeaders}
-                dataRows={dataRows}
+                dataRows={topics}
             />
         </div>
     )

@@ -319,7 +319,7 @@ export class DsbApiService {
       })
       switch (res.status) {
         case 200:
-          return { ok: res.data }
+          return { ok: res.data.records }
         case 401:
           throw Error(ErrorCode.DSB_UNAUTHORIZED)
         case 403:
