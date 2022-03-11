@@ -21,18 +21,15 @@ type TopicProps = {
     topics: TopicType[] | undefined
     myDID?: string,
     handlePostTopic: (body: TopicType) => void
+    handleUpdateTopic: (body: TopicType) => void
 }
 
-export default function Topic({ applicationName, topics, myDID, handlePostTopic }: TopicProps) {
+export default function Topic({ applicationName, topics, myDID, handlePostTopic, handleUpdateTopic }: TopicProps) {
     const classes = useStyles()
     const [open, setOpen] = useState(false)
 
-
-    let data = {
-        dialogTitle: 'Create Topic',
-        dialogText: 'Provide Topic data with this form'
-    }
-
+    let dialogTitle = 'Create Topic'
+    let dialogText = 'Provide Topic data with this form'
     const handleClickOpen = () => {
         setOpen(true)
     }
@@ -58,9 +55,10 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic 
                 </section>
 
                 <SimpleDialog
-                    data={data}
                     onClose={handleClose}
                     open={open}
+                    dialogTitle={dialogTitle}
+                    dialogText={dialogText}
                     handlePostOrUpdateTopic={handlePostTopic}
                 />
             </div>
@@ -68,6 +66,7 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic 
             <Table
                 headers={topicHeaders}
                 dataRows={topics}
+                handleUpdateTopic={handleUpdateTopic}
             />
         </div>
     )

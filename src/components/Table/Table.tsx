@@ -97,7 +97,8 @@ type TableProps = {
     headers: ApplicationHeaderType[] | undefined
     dataRows: ApplicationType[] | TopicType[] | undefined
     location?: string | undefined
-    handleUpdateTopic?: (body: TopicType) => void
+    handleUpdateTopic: (body: TopicType) => void
+
 }
 
 function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
@@ -114,9 +115,11 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
 
     }
 
+    let dialogTitle = 'Update Topic'
+    let dialogText = 'Update Topic data'
+
+
     let topicData = {
-        dialogTitle: 'Update Topic',
-        dialogText: 'Update Topic data',
         id: "622ac6325c890a2fd73cd081",
         topicName: "vikas7",
         owner: "vikas7",
@@ -360,6 +363,8 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
                 data={topicData}
                 onClose={handleClose}
                 open={openDialog}
+                dialogTitle={dialogTitle}
+                dialogText={dialogText}
                 handlePostOrUpdateTopic={handleUpdateTopic}
             />
 

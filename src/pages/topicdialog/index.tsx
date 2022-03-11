@@ -13,19 +13,20 @@ import swal from '@sweetalert/with-react'
 
 
 type Props = {
-    data: {
-        dialogTitle: string
-        dialogText: string
-        topicName?: string | undefined
-        version?: string | undefined
-        tags?: string[] | undefined
-        schemaType?: string | undefined
-        jsonSchema?: object | undefined
+    data?: {
+        topicName: string
+        version: string
+        tags: string[]
+        schemaType: string
+        jsonSchema: object
     }
 
     onClose: any
     open: boolean
-    handlePostOrUpdateTopic?: (body: TopicType) => void
+    dialogTitle: string
+    dialogText: string
+    handlePostOrUpdateTopic: (body: TopicType) => void
+
 }
 
 let schemaTypes = [
@@ -34,23 +35,27 @@ let schemaTypes = [
 ]
 
 export default function SimpleDialog(props: Props) {
-    const { onClose, handlePostOrUpdateTopic, open, data } = props
+    const { onClose, handlePostOrUpdateTopic, open, data, dialogTitle, dialogText } = props
 
-    let dialogText = data.dialogText
-    let dialogTitle = data.dialogTitle
+    let [jsonSchema, setJsonSchema] = React.useState({})
+    let [topicName, setTopicName] = React.useState('')
+    let [version, setVersion] = React.useState('')
+    let [tags, setTags] = React.useState(Array)
+    let [schemaType, setSchemaType] = React.useState('')
 
-    const [jsonSchema, setJsonSchema] = React.useState({})
-    const [topicName, setTopicName] = React.useState('')
-    const [version, setVersion] = React.useState('')
-    const [tags, setTags] = React.useState([])
-    const [schemaType, setSchemaType] = React.useState('')
+    if (data) {
+        topicName = data.topicName
+        version = data.version
+        tags = data.tags
+        schemaType = data.schemaType
+        jsonSchema = data.jsonSchema
+    }
 
     const classes = useStyles()
 
     const handleClose = () => {
         onClose()
     }
-
 
 
     return (
@@ -64,9 +69,7 @@ export default function SimpleDialog(props: Props) {
                         <div className={classes.formGroup}>
                             <Typography variant="caption">Topic Name</Typography>
                             <CustomInput
-                                placeholder={topicName ? topicName :
-                                    data.topicName ? data.topicName : 'Topic Name'}
-
+                                placeholder='Topic Name'
                                 value={topicName}
                                 onChange={(event: any) => setTopicName(event.target.value)}
                             />
@@ -77,8 +80,7 @@ export default function SimpleDialog(props: Props) {
                         <div className={classes.formGroup}>
                             <Typography variant="caption">Version</Typography>
                             <CustomInput
-                                placeholder={version ? version :
-                                    data.version ? data.version : 'Version'}
+                                placeholder='Version'
                                 value={version}
                                 onChange={(event: any) => setVersion(event.target.value)}
                                 fullWidth />
@@ -106,8 +108,7 @@ export default function SimpleDialog(props: Props) {
                                     <Select
                                         labelId="channelLabel"
                                         id="demo-customized-select"
-                                        value={schemaType ? schemaType :
-                                            data.schemaType ? data.schemaType : null}
+                                        value={schemaType}
                                         onChange={(event: any) => setSchemaType(event.target.value)}
                                         input={<CustomInput />}
                                         fullWidth
@@ -129,7 +130,7 @@ export default function SimpleDialog(props: Props) {
 
                                 <div style={{ maxWidth: "1400px", maxHeight: "100%" }}>
                                     <JSONInput
-                                        placeholder={data.jsonSchema ? data.jsonSchema : {}} // data to display
+                                        placeholder={jsonSchema ? jsonSchema : {}} // data to display
                                         theme="dark_vscode_tribute"
                                         // onKeyPressUpdate='false'
                                         // waitAfterKeyPress='1'
@@ -165,6 +166,7 @@ export default function SimpleDialog(props: Props) {
                                 color="secondary"
                                 fullWidth
                                 onClick={() => {
+
                                     if (!topicName) {
                                         return swal('Error', 'Please enter topic name', 'error')
                                     }
@@ -184,16 +186,17 @@ export default function SimpleDialog(props: Props) {
                                         return swal('Error', 'Please enter Json Schema', 'error')
                                     }
 
-                                    let data = {
+                                    let topicData = {
                                         name: topicName,
                                         schemaType: schemaType,
-                                        schema: jsonSchema,
+                                        schema: JSON.stringify(jsonSchema),
                                         version: version,
                                         owner: topicName,
                                         tags: ["vikas6"] // check how to take tags from user
                                     }
 
-                                    handlePostOrUpdateTopic ? handlePostOrUpdateTopic(data) : null
+                                    handlePostOrUpdateTopic(topicData)
+
                                 }}
                             >
                                 Save

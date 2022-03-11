@@ -42,8 +42,37 @@ export const TopicContainer = ({ applicationNameSpace, auth, topics, did }: Topi
         }
     }
 
+
+    const handleUpdateTopic = async (body: TopicType) => {
+        setIsLoading(true)
+
+        try {
+            const res = await axios.patch(
+                `/api/v1/topics`,
+                body,
+                {
+                    headers: {
+                        Authorization: auth ? `Bearer ${auth}` : undefined,
+                        'content-type': 'application/json'
+                    }
+                }
+            )
+            console.log(res.data)
+
+            swal(`Success: `, `Topic Created Successfully`, 'success')
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                swal('Error', err.response?.data?.err?.reason, 'error')
+            } else {
+                swal('Error', `Could not set identity: ${err}`, 'error')
+            }
+            setIsLoading(false)
+        }
+    }
+
     return <Topic
         applicationName={applicationNameSpace}
         topics={topics} myDID={did}
-        handlePostTopic={handlePostTopic} />
+        handlePostTopic={handlePostTopic}
+        handleUpdateTopic={handleUpdateTopic} />
 }
