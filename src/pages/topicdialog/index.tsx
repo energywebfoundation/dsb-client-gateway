@@ -10,14 +10,22 @@ import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
 import { Topic as TopicType } from '../../utils'
 import swal from '@sweetalert/with-react'
-import { json } from 'stream/consumers'
+
 
 type Props = {
-    data: { dialogTitle: string, dialogText: string }
-    selectedValue: string
+    data: {
+        dialogTitle: string
+        dialogText: string
+        topicName?: string | undefined
+        version?: string | undefined
+        tags?: string[] | undefined
+        schemaType?: string | undefined
+        jsonSchema?: object | undefined
+    }
+
     onClose: any
     open: boolean
-    handlePostTopic: (body: TopicType) => void
+    handlePostOrUpdateTopic?: (body: TopicType) => void
 }
 
 let schemaTypes = [
@@ -26,10 +34,7 @@ let schemaTypes = [
 ]
 
 export default function SimpleDialog(props: Props) {
-    const { onClose, handlePostTopic, open, data, selectedValue } = props
-
-
-
+    const { onClose, handlePostOrUpdateTopic, open, data } = props
 
     let dialogText = data.dialogText
     let dialogTitle = data.dialogTitle
@@ -43,7 +48,7 @@ export default function SimpleDialog(props: Props) {
     const classes = useStyles()
 
     const handleClose = () => {
-        onClose(selectedValue)
+        onClose()
     }
 
 
@@ -59,7 +64,9 @@ export default function SimpleDialog(props: Props) {
                         <div className={classes.formGroup}>
                             <Typography variant="caption">Topic Name</Typography>
                             <CustomInput
-                                placeholder={topicName ? topicName : 'Topic Name'}
+                                placeholder={topicName ? topicName :
+                                    data.topicName ? data.topicName : 'Topic Name'}
+
                                 value={topicName}
                                 onChange={(event: any) => setTopicName(event.target.value)}
                             />
@@ -70,7 +77,8 @@ export default function SimpleDialog(props: Props) {
                         <div className={classes.formGroup}>
                             <Typography variant="caption">Version</Typography>
                             <CustomInput
-                                placeholder={version ? version : 'Version'}
+                                placeholder={version ? version :
+                                    data.version ? data.version : 'Version'}
                                 value={version}
                                 onChange={(event: any) => setVersion(event.target.value)}
                                 fullWidth />
@@ -98,7 +106,8 @@ export default function SimpleDialog(props: Props) {
                                     <Select
                                         labelId="channelLabel"
                                         id="demo-customized-select"
-                                        value={schemaType}
+                                        value={schemaType ? schemaType :
+                                            data.schemaType ? data.schemaType : null}
                                         onChange={(event: any) => setSchemaType(event.target.value)}
                                         input={<CustomInput />}
                                         fullWidth
@@ -184,7 +193,7 @@ export default function SimpleDialog(props: Props) {
                                         tags: ["vikas6"] // check how to take tags from user
                                     }
 
-                                    handlePostTopic(data)
+                                    handlePostOrUpdateTopic ? handlePostOrUpdateTopic(data) : null
                                 }}
                             >
                                 Save
@@ -200,8 +209,7 @@ export default function SimpleDialog(props: Props) {
 
 SimpleDialog.propTypes = {
     onClose: PropTypes.func.isRequired,
-    open: PropTypes.bool.isRequired,
-    selectedValue: PropTypes.string.isRequired,
+    open: PropTypes.bool.isRequired
 }
 
 const useStyles = makeStyles((theme: Theme) => ({

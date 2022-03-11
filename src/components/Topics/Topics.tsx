@@ -11,7 +11,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { Topic as TopicType } from '../../utils'
 import { JsonView, defaultStyles } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
-import TopicTable from '../Table/Table'
+import Table from '../Table/Table'
 import SimpleDialog from '../../pages/topicdialog'
 
 import { TOPIC_HEADERS as topicHeaders } from '../../utils'
@@ -32,13 +32,12 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic 
         dialogTitle: 'Create Topic',
         dialogText: 'Provide Topic data with this form'
     }
-    const selectedValue = 'vikaskum660@gmail.com'
 
     const handleClickOpen = () => {
         setOpen(true)
     }
 
-    const handleClose = (value) => {
+    const handleClose = () => {
         setOpen(false)
     }
 
@@ -63,13 +62,12 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic 
                 <SimpleDialog
                     data={data}
                     onClose={handleClose}
-                    selectedValue={selectedValue}
                     open={open}
-                    handlePostTopic={handlePostTopic}
+                    handlePostOrUpdateTopic={handlePostTopic}
                 />
             </div>
 
-            <TopicTable
+            <Table
                 headers={topicHeaders}
                 dataRows={topics}
             />

@@ -12,16 +12,30 @@ import {
 import { useRouter } from 'next/router'
 import clsx from 'clsx'
 import Link from 'next/link'
+import SimpleDialog from '../../pages/topicdialog'
 
-const options = [{
-    id: 1,
-    name: 'Vikas'
-},
-{
-    id: 2,
-    name: 'Vikas'
+const options = [
+    {
+        id: 1,
+        name: 'View Details'
 
-}]
+    },
+    {
+        id: 2,
+        name: 'Update'
+    },
+
+    {
+        id: 3,
+        name: 'View ersion history'
+
+    },
+    {
+        id: 4,
+        name: 'Remove'
+
+    }
+]
 
 function fuzzyTextFilterFn(rows, id, filterValue) {
     return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
@@ -83,14 +97,45 @@ type TableProps = {
     headers: ApplicationHeaderType[] | undefined
     dataRows: ApplicationType[] | TopicType[] | undefined
     location?: string | undefined
+    handleUpdateTopic?: (body: TopicType) => void
 }
 
-function TopicTable({ headers, dataRows, location }: TableProps) {
+function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
 
     const router = useRouter()
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
     const [openMenu, setOpenMenu] = useState(false)
+    const [openDialog, setOpenDialog] = useState(false)
     const [filterInput, setFilterInput] = useState("")
+
+    const handleClickOpen = () => {
+        setOpenDialog(true)
+    }
+
+    let topicData = {
+        dialogTitle: 'Update Topic',
+        dialogText: 'Update Topic data',
+        "id": "622ac6325c890a2fd73cd081",
+        "name": "vikas7",
+        "owner": "vikas7",
+        "schema": {
+            "data": "Vikas"
+        },
+        "schemaType": "JSD7",
+        "tags": [
+            "vikas7"
+        ],
+        "version": "1.0.0"
+    }
+
+    const handleClose = (value) => {
+        setOpenDialog(false)
+    }
+
+
+    if (dataRows === undefined) {
+        dataRows = []
+    }
 
     //shallow copy to avoid duplicate headers as using React.useMemo
     const newHeaders = headers?.map((header) => header)
@@ -100,9 +145,13 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
         accessor: '',
         filter: 'false',
         Cell: (props) => {
+
+            // currenty sending test change it to owner variable afterwards
             let owner = props.cell.row.values.applicationName
+
             if (location === 'Application') {
                 return <div>
+
                     {owner ? <Link href={`/topics?owner=test`}>
                         <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>
                     </Link> :
@@ -286,21 +335,31 @@ function TopicTable({ headers, dataRows, location }: TableProps) {
                         )
                     })}
                 </tbody>
-
             </table>
 
             <Menu
                 key="menu"
                 open={openMenu}
                 onClose={e => setOpenMenu(false)}
-                style={{ marginLeft: 'auto' }}>
-
-                {options?.map((topic) => (
-                    <MenuItem key={topic.id} value={topic.name}>
-                        {topic.name}
+                style={{ marginRight: 'auto' }}>
+                {options?.map((option) => (
+                    <MenuItem
+                        key={option.id}
+                        value={option.name}
+                        onClick={option.id === 2 ? () => handleClickOpen() : () => null}
+                    >
+                        {option.name}
                     </MenuItem>
+
                 ))}
             </Menu>
+
+            <SimpleDialog
+                data={topicData}
+                onClose={handleClose}
+                open={openDialog}
+                handlePostOrUpdateTopic={handleUpdateTopic}
+            />
 
             <br />
 
@@ -381,5 +440,5 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }))
 
-export default TopicTable
+export default Table
 

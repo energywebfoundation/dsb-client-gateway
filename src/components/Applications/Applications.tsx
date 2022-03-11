@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core'
 import { Application as ApplicationType } from '../../utils'
 import 'react-json-view-lite/dist/index.css'
-import TopicTable from '../Table/Table'
+import Table from '../Table/Table'
 
 import { APPLICATIONS_HEADERS as applicationHeaders } from '../../utils/constants'
 
@@ -22,7 +22,7 @@ export default function Topic({ applications, myDID }: TopicProps) {
     return (
         <div >
             {/* <div className={classes.navbar}></div> */}
-            <TopicTable
+            <Table
                 headers={applicationHeaders}
                 dataRows={applications}
                 location='Application'

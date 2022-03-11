@@ -12,7 +12,6 @@ import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 
-import SimpleDialog from '../topicdialog'
 
 type Props = {
     health: Result<boolean, ErrorBodySerialized>

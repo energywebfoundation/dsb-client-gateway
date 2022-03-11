@@ -4,20 +4,18 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import { makeStyles } from '@material-ui/styles'
 import { Container, Theme, } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
-import Header from '../../components/Header/Header'
-import { DsbApiService } from '../../services/dsb-api.service'
-import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 
+import { Topic as TopicType } from '../../utils'
 import SimpleDialog from '../../pages/topicdialog'
 
 type Props = {
-    topic: Topic | undefined
+    topic: TopicType | undefined
     myDID?: string
+    handleUpdateTopic: (body: TopicType) => void
 }
 
 
-export default function UpdateTopic({ topic, myDID }: Props) {
+export default function UpdateTopic({ topic, myDID, handleUpdateTopic }: Props) {
     const classes = useStyles()
 
     const [open, setOpen] = useState(false)
@@ -26,10 +24,11 @@ export default function UpdateTopic({ topic, myDID }: Props) {
     let data = {
         dialogTitle: 'Create Topic',
         dialogText: 'Provide Topic data with this form',
-        topicName: 'Topic name',
-        version: '1.0.0',
-        tags: ['Aggregator'],
-        jsonSchema: {}
+        topicName: topic?.name,
+        version: topic?.version,
+        tags: topic?.tags,
+        schemaType: topic?.schemaType,
+        jsonSchema: topic?.schema
     }
 
     const handleClickOpen = () => {
@@ -42,18 +41,13 @@ export default function UpdateTopic({ topic, myDID }: Props) {
 
     return (
         <div>
-            <Head>
-                <title>EW-DSB Client Gateway - Topic List</title>
-                <meta name="description" content="EW-DSB Client Gateway" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
             <main>
-                <Header />
                 <Container maxWidth="lg">
                     <SimpleDialog
+                        handlePostOrUpdateTopic={handleUpdateTopic}
                         data={data}
                         onClose={handleClose}
-                        selectedValue={selectedValue}
+
                         open={open}
                     />
                 </Container>

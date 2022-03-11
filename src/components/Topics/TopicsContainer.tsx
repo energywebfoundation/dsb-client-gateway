@@ -18,9 +18,6 @@ export const TopicContainer = ({ applicationNameSpace, auth, topics, did }: Topi
     const handlePostTopic = async (body: TopicType) => {
         setIsLoading(true)
 
-
-        console.log('body', body)
-
         try {
             const res = await axios.post(
                 `/api/v1/topics`,
