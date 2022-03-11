@@ -129,7 +129,7 @@ export default function SimpleDialog(props: Props) {
 
                                 <div style={{ maxWidth: "1400px", maxHeight: "100%" }}>
                                     <JSONInput
-                                        placeholder={{}} // data to display
+                                        placeholder={data.jsonSchema ? data.jsonSchema : {}} // data to display
                                         theme="dark_vscode_tribute"
                                         // onKeyPressUpdate='false'
                                         // waitAfterKeyPress='1'

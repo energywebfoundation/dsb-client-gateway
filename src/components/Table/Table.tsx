@@ -109,23 +109,25 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
     const [filterInput, setFilterInput] = useState("")
 
     const handleClickOpen = () => {
+        setOpenMenu(false)
         setOpenDialog(true)
+
     }
 
     let topicData = {
         dialogTitle: 'Update Topic',
         dialogText: 'Update Topic data',
-        "id": "622ac6325c890a2fd73cd081",
-        "name": "vikas7",
-        "owner": "vikas7",
-        "schema": {
+        id: "622ac6325c890a2fd73cd081",
+        topicName: "vikas7",
+        owner: "vikas7",
+        jsonSchema: {
             "data": "Vikas"
         },
-        "schemaType": "JSD7",
-        "tags": [
+        schemaType: "JSD7",
+        tags: [
             "vikas7"
         ],
-        "version": "1.0.0"
+        version: "1.0.0"
     }
 
     const handleClose = (value) => {

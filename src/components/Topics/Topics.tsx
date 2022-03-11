@@ -43,8 +43,6 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic 
 
     return (
         <div>
-            {/* <div className={classes.navbar}></div> */}
-
             <section className={classes.connectionStatus}>
                 <Typography variant="h4">{applicationName}</Typography>
             </section>
