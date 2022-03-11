@@ -37,19 +37,12 @@ let schemaTypes = [
 export default function SimpleDialog(props: Props) {
     const { onClose, handlePostOrUpdateTopic, open, data, dialogTitle, dialogText } = props
 
-    let [jsonSchema, setJsonSchema] = React.useState({})
-    let [topicName, setTopicName] = React.useState('')
-    let [version, setVersion] = React.useState('')
-    let [tags, setTags] = React.useState(Array)
-    let [schemaType, setSchemaType] = React.useState('')
+    let [jsonSchema, setJsonSchema] = React.useState(data?.jsonSchema)
+    let [topicName, setTopicName] = React.useState(data?.topicName)
+    let [version, setVersion] = React.useState(data?.version)
+    let [tags, setTags] = React.useState(data?.tags)
+    let [schemaType, setSchemaType] = React.useState(data?.schemaType)
 
-    if (data) {
-        topicName = data.topicName
-        version = data.version
-        tags = data.tags
-        schemaType = data.schemaType
-        jsonSchema = data.jsonSchema
-    }
 
     const classes = useStyles()
 
