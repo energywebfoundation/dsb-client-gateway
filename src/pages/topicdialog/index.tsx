@@ -163,9 +163,9 @@ export default function SimpleDialog(props: Props) {
                                         return swal('Error', 'Please enter version', 'error')
                                     }
 
-                                    // if (!schemaType) {
-                                    //     return swal('Error', 'Please enter schema type', 'error')
-                                    // }
+                                    if (!schemaType) {
+                                        return swal('Error', 'Please enter schema type', 'error')
+                                    }
 
                                     if (!tags) {
                                         return swal('Error', 'Please enter tags', 'error')
@@ -177,11 +177,11 @@ export default function SimpleDialog(props: Props) {
 
                                     let data = {
                                         name: topicName,
-                                        schemaType: 'JSD7',
-                                        schema: JSON.stringify(jsonSchema),
+                                        schemaType: schemaType,
+                                        schema: jsonSchema,
                                         version: version,
                                         owner: topicName,
-                                        tags: ["vikas6"]
+                                        tags: ["vikas6"] // check how to take tags from user
                                     }
 
                                     handlePostTopic(data)
