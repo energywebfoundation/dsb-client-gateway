@@ -14,11 +14,12 @@ import swal from '@sweetalert/with-react'
 
 type Props = {
     data?: {
-        topicName: string
+        id: string
+        name: string
         version: string
         tags: string[]
         schemaType: string
-        jsonSchema: object
+        schema: object
     }
 
     onClose: any
@@ -37,8 +38,8 @@ let schemaTypes = [
 export default function SimpleDialog(props: Props) {
     const { onClose, handlePostOrUpdateTopic, open, data, dialogTitle, dialogText } = props
 
-    let [jsonSchema, setJsonSchema] = React.useState(data?.jsonSchema)
-    let [topicName, setTopicName] = React.useState(data?.topicName)
+    let [jsonSchema, setJsonSchema] = React.useState(data?.schema)
+    let [topicName, setTopicName] = React.useState(data?.name)
     let [version, setVersion] = React.useState(data?.version)
     let [tags, setTags] = React.useState(data?.tags)
     let [schemaType, setSchemaType] = React.useState(data?.schemaType)
@@ -180,6 +181,7 @@ export default function SimpleDialog(props: Props) {
                                     }
 
                                     let topicData = {
+                                        id: data?.id,
                                         name: topicName,
                                         schemaType: schemaType,
                                         schema: JSON.stringify(jsonSchema),

@@ -108,6 +108,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
     const [openMenu, setOpenMenu] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
     const [filterInput, setFilterInput] = useState("")
+    const [cellValue, setCellValue] = useState()
 
     const handleClickOpen = () => {
         setOpenMenu(false)
@@ -115,23 +116,14 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
 
     }
 
+    // Function to get cell value
+    const getCellValue = (cell) => {
+        setCellValue(cell.row.original)
+    }
+
     let dialogTitle = 'Update Topic'
     let dialogText = 'Update Topic data'
 
-
-    let topicData = {
-        id: "622ac6325c890a2fd73cd081",
-        topicName: "vikas7",
-        owner: "vikas7",
-        jsonSchema: {
-            "data": "Vikas"
-        },
-        schemaType: "JSD7",
-        tags: [
-            "vikas7"
-        ],
-        version: "1.0.0"
-    }
 
     const handleClose = (value) => {
         setOpenDialog(false)
@@ -315,6 +307,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
                                 {row.cells.map((cell, key) => {
                                     return (
                                         <td key={key}
+                                            onClick={() => getCellValue(cell)}
                                             {...cell.getCellProps()}
                                             style={{
                                                 color: '#C6C9CE',
@@ -360,7 +353,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
             </Menu>
 
             <SimpleDialog
-                data={topicData}
+                data={cellValue}
                 onClose={handleClose}
                 open={openDialog}
                 dialogTitle={dialogTitle}
