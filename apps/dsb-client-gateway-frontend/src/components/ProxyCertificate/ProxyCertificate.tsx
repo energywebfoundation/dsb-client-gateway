@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
+import { CornerUpLeft } from 'react-feather'
 import swal from 'sweetalert'
 import { CustomInput } from '../CustomInput/CustomInput'
 import { CertificateFiles } from '../../utils'
@@ -22,17 +23,23 @@ export const ProxyCertificate = ({
     <div className={classes.credentials}>
       <div className={classes.formGroup}>
         <div className={classes.credentialsHeader}>
+          <CornerUpLeft className={classes.avatarIcon} color= '#7367F0' size={20} />
+          <div>
           <Typography variant="h6">Outbound Certificate</Typography>
-          <Tooltip
+          {/* <Tooltip
             title="Configure the certificate (public and private key) used for mTLS authentication
             (if using a message broker inside a secure environment)."
           >
             <InfoIcon />
-          </Tooltip>
+          </Tooltip> */}
+              <div>
+              <Typography variant="caption">Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur.</Typography>
+            </div>
+            </div>
         </div>
 
         <div>
-          <div className={classes.formGroup}>
+          {/* <div className={classes.formGroup}>
             <Typography className={classes.formLabel} variant="caption">Certificate</Typography>
             <div className={classes.fileInput}>
               <CustomInput placeholder={cert?.name ?? certificate?.cert.name ?? 'Upload a .pem file'} disabled />
@@ -91,10 +98,10 @@ export const ProxyCertificate = ({
                 />
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
-      <div className={classes.buttonGroup}>
+      {/* <div className={classes.buttonGroup}>
         <Button
           variant="contained"
           color="primary"
@@ -109,7 +116,7 @@ export const ProxyCertificate = ({
         >
           Save
         </Button>
-      </div>
+      </div> */}
     </div>
   )
 }
@@ -119,14 +126,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: '6px',
     background: theme.palette.primary.dark,
     padding: '2rem',
-    minHeight: '550px',
+    // minHeight: '550px',
+    minHeight: '212px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between'
   },
   credentialsHeader: {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'left',
     alignItems: 'center',
     color: '#fff',
     marginBottom: '1rem'
@@ -164,5 +172,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   fileButton: {
     // marginTop: theme.spacing(3),
     // padding: '.7rem'
-  }
+  },
+  avatarIcon:{
+    background: 'rgba(115, 103, 240, 0.12)',
+    borderRadius: '50%',
+    width: '46px',
+    height: '46px',
+    padding: '0.6rem',
+    marginRight: '1rem'
+  },
 }))

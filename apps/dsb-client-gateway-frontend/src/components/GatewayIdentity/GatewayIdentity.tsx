@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import swal from 'sweetalert'
+import { Box } from 'react-feather'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { EnrolmentState, snip, StringType } from '../../utils'
 type GatewayIdentityProps = {
@@ -48,14 +49,23 @@ export const GatewayIdentity = ({
     <div className={classes.credentials}>
       <div className={classes.formGroup}>
         <div className={classes.credentialsHeader}>
-          <Typography variant="h6">Gateway Identity</Typography>
-          <Tooltip
-            title="Configure and enrol the gateway as a DSB user using Energy Web Switchboard. You need
-                        to do this before the gateway can publish/subscribe to messages."
-          >
-            <InfoIcon />
-          </Tooltip>
+            <Box className={classes.avatarIcon} color= '#FF5A00' size={20} />
+            <div>
+              <Typography variant="h6">Gateway Identity</Typography>
+              {/* <Tooltip
+                title="Configure and enrol the gateway as a DSB user using Energy Web Switchboard. You need
+                            to do this before the gateway can publish/subscribe to messages."
+              >
+                <InfoIcon />
+              </Tooltip> */}
+              <div>
+              <Typography variant="caption">ID 0x133CEF1178BC392a1bFe067595E3846B96097818</Typography>
+            </div>
+          </div>
         </div>
+
+        
+{/* 
         {statusText && (
           <div className={classes.formGroup}>
             <Typography variant="caption">STATUS</Typography>
@@ -115,7 +125,7 @@ export const GatewayIdentity = ({
           }}
         >
           Save
-        </Button>
+        </Button> */}
       </div>
     </div>
   )
@@ -126,14 +136,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: '6px',
     background: theme.palette.primary.dark,
     padding: '2rem',
-    height: '550px',
+    // height: '550px',
+    minHeight: '212px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between'
   },
   credentialsHeader: {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'left',
     alignItems: 'center',
     color: '#fff',
     marginBottom: '1rem'
@@ -167,5 +178,13 @@ const useStyles = makeStyles((theme: Theme) => ({
       padding: '.7rem',
       marginBottom: '1rem'
     }
-  }
+  },
+  avatarIcon:{
+    background: 'rgba(255, 159, 67, 0.12)',
+    borderRadius: '50%',
+    width: '46px',
+    height: '46px',
+    padding: '0.6rem',
+    marginRight: '1rem'
+  },
 }))
