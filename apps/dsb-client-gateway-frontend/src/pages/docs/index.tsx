@@ -15,6 +15,8 @@ import { Breadcrumbs } from '@material-ui/core'
 import { Home } from 'react-feather'
 import { NavigateNext } from '@material-ui/icons'
 import { getEnrolment } from '../../services/storage.service'
+// import Link from '@material-ui/core/Link'
+
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
   channels: Result<Channel[], ErrorBodySerialized>
@@ -84,17 +86,17 @@ export default function Documentation({
         <ResponsiveHeader />
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
-          <Typography variant="h5" className={classes.pageTitle}>Integration APIs</Typography>
+            <Typography variant="h5" className={classes.pageTitle}>Integration APIs</Typography>
             <Typography variant="h5">|</Typography>
             {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography> */}
-            <Breadcrumbs separator={<NavigateNext fontSize="small" />}aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <Link color="inherit" href="/">
-                <Home color='#A466FF' size={15} />
-              </Link>
-              <Typography color="text.primary">Integration APIs</Typography>
-          </Breadcrumbs>
+            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
+              {/* <Link color="inherit" href="/"> */}
+              <Home color='#A466FF' size={15} />
+              {/* </Link> */}
+              <Typography color="primary">Integration APIs</Typography>
+            </Breadcrumbs>
           </section>
           <Divider className={classes.divider} />
           <section className={classes.apiDocs}>
@@ -178,8 +180,8 @@ const useStyles = makeStyles((theme: Theme) => ({
       padding: '0.5rem'
     }
   },
-  
-  pageTitle:{
+
+  pageTitle: {
     marginRight: '1rem',
     fontSize: '24px'
   },

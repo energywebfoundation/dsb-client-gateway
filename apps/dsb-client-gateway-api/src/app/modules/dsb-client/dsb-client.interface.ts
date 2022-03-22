@@ -1,11 +1,23 @@
-import { GatewayError } from '../../../../../dsb-client-gateway-frontend/src/utils';
+
 import { IAppDefinition } from '@energyweb/iam-contracts'
 export interface Topic {
   namespace: string;
   schema: object | string;
 }
 
-export interface Topic {
+
+
+export interface PaginatedData<T> {
+  count: number;
+  limit: number;
+  page: number;
+  records: T[];
+}
+
+export type TopicDataResponse = PaginatedData<TopicData>;
+
+export interface TopicData {
+
   id: string;
   name: string;
   owner: string;
@@ -14,6 +26,8 @@ export interface Topic {
   tags: string[]
   version: string;
 }
+
+
 export class ApplicationDTO implements IAppDefinition {
   appName: string
   logoUrl?: string
@@ -23,7 +37,7 @@ export class ApplicationDTO implements IAppDefinition {
   topicsCount?: number
 }
 
-export type ApplicationHeader = {
+export interface ApplicationHeader {
   id?: string
   Header?: string
   accessor: string
@@ -111,9 +125,3 @@ export interface Message {
   timestampNanos: number;
   transactionId?: string;
 }
-
-
-export type Result<T = boolean, E = GatewayError> = {
-  ok?: T;
-  err?: E;
-};

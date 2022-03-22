@@ -14,7 +14,7 @@ import {
   Topic,
   SendTopicBodyDTO,
   TopicResultDTO,
-  Result
+  TopicDataResponse,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,15 +22,13 @@ import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
-import { IAppDefinition } from '@energyweb/iam-contracts'
-const qs = require('qs');
+import qs from 'qs';
 
 @Injectable()
 export class DsbApiService implements OnModuleInit {
   private readonly logger = new Logger(DsbApiService.name);
 
   protected tls: Agent | null;
-  protected authToken?: string;
   protected baseUrl: string;
 
   public async onModuleInit(): Promise<void> {
@@ -92,12 +90,40 @@ export class DsbApiService implements OnModuleInit {
     }
   }
 
-  public async getTopics(ownerDID?: string): Promise<Topic[]> {
+
+  public async getTopicsByOwnerAndName(
+    name: string,
+    owner: string
+  ): Promise<TopicDataResponse> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get('http://localhost:8080/topic', {
+          params: {
+            owner,
+            name,
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data;
+  }
+
+  public async getTopics(ownerDID?: string): Promise<TopicDataResponse> {
     if (!ownerDID) {
       const enrolment = this.enrolmentRepository.getEnrolment();
 
       if (!enrolment) {
-        return [];
+        return {
+          count: 0,
+          limit: 0,
+          page: 1,
+          records: []
+        };
       }
 
       ownerDID = enrolment.did;
@@ -138,7 +164,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -147,29 +173,27 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
-
-
-
   /**
    * Sends a POST /postTopics request to the broker
    *
    * @returns
    */
-  public async postTopics(data: SendTopicBodyDTO): Promise<Result<Topic>> {
+  public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
 
-    const { result } = await promiseRetry(async (retry, attempt) => {
+    const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.post('https://aemovc.eastus.cloudapp.azure.com/topic', {
-          data: data,
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        })
+        this.httpService.post('https://aemovc.eastus.cloudapp.azure.com/topic',
+          data,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`
+            }
+          })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
-    return result
+    return result.data
   }
 
   /**
@@ -177,28 +201,22 @@ export class DsbApiService implements OnModuleInit {
   *
   * @returns
   */
-  public async updateTopics(data: SendTopicBodyDTO): Promise<Result<TopicResultDTO>> {
+  public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
 
-    const { result } = await promiseRetry(async (retry, attempt) => {
+    const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.patch('https://aemovc.eastus.cloudapp.azure.com/topic', {
-          data: data,
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        })
-      ).catch((err) => {
-
-        this.logger.error('result of updateTopics', err)
-        return this.handleRequestWithRetry(err, retry)
-
-      });
+        this.httpService.patch('https://aemovc.eastus.cloudapp.azure.com/topic',
+          data,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`
+            },
+          })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
-
-
-    return result
+    return result.data
 
   }
   public async getMessages(
@@ -286,8 +304,8 @@ export class DsbApiService implements OnModuleInit {
       this.logger.log('Unauthorized, attempting to login');
 
       await this.login();
-
-      return retry();
+      // return retry()
+      throw new Error(e);
     }
 
     if (status === HttpStatus.FORBIDDEN) {
@@ -296,7 +314,8 @@ export class DsbApiService implements OnModuleInit {
       throw new Error();
     }
 
-    return retry();
+    throw new Error(e);
+    // return retry();
   }
 
   public async getChannels(): Promise<Channel[]> {
