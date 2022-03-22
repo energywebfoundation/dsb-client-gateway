@@ -33,9 +33,20 @@ export const ProxyCertificate = ({
             <InfoIcon />
           </Tooltip> */}
               <div>
-              <Typography variant="caption">Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur.</Typography>
+              <Typography variant="caption">Neque porro quisquam est qui dolorem ipsum quia dolor sit amet.</Typography>
             </div>
             </div>
+        </div>
+
+        <div className={classes.statusContainer}>
+            <div>
+              <Typography variant="caption">STATUS</Typography>
+              <div>
+              <div><Typography variant="caption" className={classes.statusState}>Set</Typography><Typography variant="caption">Updated 20mins ago</Typography></div>
+            </div>
+            
+          </div>
+          <Button color="primary" variant="contained">Browse</Button>
         </div>
 
         <div>
@@ -127,7 +138,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     background: theme.palette.primary.dark,
     padding: '2rem',
     // minHeight: '550px',
-    minHeight: '212px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between'
@@ -143,7 +153,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    marginBottom: '2rem',
     '& span': {
       fontSize: '.8rem',
     },
@@ -181,4 +190,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: '0.6rem',
     marginRight: '1rem'
   },
+  statusContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '1rem',
+  },
+  statusState: {
+    background: 'rgba(46, 182, 125, 0.12)',
+    padding: '5px',
+    borderRadius: '4px',
+    color: theme.palette.success.main,
+    lineHeight: '2rem',
+    marginRight: '1rem'
+
+  }
 }))
