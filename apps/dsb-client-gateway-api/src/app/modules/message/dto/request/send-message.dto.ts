@@ -1,0 +1,69 @@
+import {
+    IsJSON,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+} from 'class-validator';
+import { IsValidChannelName } from '../../../utils/validator/decorators/IsValidChannelName';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class SendMessageDto {
+
+    @IsString()
+    @IsNotEmpty()
+    @IsValidChannelName({
+        message:
+            '$value is invalid channel name. Should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
+    })
+    @ApiProperty({
+        description: 'Channel Name',
+        type: String,
+        example: 'channel.name',
+    })
+    fqcn: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String,
+        description: 'Topic name'
+    })
+    topicName: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String,
+        example: '1.0.0',
+        description: 'Topic Version',
+    })
+    topicVersion: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String,
+        example: 'aemo.edge',
+        description: 'Topic Owner',
+    })
+    topicOwner: string;
+
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
+        type: String,
+        description: 'Transaction Id used to check Idempotency',
+    })
+    transactionId: string;
+
+    @IsJSON()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: {},
+        example: "{\n        \"data\": \"sample data\"\n    }",
+        description: 'Payload to be sent to message',
+    })
+    payload: string;
+
+}
+
