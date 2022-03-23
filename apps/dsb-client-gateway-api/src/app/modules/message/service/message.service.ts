@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Message } from '../../dsb-client/dsb-client.interface';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { SendMessageDto } from '../dto/request/send-message.dto'
+import { ChannelService } from '../../channel/service/channel.service'
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -18,7 +19,8 @@ export class MessageService {
   constructor(
     protected readonly gateway: EventsGateway,
     protected readonly configService: ConfigService,
-    protected readonly dsbApiService: DsbApiService
+    protected readonly dsbApiService: DsbApiService,
+    protected readonly channelService: ChannelService
   ) { }
 
   public async sendMessagesToSubscribers(
@@ -48,7 +50,7 @@ export class MessageService {
   }
 
   public async sendMessage(dto: SendMessageDto): Promise<void> {
-
+    await this.channelService.getChannelOrThrow(dto.fqcn)
   }
 
 }

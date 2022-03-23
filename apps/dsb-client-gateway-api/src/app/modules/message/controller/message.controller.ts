@@ -15,15 +15,18 @@ import { SendMessageDto } from '../dto/request/send-message.dto';
 import { MessageService } from '../service/message.service'
 
 
+
 @Controller('message')
+@ApiTags('send-message')
 
 export class MessageControlller {
-    constructor(protected readonly messageService: MessageService) { }
+    constructor(
+        protected readonly messageService: MessageService) { }
 
     @Post()
     @ApiResponse({
         status: HttpStatus.CREATED,
-        description: '',
+        description: 'message sent successfully',
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST,
@@ -39,6 +42,5 @@ export class MessageControlller {
         @Body() dto: SendMessageDto
     ): Promise<void> {
         await this.messageService.sendMessage(dto)
-        // await this.channelService.createChannel(dto);
     }
 }
