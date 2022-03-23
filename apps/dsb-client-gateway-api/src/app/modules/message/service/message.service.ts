@@ -5,6 +5,7 @@ import { Message } from '../../dsb-client/dsb-client.interface';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { SendMessageDto } from '../dto/request/send-message.dto'
 import { ChannelService } from '../../channel/service/channel.service'
+import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid'
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -50,7 +51,25 @@ export class MessageService {
   }
 
   public async sendMessage(dto: SendMessageDto): Promise<void> {
+
+
+    //get this schema from topic cache given by Kris
+    const schema = {
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { type: "number", maximum: 3 },
+      },
+      required: ["foo", "bar"],
+      additionalProperties: false,
+    }
+
+
+    const isSchemaValid = IsSchemaValid(schema, dto.payload)
+
+
     await this.channelService.getChannelOrThrow(dto.fqcn)
+
   }
 
 }

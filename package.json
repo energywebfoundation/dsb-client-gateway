@@ -26,6 +26,7 @@
     "@nrwl/next": "13.7.3",
     "@sentry/nextjs": "^6.17.9",
     "@sweetalert/with-react": "^0.1.1",
+    "ajv": "^8.11.0",
     "babel-plugin-styled-components": "^2.0.2",
     "bip39": "^3.0.4",
     "bn.js": "^5.2.0",

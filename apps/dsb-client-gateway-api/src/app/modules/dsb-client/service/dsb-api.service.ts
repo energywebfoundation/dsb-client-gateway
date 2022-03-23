@@ -32,7 +32,7 @@ export class DsbApiService implements OnModuleInit {
   protected baseUrl: string;
 
   public async onModuleInit(): Promise<void> {
-    await this.login();
+    // await this.login();
   }
 
   constructor(
