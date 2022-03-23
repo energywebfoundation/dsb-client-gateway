@@ -12,12 +12,13 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SendMessageDto } from '../dto/request/send-message.dto';
+import { MessageService } from '../service/message.service'
 
 
 @Controller('message')
 
 export class MessageControlller {
-    constructor() { }
+    constructor(protected readonly messageService: MessageService) { }
 
     @Post()
     @ApiResponse({
@@ -37,8 +38,7 @@ export class MessageControlller {
     public async create(
         @Body() dto: SendMessageDto
     ): Promise<void> {
-        console.log('dto', dto)
-
+        await this.messageService.sendMessage(dto)
         // await this.channelService.createChannel(dto);
     }
 }

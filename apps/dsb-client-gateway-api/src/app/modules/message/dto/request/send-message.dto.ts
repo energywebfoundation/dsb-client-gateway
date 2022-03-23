@@ -9,12 +9,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SendMessageDto {
 
-    @IsString()
-    @IsNotEmpty()
     @IsValidChannelName({
         message:
             '$value is invalid channel name. Should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
     })
+    @IsString()
+    @IsNotEmpty()
     @ApiProperty({
         description: 'Channel Name',
         type: String,

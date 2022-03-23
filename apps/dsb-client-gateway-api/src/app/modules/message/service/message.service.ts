@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventsGateway } from '../gateway/events.gateway';
 import { ConfigService } from '@nestjs/config';
 import { Message } from '../../dsb-client/dsb-client.interface';
+import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
+import { SendMessageDto } from '../dto/request/send-message.dto'
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -10,10 +12,14 @@ export enum EventEmitMode {
 
 @Injectable()
 export class MessageService {
+
+  protected readonly logger = new Logger(MessageService.name);
+
   constructor(
     protected readonly gateway: EventsGateway,
-    protected readonly configService: ConfigService
-  ) {}
+    protected readonly configService: ConfigService,
+    protected readonly dsbApiService: DsbApiService
+  ) { }
 
   public async sendMessagesToSubscribers(
     messages: Message[],
@@ -40,4 +46,9 @@ export class MessageService {
       client.send(JSON.stringify(data));
     });
   }
+
+  public async sendMessage(dto: SendMessageDto): Promise<void> {
+
+  }
+
 }
