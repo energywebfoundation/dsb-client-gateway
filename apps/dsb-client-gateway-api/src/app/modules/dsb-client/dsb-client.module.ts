@@ -53,4 +53,4 @@ import { DsbApplicationsController } from './controller/dsb-applications.control
   ],
   exports: [DsbApiService],
 })
-export class DsbClientModule {}
+export class DsbClientModule { }

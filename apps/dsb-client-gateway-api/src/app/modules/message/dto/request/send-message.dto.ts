@@ -63,7 +63,7 @@ export class SendMessageDto {
         example: "{\n        \"data\": \"sample data\"\n    }",
         description: 'Payload to be sent to message',
     })
-    payload: string;
+    payload: JSON;
 
 }
 

@@ -6,8 +6,7 @@ import { TopicVersion } from '../../dsb-client/dsb-client.interface';
 @Injectable()
 export class TopicRepository
   extends AbstractLokiRepository
-  implements OnModuleInit
-{
+  implements OnModuleInit {
   private readonly logger = new Logger(TopicRepository.name);
 
   constructor(protected readonly lokiService: LokiService) {

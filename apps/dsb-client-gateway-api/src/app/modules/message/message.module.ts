@@ -8,8 +8,10 @@ import { MessageControlller } from './controller/message.controller';
 import { DsbClientModule } from '../dsb-client/dsb-client.module';
 import { ChannelModule } from '../channel/channel.module'
 import { StorageModule } from '../storage/storage.module';
+import { CqrsModule } from '@nestjs/cqrs';
+import { IdentityModule } from '../identity/identity.module'
 @Module({
-  imports: [DsbClientModule, UtilsModule, ChannelModule, StorageModule],
+  imports: [DsbClientModule, CqrsModule, UtilsModule, ChannelModule, IdentityModule, StorageModule],
   providers: [EventsGateway, MessageService, ChannelRepository, ChannelService],
   exports: [MessageService],
   controllers: [MessageControlller],

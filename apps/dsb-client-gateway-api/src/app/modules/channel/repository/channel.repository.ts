@@ -7,8 +7,7 @@ import { ChannelType } from '../channel.const';
 @Injectable()
 export class ChannelRepository
   extends AbstractLokiRepository
-  implements OnModuleInit
-{
+  implements OnModuleInit {
   private readonly logger = new Logger(ChannelRepository.name);
 
   constructor(protected readonly lokiService: LokiService) {

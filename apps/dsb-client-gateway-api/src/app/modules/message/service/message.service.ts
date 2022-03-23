@@ -5,7 +5,12 @@ import { Message } from '../../dsb-client/dsb-client.interface';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { SendMessageDto } from '../dto/request/send-message.dto'
 import { ChannelService } from '../../channel/service/channel.service'
+import { TopicService } from '../../channel/service/topic.service'
+import { IdentityService } from '../../identity/service/identity.service'
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid'
+import { TopicNotFoundException } from '../exceptions/topic-not-found.exception'
+
+import { v4 as uuidv4 } from 'uuid';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -21,7 +26,9 @@ export class MessageService {
     protected readonly gateway: EventsGateway,
     protected readonly configService: ConfigService,
     protected readonly dsbApiService: DsbApiService,
-    protected readonly channelService: ChannelService
+    protected readonly channelService: ChannelService,
+    protected readonly topicService: TopicService,
+    protected readonly identityService: IdentityService
   ) { }
 
   public async sendMessagesToSubscribers(
@@ -52,23 +59,17 @@ export class MessageService {
 
   public async sendMessage(dto: SendMessageDto): Promise<void> {
 
+    const channel = await this.channelService.getChannelOrThrow(dto.fqcn)
+    const topic = await this.topicService.getTopic(dto.topicName, dto.topicOwner, dto.topicVersion)
+    const recipients = await this.channelService.getChannelQualifiedDids(dto.fqcn);
 
-    //get this schema from topic cache given by Kris
-    const schema = {
-      type: "object",
-      properties: {
-        foo: { type: "string" },
-        bar: { type: "number", maximum: 3 },
-      },
-      required: ["foo", "bar"],
-      additionalProperties: false,
+    if (!topic) {
+      throw new TopicNotFoundException()
     }
 
-
-    const isSchemaValid = IsSchemaValid(schema, dto.payload)
-
-
-    await this.channelService.getChannelOrThrow(dto.fqcn)
+    const isSchemaValid = IsSchemaValid(topic.schema, dto.payload)
+    const clientGatewayMessageId: string = uuidv4();
+    const signature = await this.identityService.signPayload(JSON.stringify(dto.payload));
 
   }
 

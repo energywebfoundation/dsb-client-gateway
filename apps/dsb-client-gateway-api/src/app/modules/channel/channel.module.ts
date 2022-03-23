@@ -26,4 +26,4 @@ import { TopicService } from './service/topic.service';
   controllers: [ChannelController],
   exports: [ChannelService, TopicService],
 })
-export class ChannelModule {}
+export class ChannelModule { }
