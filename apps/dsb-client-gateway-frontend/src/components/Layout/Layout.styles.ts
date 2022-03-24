@@ -5,6 +5,6 @@ export const useStyles = makeStyles()((theme) => ({
     display: 'flex',
   },
   content: {
-    flexGrow: 1
+    flexGrow: 1,
   },
 }));

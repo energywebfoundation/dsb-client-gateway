@@ -1,11 +1,8 @@
-
-import { IAppDefinition } from '@energyweb/iam-contracts'
+import { IAppDefinition } from '@energyweb/iam-contracts';
 export interface Topic {
   namespace: string;
   schema: object | string;
 }
-
-
 
 export interface PaginatedData<T> {
   count: number;
@@ -28,63 +25,59 @@ export interface TopicVersion {
 export type TopicVersionResponse = PaginatedData<TopicVersion>;
 
 export interface TopicData {
-
   id: string;
   name: string;
   owner: string;
   schema: object | string;
   schemaType: string;
-  tags: string[]
+  tags: string[];
   version: string;
 }
 
-
 export class ApplicationDTO implements IAppDefinition {
-  appName: string
-  logoUrl?: string
-  websiteUrl?: string
-  description?: string
-  namespace?: string
-  topicsCount?: number
+  appName: string;
+  logoUrl?: string;
+  websiteUrl?: string;
+  description?: string;
+  namespace?: string;
+  topicsCount?: number;
 }
 
 export interface ApplicationHeader {
-  id?: string
-  Header?: string
-  accessor: string
-  filter?: string
-  Cell?: any
+  id?: string;
+  Header?: string;
+  accessor: string;
+  filter?: string;
+  Cell?: any;
 }
 
 export type TopicResultDTO = {
-  id: string
-  name: string
-  schemaType: string
-  schema: string
-  version: string
-  owner: string,
-  tags: string[]
-}
-
+  id: string;
+  name: string;
+  schemaType: string;
+  schema: string;
+  version: string;
+  owner: string;
+  tags: string[];
+};
 
 export type GetTopicsOptions = {
-  limit?: number
-  name: string
-  owner: string
-  page?: number
-  tags?: string[]
-}
+  limit?: number;
+  name: string;
+  owner: string;
+  page?: number;
+  tags?: string[];
+};
 
 export type SendTopicBodyDTO = {
-  name: string
-  schemaType: string
-  schema: string
-  version: string
-  signature: string
-  owner: string
-  tags: string[]
-}
-
+  name: string;
+  schemaType: string;
+  schema: string;
+  version: string;
+  signature: string;
+  owner: string;
+  tags: string[];
+};
 
 export class ChannelDTO {
   fqcn: string;

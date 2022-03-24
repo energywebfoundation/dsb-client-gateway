@@ -5,8 +5,9 @@ export class CreateIdentityDto {
   @IsOptional()
   @IsString()
   @ApiProperty({
-    description: 'Private key starting with 0x. If not passed then keys will be generated',
-    required: false
+    description:
+      'Private key starting with 0x. If not passed then keys will be generated',
+    required: false,
   })
   privateKey?: string;
 }

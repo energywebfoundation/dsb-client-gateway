@@ -14,8 +14,8 @@ export interface CertificateDetails {
 }
 
 export interface EncryptionKeys {
-  createdAt,
-  privateDerivedKey,
-  publicMasterKey,
-  privateMasterKey
+  createdAt;
+  privateDerivedKey;
+  publicMasterKey;
+  privateMasterKey;
 }

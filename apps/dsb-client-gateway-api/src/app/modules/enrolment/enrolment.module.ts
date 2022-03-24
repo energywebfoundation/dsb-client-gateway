@@ -8,8 +8,6 @@ import { StorageModule } from '../storage/storage.module';
 @Module({
   imports: [UtilsModule, StorageModule],
   providers: [EnrolmentService, NatsListenerService],
-  controllers: [EnrolmentController]
+  controllers: [EnrolmentController],
 })
-export class EnrolmentModule {
-
-}
+export class EnrolmentModule {}

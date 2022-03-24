@@ -8,8 +8,6 @@ import { KeysController } from './keys.controller';
   imports: [StorageModule, SecretsEngineModule],
   providers: [KeysService],
   controllers: [KeysController],
-  exports: [KeysService]
+  exports: [KeysService],
 })
-export class KeysModule {
-
-}
+export class KeysModule {}

@@ -1,6 +1,4 @@
-import {
-  makeStyles, withStyles
-} from 'tss-react/mui';
+import { makeStyles, withStyles } from 'tss-react/mui';
 import {
   Accordion,
   AccordionDetails,
@@ -12,9 +10,9 @@ import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 
 type ChannelProps = {
-  channel: ChannelType
-  myDID?: string
-}
+  channel: ChannelType;
+  myDID?: string;
+};
 
 const AccordionSummary = withStyles(MuiAccordionSummary, {
   root: {
@@ -23,18 +21,18 @@ const AccordionSummary = withStyles(MuiAccordionSummary, {
     marginBottom: -1,
     minHeight: 56,
     '&$expanded': {
-      minHeight: 56
-    }
+      minHeight: 56,
+    },
   },
   content: {
     '&$expanded': {
-      margin: '12px 0'
-    }
+      margin: '12px 0',
+    },
   },
-  expanded: {}
+  expanded: {},
 });
 
-export default function Channel({channel, myDID}: ChannelProps) {
+export default function Channel({ channel, myDID }: ChannelProps) {
   const { classes } = useStyles();
 
   const isPubSub = () => {
@@ -83,11 +81,15 @@ export default function Channel({channel, myDID}: ChannelProps) {
                 </AccordionSummary>
                 <AccordionDetails>
                   <JsonView
-                    data={typeof topic.schema === 'string' ? JSON.parse(topic.schema) : topic.schema}
+                    data={
+                      typeof topic.schema === 'string'
+                        ? JSON.parse(topic.schema)
+                        : topic.schema
+                    }
                     shouldInitiallyExpand={(level) => level !== 1}
                     style={{
                       ...defaultStyles,
-                      container: classes.jsonContainer
+                      container: classes.jsonContainer,
                     }}
                   />
                 </AccordionDetails>
@@ -102,29 +104,29 @@ export default function Channel({channel, myDID}: ChannelProps) {
 
 const useStyles = makeStyles()((theme) => ({
   container: {
-    margin: '2rem'
+    margin: '2rem',
   },
   accordion: {
-    backgroundColor: theme.palette.secondary.light
+    backgroundColor: theme.palette.secondary.light,
   },
   accordionTitle: {
     color: theme.palette.info.contrastText,
     '& div': {
       display: 'flex',
-      justifyContent: 'space-between'
-    }
+      justifyContent: 'space-between',
+    },
   },
   name: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   sectionTitle: {
     margin: '1rem 0.5rem',
     color: theme.palette.info.contrastText,
-    textDecorationStyle: 'wavy'
+    textDecorationStyle: 'wavy',
   },
   channelDetail: {
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   channel: {
     color: '#fff',
@@ -136,14 +138,13 @@ const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
 
     '& span': {
-      fontSize: '.9rem'
+      fontSize: '.9rem',
     },
     '&:hover': {
-      cursor: 'pointer'
-    }
+      cursor: 'pointer',
+    },
   },
   jsonContainer: {
-    fontFamily: 'monospace'
-  }
+    fontFamily: 'monospace',
+  },
 }));
-

@@ -1,89 +1,98 @@
-import { base64 } from 'ethers/lib/utils'
-import { Server } from 'http'
-import { EventEmitter } from 'events'
-import { client as WsClient, IBinaryMessage, IUtf8Message, server as WsServer } from 'websocket'
-import { WebSocketClientOptions } from '../utils'
-import { WebSocketClient, WebSocketServer } from './websocket.service'
+import { base64 } from 'ethers/lib/utils';
+import { Server } from 'http';
+import { EventEmitter } from 'events';
+import {
+  client as WsClient,
+  IBinaryMessage,
+  IUtf8Message,
+  server as WsServer,
+} from 'websocket';
+import { WebSocketClientOptions } from '../utils';
+import { WebSocketClient, WebSocketServer } from './websocket.service';
 
 const parseMessage = <T>(msg: IUtf8Message | IBinaryMessage): T => {
   if (msg.type === 'utf8') {
-    return JSON.parse(msg.utf8Data)
+    return JSON.parse(msg.utf8Data);
   }
-  return JSON.parse(msg.binaryData.toString('utf8'))
-}
+  return JSON.parse(msg.binaryData.toString('utf8'));
+};
 
 describe('WebSocketService', () => {
   describe('Server', () => {
-    const authorization = `Bearer ${base64.encode(Buffer.from('test:password'))}`
-    let server: Server
-    let wsServer: WebSocketServer
+    const authorization = `Bearer ${base64.encode(
+      Buffer.from('test:password')
+    )}`;
+    let server: Server;
+    let wsServer: WebSocketServer;
 
     beforeEach(() => {
-      server = new Server()
-      server.listen('5000')
-      wsServer = WebSocketServer.init(server, '/ws')
-    })
+      server = new Server();
+      server.listen('5000');
+      wsServer = WebSocketServer.init(server, '/ws');
+    });
 
     afterEach(() => {
-      WebSocketServer.destroy()
-      server.close()
-    })
+      WebSocketServer.destroy();
+      server.close();
+    });
 
     it('should accept authorized connections', (done) => {
-      const ws = new WsClient()
+      const ws = new WsClient();
       ws.on('connect', (conn) => {
-        conn.close()
-        done()
-      })
-      ws.on('connectFailed', done)
-      ws.connect('ws://localhost:5000/ws', 'dsb-messages', undefined, { authorization })
-    })
+        conn.close();
+        done();
+      });
+      ws.on('connectFailed', done);
+      ws.connect('ws://localhost:5000/ws', 'dsb-messages', undefined, {
+        authorization,
+      });
+    });
 
     it('should not allow unauthorized clients to connect: missing auth', (done) => {
-      const ws = new WsClient()
-      ws.on('connect', () => done('Should not connect'))
+      const ws = new WsClient();
+      ws.on('connect', () => done('Should not connect'));
       ws.on('connectFailed', (err) => {
-        expect(err.message).toContain('401 Unauthorized')
-        done()
-      })
-      ws.connect('ws://localhost:5000/ws', 'dsb-messages')
-    })
+        expect(err.message).toContain('401 Unauthorized');
+        done();
+      });
+      ws.connect('ws://localhost:5000/ws', 'dsb-messages');
+    });
 
     it('should not allow unauthorized clients to connect: wrong auth', (done) => {
-      const ws = new WsClient()
-      ws.on('connect', () => done('Should not connect'))
+      const ws = new WsClient();
+      ws.on('connect', () => done('Should not connect'));
       ws.on('connectFailed', (err) => {
-        expect(err.message).toContain('401 Unauthorized')
-        done()
-      })
+        expect(err.message).toContain('401 Unauthorized');
+        done();
+      });
       ws.connect('ws://localhost:5000/ws', 'dsb-messages', undefined, {
-        authorization: `Bearer ${base64.encode(Buffer.from('dev:pass'))}`
-      })
-    })
+        authorization: `Bearer ${base64.encode(Buffer.from('dev:pass'))}`,
+      });
+    });
 
     it('should reject connections on wrong path', (done) => {
-      const ws = new WsClient()
-      ws.on('connect', () => done('Should not connect'))
+      const ws = new WsClient();
+      ws.on('connect', () => done('Should not connect'));
       ws.on('connectFailed', (err) => {
-        expect(err.message).toContain('404 Not Found')
-        done()
-      })
-      ws.connect('ws://localhost:5000/wss', 'dsb-messages')
-    })
+        expect(err.message).toContain('404 Not Found');
+        done();
+      });
+      ws.connect('ws://localhost:5000/wss', 'dsb-messages');
+    });
 
     it('should reject connections on wrong protocol', (done) => {
-      const ws = new WsClient()
-      ws.on('connect', () => done('Should not connect'))
+      const ws = new WsClient();
+      ws.on('connect', () => done('Should not connect'));
       ws.on('connectFailed', (err) => {
-        expect(err.message).toContain('400 Bad Request')
-        expect(err.message).toContain('Protocol Not Supported')
-        done()
-      })
-      ws.connect('ws://localhost:5000/ws', 'dsb')
-    })
+        expect(err.message).toContain('400 Bad Request');
+        expect(err.message).toContain('Protocol Not Supported');
+        done();
+      });
+      ws.connect('ws://localhost:5000/ws', 'dsb');
+    });
 
     it('should send a message to the client', (done) => {
-      const ws = new WsClient()
+      const ws = new WsClient();
       ws.on('connect', (conn) => {
         const payload = {
           id: '1',
@@ -92,40 +101,45 @@ describe('WebSocketService', () => {
           payload: '<payload>',
           sender: 'did:ethr:<address>',
           signature: 'signed',
-          timestampNanos: 0
-        }
+          timestampNanos: 0,
+        };
         conn.on('message', (data) => {
-          const msg = parseMessage(data)
-          expect(msg).toEqual(payload)
-          conn.close()
-          done()
-        })
-        wsServer.emit(payload)
-      })
-      ws.on('connectFailed', done)
-      ws.connect('ws://localhost:5000/ws', 'dsb-messages', undefined, { authorization })
-    })
+          const msg = parseMessage(data);
+          expect(msg).toEqual(payload);
+          conn.close();
+          done();
+        });
+        wsServer.emit(payload);
+      });
+      ws.on('connectFailed', done);
+      ws.connect('ws://localhost:5000/ws', 'dsb-messages', undefined, {
+        authorization,
+      });
+    });
 
     it('should receive a message from the client', (done) => {
-      const ws = new WsClient()
+      const ws = new WsClient();
       ws.on('connect', (conn) => {
         const payload = {
           fqcn: 'test.channel',
           payload: '<payload>',
-          transactionId: '123'
-        }
+          transactionId: '123',
+        };
         conn.on('message', (data) => {
-          const msg: { transactionId: string; err: string } = parseMessage(data)
-          expect(msg.transactionId).toBe(payload.transactionId)
-          expect(msg.err).toBeDefined()
-          conn.close()
-          done()
-        })
-        conn.send(Buffer.from(JSON.stringify(payload)))
-      })
-      ws.on('connectFailed', done)
-      ws.connect('ws://localhost:5000/ws', 'dsb-messages', undefined, { authorization })
-    })
+          const msg: { transactionId: string; err: string } =
+            parseMessage(data);
+          expect(msg.transactionId).toBe(payload.transactionId);
+          expect(msg.err).toBeDefined();
+          conn.close();
+          done();
+        });
+        conn.send(Buffer.from(JSON.stringify(payload)));
+      });
+      ws.on('connectFailed', done);
+      ws.connect('ws://localhost:5000/ws', 'dsb-messages', undefined, {
+        authorization,
+      });
+    });
 
     it('should emit on second instance', () => {
       const ws = WebSocketServer.get().emit({
@@ -135,83 +149,83 @@ describe('WebSocketService', () => {
         payload: 'string',
         sender: 'did:ethr:addr',
         signature: 'sig',
-        timestampNanos: 0
-      })
-    })
-  })
+        timestampNanos: 0,
+      });
+    });
+  });
 
   describe('Client', () => {
-    let httpServer: Server
-    let server: WsServer
+    let httpServer: Server;
+    let server: WsServer;
 
-    const protocol = 'dsb-gateway'
+    const protocol = 'dsb-gateway';
 
     const defaults = {
       url: 'http://localhost:3030/',
       protocol,
-      reconnect: false
-    }
+      reconnect: false,
+    };
 
-    const events = new EventEmitter()
+    const events = new EventEmitter();
 
     beforeEach(() => {
-      httpServer = new Server()
-      httpServer.listen(3030)
-      server = new WsServer({ httpServer })
+      httpServer = new Server();
+      httpServer.listen(3030);
+      server = new WsServer({ httpServer });
       server.on('request', (req) => {
         if (!req.requestedProtocols.includes(protocol)) {
-          return req.reject()
+          return req.reject();
         }
-        const conn = req.accept(protocol)
+        const conn = req.accept(protocol);
         conn.on('message', (data) => {
-          const msg: any = parseMessage(data)
+          const msg: any = parseMessage(data);
           if (msg.fqcn) {
-            events.emit(`${msg.fqcn}#${msg.id}`, msg)
+            events.emit(`${msg.fqcn}#${msg.id}`, msg);
           } else if (msg.transactionId) {
-            events.emit(msg.transactionId, msg)
+            events.emit(msg.transactionId, msg);
           }
-        })
-      })
-    })
+        });
+      });
+    });
 
     afterEach(() => {
-      WebSocketClient.destroy()
-      httpServer.close()
-      server.shutDown()
-    })
+      WebSocketClient.destroy();
+      httpServer.close();
+      server.shutDown();
+    });
 
     it('should connect to server on particular protocol', (done) => {
       WebSocketClient.init(defaults).then((client) => {
-        client.close()
-        done()
-      })
-    })
+        client.close();
+        done();
+      });
+    });
 
     it('should return error if url not available', (done) => {
-      const options = { ...defaults, url: 'http://localhost:3031/' }
+      const options = { ...defaults, url: 'http://localhost:3031/' };
       WebSocketClient.init(options)
         .then((client) => {
-          client.close()
-          done('Should not connect!')
+          client.close();
+          done('Should not connect!');
         })
         .catch((err) => {
-          expect(err.message).toContain('ECONNREFUSED')
-          done()
-        })
-    })
+          expect(err.message).toContain('ECONNREFUSED');
+          done();
+        });
+    });
 
     it('should return error if protocol not supported', (done) => {
-      const options = { ...defaults, protocol: undefined }
+      const options = { ...defaults, protocol: undefined };
       WebSocketClient.init(options)
         .then((client) => {
-          client.close()
-          done('Should not connect!')
+          client.close();
+          done('Should not connect!');
         })
         .catch((err) => {
-          expect(err.message).toContain('403 Forbidden')
-          done()
-        })
-    })
+          expect(err.message).toContain('403 Forbidden');
+          done();
+        });
+    });
 
     it('should send a message to the server', (done) => {
       WebSocketClient.init(defaults).then((client) => {
@@ -223,60 +237,60 @@ describe('WebSocketService', () => {
           sender: 'did:ethr:<address>',
           signature: 'signed',
           timestampNanos: 0,
-          transactionId: '<key>'
-        }
+          transactionId: '<key>',
+        };
         events.on(`${payload.fqcn}#${payload.id}`, (msg) => {
-          expect(msg).toEqual(payload)
-          client.close()
-          done()
-        })
-        client.emit(payload)
-      })
-    })
+          expect(msg).toEqual(payload);
+          client.close();
+          done();
+        });
+        client.emit(payload);
+      });
+    });
 
     it('should receive a message from the server', (done) => {
       WebSocketClient.init(defaults).then((client) => {
         if (server.connections.length !== 1) {
-          throw Error('Server should have exactly 1 connection')
+          throw Error('Server should have exactly 1 connection');
         }
         const payload = {
           fqcn: 'my.channel',
           payload: '<test_payload>',
-          transactionId: '456'
-        }
+          transactionId: '456',
+        };
         events.on(payload.transactionId, (msg) => {
-          expect(msg.transactionId).toBe(payload.transactionId)
-          expect(msg.err).toBeDefined()
-          client.close()
-          done()
-        })
-        server.connections[0].send(Buffer.from(JSON.stringify(payload)))
-      })
-    })
+          expect(msg.transactionId).toBe(payload.transactionId);
+          expect(msg.err).toBeDefined();
+          client.close();
+          done();
+        });
+        server.connections[0].send(Buffer.from(JSON.stringify(payload)));
+      });
+    });
 
     it('should attempt to reconnect on server close', (done) => {
       const options: WebSocketClientOptions = {
         ...defaults,
         reconnect: true,
         reconnectTimeout: 500,
-        reconnectMaxRetries: 1
-      }
+        reconnectMaxRetries: 1,
+      };
       WebSocketClient.init(options).then((client) => {
-        expect(client.isConnected()).toBe(true)
-        server.closeAllConnections()
+        expect(client.isConnected()).toBe(true);
+        server.closeAllConnections();
 
         // wait 200ms to be sure state has changed
         setTimeout(() => {
-          expect(client.isConnected()).toBe(false)
+          expect(client.isConnected()).toBe(false);
           // wait a further 500ms for reconnect
           setTimeout(() => {
-            expect(client.isConnected()).toBe(true)
-            client.close()
-            done()
-          }, 500)
-        }, 200)
-      })
-    })
+            expect(client.isConnected()).toBe(true);
+            client.close();
+            done();
+          }, 500);
+        }, 200);
+      });
+    });
 
     it('should emit on second instance', (done) => {
       WebSocketClient.init(defaults).then(() => {
@@ -287,10 +301,10 @@ describe('WebSocketService', () => {
           payload: 'string',
           sender: 'did:ethr:addr',
           signature: 'sig',
-          timestampNanos: 0
-        })
-        done()
-      })
-    })
-  })
-})
+          timestampNanos: 0,
+        });
+        done();
+      });
+    });
+  });
+});

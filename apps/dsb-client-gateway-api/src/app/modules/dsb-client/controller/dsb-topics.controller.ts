@@ -1,10 +1,17 @@
 import {
-  Controller, Get, UseGuards, Body, Post, Patch, Query, HttpCode,
+  Controller,
+  Get,
+  UseGuards,
+  Body,
+  Post,
+  Patch,
+  Query,
+  HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { DsbApiService } from '../service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
-import { ApiTags, ApiResponse, } from '@nestjs/swagger';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { SendTopicBodyDTO } from '../dsb-client.interface';
 import { GetTopicsCountQueryDto, PaginatedResponse } from '../dto';
 
@@ -12,7 +19,7 @@ import { GetTopicsCountQueryDto, PaginatedResponse } from '../dto';
 @UseGuards(DigestGuard)
 @ApiTags('dsb', 'topics')
 export class DsbTopicsController {
-  constructor(protected readonly dsbClientService: DsbApiService) { }
+  constructor(protected readonly dsbClientService: DsbApiService) {}
 
   @Get('topics')
   @ApiResponse({
@@ -30,7 +37,8 @@ export class DsbTopicsController {
 
   @Get('topics/count')
   public async getTopicsCountByOwner(
-    @Query() { owner }: GetTopicsCountQueryDto) {
+    @Query() { owner }: GetTopicsCountQueryDto
+  ) {
     return this.dsbClientService.getTopicsCountByOwner(owner);
   }
 
@@ -49,9 +57,7 @@ export class DsbTopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  public async postTopics(
-    @Body() data: SendTopicBodyDTO
-  ) {
+  public async postTopics(@Body() data: SendTopicBodyDTO) {
     return this.dsbClientService.postTopics(data);
   }
 
@@ -74,9 +80,7 @@ export class DsbTopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.CREATED)
-  public async updateTopics(
-    @Body() data: SendTopicBodyDTO
-  ) {
+  public async updateTopics(@Body() data: SendTopicBodyDTO) {
     return this.dsbClientService.updateTopics(data);
   }
 }

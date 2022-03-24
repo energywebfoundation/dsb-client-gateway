@@ -1,25 +1,25 @@
-import { useState } from 'react'
-import { Button, Tooltip, Typography } from '@mui/material'
+import { useState } from 'react';
+import { Button, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import Swal from 'sweetalert2';
-import { CustomInput } from '../CustomInput/CustomInput'
-import { CertificateFiles } from '../../utils'
+import { CustomInput } from '../CustomInput/CustomInput';
+import { CertificateFiles } from '../../utils';
 import InfoIcon from '@mui/icons-material/Info';
 
 type ProxyCertificateProps = {
-  certificate?: CertificateFiles
-  isLoading: boolean
-  onSubmit: (cert: File, key: File, ca?: File) => void
-}
+  certificate?: CertificateFiles;
+  isLoading: boolean;
+  onSubmit: (cert: File, key: File, ca?: File) => void;
+};
 export const ProxyCertificate = ({
   certificate,
   isLoading,
-  onSubmit
+  onSubmit,
 }: ProxyCertificateProps) => {
-  const { classes } = useStyles()
-  const [cert, setCert] = useState<File>()
-  const [privateKey, setPrivateKey] = useState<File>()
-  const [ca, setCa] = useState<File>()
+  const { classes } = useStyles();
+  const [cert, setCert] = useState<File>();
+  const [privateKey, setPrivateKey] = useState<File>();
+  const [ca, setCa] = useState<File>();
   return (
     <div className={classes.credentials}>
       <div className={classes.formGroup}>
@@ -35,9 +35,16 @@ export const ProxyCertificate = ({
 
         <div>
           <div className={classes.formGroup}>
-            <Typography className={classes.formLabel} variant="caption">Certificate</Typography>
+            <Typography className={classes.formLabel} variant="caption">
+              Certificate
+            </Typography>
             <div className={classes.fileInput}>
-              <CustomInput placeholder={cert?.name ?? certificate?.cert.name ?? 'Upload a .pem file'} disabled />
+              <CustomInput
+                placeholder={
+                  cert?.name ?? certificate?.cert.name ?? 'Upload a .pem file'
+                }
+                disabled
+              />
               <Button
                 variant="contained"
                 color="primary"
@@ -55,9 +62,18 @@ export const ProxyCertificate = ({
             </div>
           </div>
           <div className={classes.formGroup}>
-            <Typography className={classes.formLabel} variant="caption">Private key</Typography>
+            <Typography className={classes.formLabel} variant="caption">
+              Private key
+            </Typography>
             <div className={classes.fileInput}>
-              <CustomInput placeholder={privateKey?.name ?? certificate?.key?.name ?? 'Upload a .pem file'} disabled />
+              <CustomInput
+                placeholder={
+                  privateKey?.name ??
+                  certificate?.key?.name ??
+                  'Upload a .pem file'
+                }
+                disabled
+              />
               <Button
                 variant="contained"
                 color="primary"
@@ -75,9 +91,16 @@ export const ProxyCertificate = ({
             </div>
           </div>
           <div className={classes.formGroup}>
-            <Typography className={classes.formLabel} variant="caption">CA Certificate (optional)</Typography>
+            <Typography className={classes.formLabel} variant="caption">
+              CA Certificate (optional)
+            </Typography>
             <div className={classes.fileInput}>
-              <CustomInput placeholder={ca?.name ?? certificate?.ca?.name ?? 'Upload a .crt file'} disabled />
+              <CustomInput
+                placeholder={
+                  ca?.name ?? certificate?.ca?.name ?? 'Upload a .crt file'
+                }
+                disabled
+              />
               <Button
                 variant="contained"
                 color="primary"
@@ -104,17 +127,20 @@ export const ProxyCertificate = ({
           disabled={isLoading}
           onClick={() => {
             if (!cert || !privateKey) {
-              return Swal.fire('Error', 'Public certificate and private key are required.')
+              return Swal.fire(
+                'Error',
+                'Public certificate and private key are required.'
+              );
             }
-            onSubmit(cert, privateKey, ca)
+            onSubmit(cert, privateKey, ca);
           }}
         >
           Save
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const useStyles = makeStyles()((theme) => ({
   credentials: {
@@ -124,14 +150,14 @@ const useStyles = makeStyles()((theme) => ({
     minHeight: '550px',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   credentialsHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     color: '#fff',
-    marginBottom: '1rem'
+    marginBottom: '1rem',
   },
   formGroup: {
     display: 'flex',
@@ -143,19 +169,19 @@ const useStyles = makeStyles()((theme) => ({
     },
     '& input': {
       color: '#fff',
-      width: '230px'
-    }
+      width: '230px',
+    },
   },
   formLabel: {
     color: '#fff',
-    marginBottom: '.3rem'
+    marginBottom: '.3rem',
   },
   buttonGroup: {
     marginTop: '1rem',
     '& button': {
       padding: '.7rem',
-      marginBottom: '1rem'
-    }
+      marginBottom: '1rem',
+    },
   },
   fileInput: {
     display: 'flex',
@@ -166,5 +192,5 @@ const useStyles = makeStyles()((theme) => ({
   fileButton: {
     // marginTop: theme.spacing(3),
     // padding: '.7rem'
-  }
-}))
+  },
+}));

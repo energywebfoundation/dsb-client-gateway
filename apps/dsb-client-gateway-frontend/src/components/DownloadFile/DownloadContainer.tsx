@@ -2,7 +2,7 @@ import { Download } from './Download';
 import { Channel, UnknownError } from '../../utils';
 import { useState } from 'react';
 import axios from 'axios';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 import { captureException } from '@sentry/nextjs';
 
 type DownloadContainerProps = {

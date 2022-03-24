@@ -1,17 +1,24 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
-import { Typography, Button, Grid, MenuItem, FormControl, Select } from '@mui/material'
-import { Info } from '@mui/icons-material'
-import { CustomInput } from '../../components/CustomInput/CustomInput'
-import { Channel } from '../../utils'
-import Swal from 'sweetalert2'
+import {
+  Typography,
+  Button,
+  Grid,
+  MenuItem,
+  FormControl,
+  Select,
+} from '@mui/material';
+import { Info } from '@mui/icons-material';
+import { CustomInput } from '../../components/CustomInput/CustomInput';
+import { Channel } from '../../utils';
+import Swal from 'sweetalert2';
 type DownloadProps = {
-  channels: Channel[] | undefined,
-  onDownload: (fqcn: string, amount: number, clientId?: string) => void
-}
-export const Download = ({ channels, onDownload }: DownloadProps,) => {
-  const { classes } = useStyles()
-  const [channelName, setChannelName] = useState('')
+  channels: Channel[] | undefined;
+  onDownload: (fqcn: string, amount: number, clientId?: string) => void;
+};
+export const Download = ({ channels, onDownload }: DownloadProps) => {
+  const { classes } = useStyles();
+  const [channelName, setChannelName] = useState('');
   return (
     <section className={classes.download}>
       <div className={classes.downloadHeader}>
@@ -43,12 +50,19 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
 
           <Grid container spacing={2}>
             <Grid item xs={6} sm={5}>
-              <Button variant="contained" color="primary" fullWidth
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
                 onClick={() => {
                   if (!channelName) {
-                    return Swal.fire('Error', 'Please enter channel name', 'error')
+                    return Swal.fire(
+                      'Error',
+                      'Please enter channel name',
+                      'error'
+                    );
                   }
-                  onDownload(channelName, 1)
+                  onDownload(channelName, 1);
                 }}
               >
                 Download recent
@@ -58,26 +72,26 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
         </Grid>
       </div>
     </section>
-  )
-}
+  );
+};
 
 const useStyles = makeStyles()((theme) => ({
   download: {
     borderRadius: '6px',
     background: theme.palette.primary.dark,
     padding: theme.spacing(6),
-    margin: theme.spacing(3, 1)
+    margin: theme.spacing(3, 1),
   },
   downloadHeader: {
     textAlign: 'right',
-    color: '#fff'
+    color: '#fff',
   },
   form: {
     marginTop: '1rem',
     '& button': {
       padding: '.7rem',
-      marginBottom: '1rem'
-    }
+      marginBottom: '1rem',
+    },
   },
   formGroup: {
     display: 'flex',
@@ -86,16 +100,16 @@ const useStyles = makeStyles()((theme) => ({
     marginBottom: '2rem',
     '& span': {
       fontSize: '.8rem',
-      marginBottom: '.3rem'
+      marginBottom: '.3rem',
     },
     '& *': {
-      color: '#fff'
+      color: '#fff',
     },
     '& input': {
-      width: '100%'
-    }
+      width: '100%',
+    },
   },
   errorText: {
-    color: theme.palette.error.main
-  }
-}))
+    color: theme.palette.error.main,
+  },
+}));

@@ -2,9 +2,9 @@ import { alpha } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 
-export const CustomInput = styled(InputBase)(({theme}) => ({
+export const CustomInput = styled(InputBase)(({ theme }) => ({
   'label + &': {
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   '& .MuiInputBase-input': {
     borderRadius: 4,
@@ -17,7 +17,7 @@ export const CustomInput = styled(InputBase)(({theme}) => ({
     transition: theme.transitions.create(['border-color', 'box-shadow']),
     '&:focus': {
       boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.2rem`,
-      borderColor: theme.palette.primary.main
-    }
-  }
+      borderColor: theme.palette.primary.main,
+    },
+  },
 }));

@@ -6,6 +6,6 @@ import { SecretsEngineModule } from '../secrets-engine/secrets-engine.module';
 @Module({
   imports: [SecretsEngineModule],
   providers: [CertificateService],
-  controllers: [CertificateController]
+  controllers: [CertificateController],
 })
 export class CertificateModule {}

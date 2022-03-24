@@ -7,7 +7,7 @@ import Axios from 'axios';
 import { DDHubThemeProvider } from '../styles/theme';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
-import createCache from "@emotion/cache";
+import createCache from '@emotion/cache';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
 import { Layout } from '../components/Layout';
@@ -15,7 +15,8 @@ import { Layout } from '../components/Layout';
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';
 
 let muiCache: EmotionCache | undefined = undefined;
-export const createMuiCache = () => muiCache = createCache({ "key": "mui", "prepend": true });
+export const createMuiCache = () =>
+  (muiCache = createCache({ key: 'mui', prepend: true }));
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -25,7 +26,7 @@ function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
 
   useEffect(() => {
-    NProgress.configure({showSpinner: false});
+    NProgress.configure({ showSpinner: false });
     Router.events.on('routeChangeStart', () => NProgress.start());
     Router.events.on('routeChangeComplete', () => NProgress.done());
     Router.events.on('routeChangeError', () => NProgress.done());

@@ -1,187 +1,188 @@
-import { useEffect, useState } from 'react'
-import Head from 'next/head'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from 'tss-react/mui'
-import { Container } from '@mui/material'
+import { useEffect, useState } from 'react';
+import Head from 'next/head';
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next';
+import { makeStyles } from 'tss-react/mui';
+import { Container } from '@mui/material';
 import Swal from 'sweetalert2';
-import { TopicContainer } from '../../components/Topics/TopicsContainer'
-import { refreshState } from '../../services/identity.service'
-import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Option, Topic } from '../../utils'
-import axios from 'axios'
+import { TopicContainer } from '../../components/Topics/TopicsContainer';
+import { refreshState } from '../../services/identity.service';
+import { isAuthorized } from '../../services/auth.service';
+import { ErrorCode, Option, Topic } from '../../utils';
+import axios from 'axios';
 
 type Props = {
-    ownerDid: string
-    owner: string
-    auth: Option<string>
-}
+  ownerDid: string;
+  owner: string;
+  auth: Option<string>;
+};
 
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-    props: Props
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<{
+  props: Props;
 }> {
+  const authHeader = context.req.headers.authorization;
+  const owner = context.req['query'].owner;
 
-    const authHeader = context.req.headers.authorization
-    const owner = context.req['query'].owner
+  const { err } = isAuthorized(authHeader);
 
+  const state = await refreshState();
+  const did = state.ok?.enrolment?.did;
 
-
-
-    const { err } = isAuthorized(authHeader)
-
-    const state = await refreshState()
-    const did = state.ok?.enrolment?.did
-
-    if (!err) {
-        return {
-            props: {
-                owner: owner,
-                ownerDid: did,
-                auth: authHeader ? { some: authHeader } : { none: true }
-            }
-        }
+  if (!err) {
+    return {
+      props: {
+        owner: owner,
+        ownerDid: did,
+        auth: authHeader ? { some: authHeader } : { none: true },
+      },
+    };
+  } else {
+    if (err.message === ErrorCode.UNAUTHORIZED) {
+      context.res.statusCode = 401;
+      context.res.setHeader(
+        'WWW-Authenticate',
+        'Basic realm="Authorization Required"'
+      );
     } else {
-        if (err.message === ErrorCode.UNAUTHORIZED) {
-            context.res.statusCode = 401
-            context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
-        } else {
-            context.res.statusCode = 403
-        }
-        return {
-            props: {
-                owner: '',
-                ownerDid: '',
-                auth: { none: true }
-            }
-        }
+      context.res.statusCode = 403;
     }
+    return {
+      props: {
+        owner: '',
+        ownerDid: '',
+        auth: { none: true },
+      },
+    };
+  }
 }
 
+export default function ListTopics({
+  owner,
+  ownerDid,
+  auth,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { classes } = useStyles();
 
-export default function ListTopics({ owner, ownerDid, auth }:
-    InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const { classes } = useStyles()
+  const [topics, setTopics] = useState<Topic[]>();
+  const [health, setHealth] = useState('');
 
-    const [topics, setTopics] = useState<Topic[]>();
-    const [health, setHealth] = useState('');
+  useEffect(() => {
+    async function getServerSideProps() {
+      const topicsResponse = await axios.get(`/v1/dsb/topics`, {
+        headers: {
+          Authorization: auth ? `Bearer ${auth}` : undefined,
+          'content-type': 'application/json',
+        },
+        params: { ownerDid: ownerDid },
+      });
 
-    useEffect(() => {
+      if (topicsResponse.status !== 200) {
+        return Swal.fire('Error', topicsResponse.data.reason, 'error');
+      }
 
-        async function getServerSideProps() {
+      setTopics(topicsResponse.data.records);
 
-            const topicsResponse = await axios.get(`/v1/dsb/topics`,
-                {
-                    headers: {
-                        Authorization: auth ? `Bearer ${auth}` : undefined,
-                        'content-type': 'application/json',
-                    },
-                    params: { ownerDid: ownerDid },
-                }
-            );
+      const healthResponse = await axios.get(`/v1/dsb/health`, {
+        headers: {
+          Authorization: auth ? `Bearer ${auth}` : undefined,
+          'content-type': 'application/json',
+        },
+      });
 
-            if (topicsResponse.status !== 200) {
-                return Swal.fire('Error', topicsResponse.data.reason, 'error')
-            }
+      setHealth(healthResponse.data);
 
-            setTopics(topicsResponse.data.records)
+      if (healthResponse.status !== 200) {
+        return Swal.fire('Error', healthResponse.data.reason, 'error');
+      }
+    }
 
+    getServerSideProps();
+  }, [auth, ownerDid]);
 
-            const healthResponse = await axios.get(`/v1/dsb/health`, {
-                headers: {
-                    Authorization: auth ? `Bearer ${auth}` : undefined,
-                    'content-type': 'application/json',
-                },
-            });
+  return (
+    <div>
+      <Head>
+        <title>EW-DSB Client Gateway - Topic List</title>
+        <meta name="description" content="EW-DSB Client Gateway" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-            setHealth(healthResponse.data)
-
-            if (healthResponse.status !== 200) {
-                return Swal.fire('Error', healthResponse.data.reason, 'error')
-            }
-
-        }
-
-        getServerSideProps()
-    }, [auth, ownerDid])
-
-    return (
-        <div>
-            <Head>
-                <title>EW-DSB Client Gateway - Topic List</title>
-                <meta name="description" content="EW-DSB Client Gateway" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-
-            <main>
-                <Container maxWidth="lg">
-                    <section className={classes.table}>
-                        {topics ? <TopicContainer
-                            applicationNameSpace={owner}
-                            auth={auth.some}
-                            topics={topics} /> : null}
-                    </section>
-
-                </Container>
-            </main>
-        </div >
-    )
+      <main>
+        <Container maxWidth="lg">
+          <section className={classes.table}>
+            {topics ? (
+              <TopicContainer
+                applicationNameSpace={owner}
+                auth={auth.some}
+                topics={topics}
+              />
+            ) : null}
+          </section>
+        </Container>
+      </main>
+    </div>
+  );
 }
 
 const useStyles = makeStyles()((theme) => ({
-    connectionStatus: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 2rem',
+  connectionStatus: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0 2rem',
 
-        '& *': {
-            color: '#fff'
-        }
+    '& *': {
+      color: '#fff',
     },
-    searchText: {
-        display: 'flex',
-        paddingTop: '1rem',
-        alignItems: 'center',
-        'font-size': '8 px',
-        '& *': {
-            color: '#6E6B7B'
-        }
+  },
+  searchText: {
+    display: 'flex',
+    paddingTop: '1rem',
+    alignItems: 'center',
+    'font-size': '8 px',
+    '& *': {
+      color: '#6E6B7B',
     },
-    connectionStatusPaper: {
-        padding: '.5rem 1rem',
-        marginLeft: '1rem',
-        background: theme.palette.secondary.main,
-        borderRadius: '1rem',
-        display: 'flex',
-        alignItems: 'center',
-        color: '#FFFFFF',
-        justifyContent: 'flex-end'
+  },
+  connectionStatusPaper: {
+    padding: '.5rem 1rem',
+    marginLeft: '1rem',
+    background: theme.palette.secondary.main,
+    borderRadius: '1rem',
+    display: 'flex',
+    alignItems: 'center',
+    color: '#FFFFFF',
+    justifyContent: 'flex-end',
+  },
+  div: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  divider: {
+    background: '#1E263C',
+    margin: '3rem 0',
+  },
+  main: {
+    padding: '0 2rem',
+  },
+  textWhite: {
+    color: '#fff',
+  },
+  table: {
+    marginTop: '1rem',
+  },
+  navLink: {
+    fontSize: '1rem',
 
+    '&:hover': {
+      textDecorationLine: 'underline',
+      color: theme.palette.secondary.main,
     },
-    div: {
-        display: 'flex',
-        justifyContent: 'flex-end'
-    },
-    divider: {
-        background: '#1E263C',
-        margin: '3rem 0'
-    },
-    main: {
-        padding: '0 2rem'
-    },
-    textWhite: {
-        color: '#fff'
-    },
-    table: {
-        marginTop: '1rem',
-    },
-    navLink: {
-        fontSize: '1rem',
-
-        '&:hover': {
-            textDecorationLine: 'underline',
-            color: theme.palette.secondary.main
-        }
-    },
-    active: {
-        color: theme.palette.secondary.main
-    }
-}))
+  },
+  active: {
+    color: theme.palette.secondary.main,
+  },
+}));

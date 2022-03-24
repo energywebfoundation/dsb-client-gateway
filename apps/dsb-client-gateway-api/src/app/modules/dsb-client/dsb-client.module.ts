@@ -50,7 +50,7 @@ import { DsbApplicationsController } from './controller/dsb-applications.control
     DsbMessagesController,
     DsbTopicsController,
     DsbFilesController,
-    DsbApplicationsController
+    DsbApplicationsController,
   ],
   exports: [DsbApiService],
 })

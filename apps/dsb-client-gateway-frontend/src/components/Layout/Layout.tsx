@@ -6,13 +6,11 @@ export interface LayoutProps {
 }
 
 export function Layout(props: LayoutProps) {
-  const {classes} = useStyles();
+  const { classes } = useStyles();
   return (
     <div className={classes.root}>
-      <Sidebar/>
-      <div className={classes.content}>
-        {props.children}
-      </div>
+      <Sidebar />
+      <div className={classes.content}>{props.children}</div>
     </div>
   );
 }

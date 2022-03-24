@@ -1,16 +1,17 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from 'next/image';
+import Link from 'next/link';
 import { makeStyles } from 'tss-react/mui';
-import { AppBar, Toolbar, Typography } from '@mui/material'
-import { useRouter } from 'next/router'
-import clsx from 'clsx'
-import logo from '../../../public/ew-flex-single-logo.png'
+import { AppBar, Toolbar, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
+import clsx from 'clsx';
+import logo from '../../../public/ew-flex-single-logo.png';
 
 export default function Header() {
-  const { classes } = useStyles()
-  const router = useRouter()
+  const { classes } = useStyles();
+  const router = useRouter();
 
-  const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
+  const isActive = (pathname: string) =>
+    router.pathname === pathname ? classes.active : '';
 
   return (
     <AppBar position="static" className={classes.appBar}>
@@ -34,7 +35,9 @@ export default function Header() {
               <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
             </Link>
             <Link href="/applications">
-              <a className={clsx(classes.navLink, isActive('/applications'))}>Applications</a>
+              <a className={clsx(classes.navLink, isActive('/applications'))}>
+                Applications
+              </a>
             </Link>
           </div>
           <p className={classes.divider}>•</p>
@@ -45,31 +48,31 @@ export default function Header() {
         </div>
       </Toolbar>
     </AppBar>
-  )
+  );
 }
 
 const useStyles = makeStyles()((theme) => ({
   appBar: {
     background: '#000',
     '& *': {
-      color: '#fff'
+      color: '#fff',
     },
-    marginBottom: '3rem'
+    marginBottom: '3rem',
   },
   active: {
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
   },
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
     '& > div': {
       display: 'flex',
-      alignItems: 'center'
-    }
+      alignItems: 'center',
+    },
   },
   logoText: {
     marginLeft: '1rem',
-    fontFamily: 'Rajdhani'
+    fontFamily: 'Rajdhani',
   },
   version: {
     borderRadius: '1rem',
@@ -77,22 +80,22 @@ const useStyles = makeStyles()((theme) => ({
     padding: '.3rem .8rem',
     color: '#fff',
     fontSize: '.7rem',
-    background: theme.palette.secondary.main
+    background: theme.palette.secondary.main,
   },
   divider: {
-    margin: '0 1rem'
+    margin: '0 1rem',
   },
   nav: {
     display: 'flex',
     width: '30rem',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   navLink: {
     fontSize: '1rem',
 
     '&:hover': {
       textDecorationLine: 'underline',
-      color: theme.palette.secondary.main
-    }
-  }
-}))
+      color: theme.palette.secondary.main,
+    },
+  },
+}));

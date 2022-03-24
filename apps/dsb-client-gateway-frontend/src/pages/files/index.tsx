@@ -1,74 +1,94 @@
-import { useEffect } from 'react'
-import Head from 'next/head'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { useEffect } from 'react';
+import Head from 'next/head';
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next';
 import { makeStyles } from 'tss-react/mui';
 import { Container, Divider, Typography } from '@mui/material';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 import { UploadContainer } from '../../components/UploadFile/UploadContainer';
 
-import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
-import { DsbApiService } from '../../services/dsb-api.service'
-import { isAuthorized } from '../../services/auth.service'
-import { Breadcrumbs } from '@mui/material'
-import { Home } from 'react-feather'
-import { NavigateNext } from '@mui/icons-material'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
+import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer';
+import { DsbApiService } from '../../services/dsb-api.service';
+import { isAuthorized } from '../../services/auth.service';
+import { Breadcrumbs } from '@mui/material';
+import { Home } from 'react-feather';
+import { NavigateNext } from '@mui/icons-material';
+import {
+  ErrorCode,
+  Result,
+  serializeError,
+  Channel,
+  Option,
+  ErrorBodySerialized,
+  Topic,
+} from '../../utils';
 type Props = {
-  health: Result<boolean, ErrorBodySerialized>
-  channels: Result<Channel[], ErrorBodySerialized>
-  topics: Result<Topic[], ErrorBodySerialized>
-  auth: Option<string>
-}
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-  props: Props
+  health: Result<boolean, ErrorBodySerialized>;
+  channels: Result<Channel[], ErrorBodySerialized>;
+  topics: Result<Topic[], ErrorBodySerialized>;
+  auth: Option<string>;
+};
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<{
+  props: Props;
 }> {
-  const authHeader = context.req.headers.authorization
-  const { err } = isAuthorized(authHeader)
+  const authHeader = context.req.headers.authorization;
+  const { err } = isAuthorized(authHeader);
   if (!err) {
-    const health = await DsbApiService.init().getHealth()
-    const channels = await DsbApiService.init().getChannels()
-    const topics = await DsbApiService.init().getTopics()
+    const health = await DsbApiService.init().getHealth();
+    const channels = await DsbApiService.init().getChannels();
+    const topics = await DsbApiService.init().getTopics();
     return {
       props: {
         health: serializeError(health),
         channels: serializeError(channels),
         topics: serializeError(topics),
-        auth: authHeader ? { some: authHeader } : { none: true }
-      }
-    }
+        auth: authHeader ? { some: authHeader } : { none: true },
+      },
+    };
   } else {
     if (err.message === ErrorCode.UNAUTHORIZED) {
-      context.res.statusCode = 401
-      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
+      context.res.statusCode = 401;
+      context.res.setHeader(
+        'WWW-Authenticate',
+        'Basic realm="Authorization Required"'
+      );
     } else {
-      context.res.statusCode = 403
+      context.res.statusCode = 403;
     }
     return {
       props: {
         health: {},
         channels: {},
         topics: {},
-        auth: { none: true }
-      }
-    }
+        auth: { none: true },
+      },
+    };
   }
 }
-export default function FileUpload({ health, channels, topics, auth }:
-  InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { classes } = useStyles()
+export default function FileUpload({
+  health,
+  channels,
+  topics,
+  auth,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { classes } = useStyles();
   useEffect(() => {
     if (health.err) {
-      Swal.fire('Error', health.err.reason, 'error')
+      Swal.fire('Error', health.err.reason, 'error');
     }
     if (channels.err) {
-      console.log('channels.err', channels.err)
-      Swal.fire('Error', channels.err.reason, 'error')
+      console.log('channels.err', channels.err);
+      Swal.fire('Error', channels.err.reason, 'error');
     }
     if (topics.err) {
-      console.log('channels.err', channels.err)
-      Swal.fire('Error', topics.err.reason, 'error')
+      console.log('channels.err', channels.err);
+      Swal.fire('Error', topics.err.reason, 'error');
     }
-  }, [health, channels, topics])
+  }, [health, channels, topics]);
   return (
     <div>
       <Head>
@@ -79,13 +99,19 @@ export default function FileUpload({ health, channels, topics, auth }:
       <main>
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
-            <Typography variant="h5" className={classes.pageTitle}>Data Messaging</Typography>
+            <Typography variant="h5" className={classes.pageTitle}>
+              Data Messaging
+            </Typography>
             <Typography variant="h5">|</Typography>
             {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography> */}
-            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <Home color='#A466FF' size={15} />
+            <Breadcrumbs
+              separator={<NavigateNext fontSize="small" />}
+              aria-label="breadcrumb"
+              className={classes.breadCrumbs}
+            >
+              <Home color="#A466FF" size={15} />
               <Typography color="primary">Data Messaging</Typography>
             </Breadcrumbs>
           </section>
@@ -94,7 +120,11 @@ export default function FileUpload({ health, channels, topics, auth }:
             <Typography className={classes.textWhite} variant="h5">
               File Upload{' '}
             </Typography>
-            <UploadContainer auth={auth.some} channels={channels.ok} topics={topics.ok} />
+            <UploadContainer
+              auth={auth.some}
+              channels={channels.ok}
+              topics={topics.ok}
+            />
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
@@ -106,7 +136,7 @@ export default function FileUpload({ health, channels, topics, auth }:
         </Container>
       </main>
     </div>
-  )
+  );
 }
 const useStyles = makeStyles()((theme) => ({
   connectionStatus: {
@@ -114,8 +144,8 @@ const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
     padding: '0 2rem',
     '& *': {
-      color: '#fff'
-    }
+      color: '#fff',
+    },
   },
   connectionStatusPaper: {
     padding: '.5rem 1rem',
@@ -124,25 +154,24 @@ const useStyles = makeStyles()((theme) => ({
     background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   divider: {
     background: '#1E263C',
-    margin: '3rem 0'
+    margin: '3rem 0',
   },
   main: {
-    padding: '0 2rem'
+    padding: '0 2rem',
   },
   pageTitle: {
     marginRight: '1rem',
-    fontSize: '24px'
+    fontSize: '24px',
   },
 
   breadCrumbs: {
     marginLeft: '1rem',
   },
   textWhite: {
-    color: '#fff'
-  }
-}))
-
+    color: '#fff',
+  },
+}));

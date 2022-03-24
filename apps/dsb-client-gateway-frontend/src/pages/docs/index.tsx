@@ -1,78 +1,99 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from 'tss-react/mui'
-import { Typography, Container, Divider, Button } from '@mui/material'
+import Head from 'next/head';
+import Link from 'next/link';
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next';
+import { makeStyles } from 'tss-react/mui';
+import { Typography, Container, Divider, Button } from '@mui/material';
 import Swal from 'sweetalert2';
-import { DsbApiService } from '../../services/dsb-api.service'
-import { isAuthorized } from '../../services/auth.service'
-import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError } from '../../utils'
-import { useEffect } from 'react'
-import { useState } from 'react'
-import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
-import { Breadcrumbs } from '@mui/material'
-import { Home } from 'react-feather'
-import { NavigateNext } from '@mui/icons-material'
-import { getEnrolment } from '../../services/storage.service'
+import { DsbApiService } from '../../services/dsb-api.service';
+import { isAuthorized } from '../../services/auth.service';
+import {
+  Channel,
+  ErrorBodySerialized,
+  ErrorCode,
+  Option,
+  Result,
+  serializeError,
+} from '../../utils';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { ChannelContainer } from '../../components/Channels/ChannelsContainer';
+import { Breadcrumbs } from '@mui/material';
+import { Home } from 'react-feather';
+import { NavigateNext } from '@mui/icons-material';
+import { getEnrolment } from '../../services/storage.service';
 
 type Props = {
-  health: Result<boolean, ErrorBodySerialized>
-  channels: Result<Channel[], ErrorBodySerialized>
-  did: Option<string>
-  auth: Option<string>
-}
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-  props: Props
+  health: Result<boolean, ErrorBodySerialized>;
+  channels: Result<Channel[], ErrorBodySerialized>;
+  did: Option<string>;
+  auth: Option<string>;
+};
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<{
+  props: Props;
 }> {
-  const authHeader = context.req.headers.authorization
-  const { err } = isAuthorized(authHeader)
+  const authHeader = context.req.headers.authorization;
+  const { err } = isAuthorized(authHeader);
   if (!err) {
-    const health = await DsbApiService.init().getHealth()
-    const channels = await DsbApiService.init().getChannels()
-    const enrolment = await getEnrolment()
+    const health = await DsbApiService.init().getHealth();
+    const channels = await DsbApiService.init().getChannels();
+    const enrolment = await getEnrolment();
     return {
       props: {
         health: serializeError(health),
         channels: serializeError(channels),
-        did: enrolment?.some?.did ? { some: enrolment?.some.did } : { none: true },
-        auth: authHeader ? { some: authHeader } : { none: true }
-      }
-    }
+        did: enrolment?.some?.did
+          ? { some: enrolment?.some.did }
+          : { none: true },
+        auth: authHeader ? { some: authHeader } : { none: true },
+      },
+    };
   } else {
     if (err.message === ErrorCode.UNAUTHORIZED) {
-      context.res.statusCode = 401
-      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
+      context.res.statusCode = 401;
+      context.res.setHeader(
+        'WWW-Authenticate',
+        'Basic realm="Authorization Required"'
+      );
     } else {
-      context.res.statusCode = 403
+      context.res.statusCode = 403;
     }
     return {
       props: {
         health: {},
         channels: {},
         did: { none: true },
-        auth: { none: true }
-      }
-    }
+        auth: { none: true },
+      },
+    };
   }
 }
 export default function Documentation({
   health,
   channels,
-  did
+  did,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { classes } = useStyles()
-  const [channelErrorText, setChannelErrorText] = useState<string>()
+  const { classes } = useStyles();
+  const [channelErrorText, setChannelErrorText] = useState<string>();
   useEffect(() => {
     if (channels.err) {
-      Swal.fire('Error', channels.err.reason, 'error')
-      setChannelErrorText('Error retrieving channels. Make sure your gateway is enroled first.')
+      Swal.fire('Error', channels.err.reason, 'error');
+      setChannelErrorText(
+        'Error retrieving channels. Make sure your gateway is enroled first.'
+      );
     } else {
-      const count = channels.ok?.length ?? 0
+      const count = channels.ok?.length ?? 0;
       if (count === 0) {
-        setChannelErrorText('No channels found with publish or subscribe rights.')
+        setChannelErrorText(
+          'No channels found with publish or subscribe rights.'
+        );
       }
     }
-  }, [channels])
+  }, [channels]);
   return (
     <div>
       <Head>
@@ -83,14 +104,20 @@ export default function Documentation({
       <main>
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
-            <Typography variant="h5" className={classes.pageTitle}>Integration APIs</Typography>
+            <Typography variant="h5" className={classes.pageTitle}>
+              Integration APIs
+            </Typography>
             <Typography variant="h5">|</Typography>
             {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography> */}
-            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
+            <Breadcrumbs
+              separator={<NavigateNext fontSize="small" />}
+              aria-label="breadcrumb"
+              className={classes.breadCrumbs}
+            >
               {/* <Link color="inherit" href="/"> */}
-              <Home color='#A466FF' size={15} />
+              <Home color="#A466FF" size={15} />
               {/* </Link> */}
               <Typography color="primary">Integration APIs</Typography>
             </Breadcrumbs>
@@ -123,13 +150,17 @@ export default function Documentation({
               </Typography>
             )}
             {channels.ok?.map((channel) => (
-              <ChannelContainer key={channel.fqcn} channel={channel} did={did?.some} />
+              <ChannelContainer
+                key={channel.fqcn}
+                channel={channel}
+                did={did?.some}
+              />
             ))}
           </section>
         </Container>
       </main>
     </div>
-  )
+  );
 }
 const useStyles = makeStyles()((theme) => ({
   connectionStatus: {
@@ -137,8 +168,8 @@ const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
     padding: '0 2rem',
     '& *': {
-      color: '#fff'
-    }
+      color: '#fff',
+    },
   },
   connectionStatusPaper: {
     padding: '.5rem 1rem',
@@ -147,24 +178,24 @@ const useStyles = makeStyles()((theme) => ({
     background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   divider: {
     background: '#1E263C',
-    margin: '3rem 0'
+    margin: '3rem 0',
   },
   main: {
-    padding: '0 2rem'
+    padding: '0 2rem',
   },
   textWhite: {
-    color: '#fff'
+    color: '#fff',
   },
   apiDocs: {
     margin: '2rem 0',
     padding: '0 2rem',
     '& *': {
-      color: '#fff'
-    }
+      color: '#fff',
+    },
   },
   apiDocsLink: {
     display: 'flex',
@@ -174,18 +205,16 @@ const useStyles = makeStyles()((theme) => ({
       width: '35rem',
       fontSize: '1rem',
       marginTop: '1rem',
-      padding: '0.5rem'
-    }
+      padding: '0.5rem',
+    },
   },
 
   pageTitle: {
     marginRight: '1rem',
-    fontSize: '24px'
+    fontSize: '24px',
   },
 
   breadCrumbs: {
     marginLeft: '1rem',
-  }
-
-}))
-
+  },
+}));

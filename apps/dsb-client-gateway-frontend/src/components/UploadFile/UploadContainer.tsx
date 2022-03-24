@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Upload } from './Upload';
 import axios from 'axios';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 import { Channel, Topic } from '../../utils';
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';

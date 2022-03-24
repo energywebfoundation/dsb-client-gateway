@@ -1,8 +1,8 @@
 import { makeStyles } from 'tss-react/mui';
-import { Link, Typography } from '@mui/material'
+import { Link, Typography } from '@mui/material';
 
 export const Swagger = () => {
-  const { classes } = useStyles()
+  const { classes } = useStyles();
 
   return (
     <section className={classes.swagger}>
@@ -13,8 +13,8 @@ export const Swagger = () => {
         <Link href="/docs">websocket api</Link>
       </div>
     </section>
-  )
-}
+  );
+};
 
 const useStyles = makeStyles()((theme) => ({
   swagger: {
@@ -22,8 +22,8 @@ const useStyles = makeStyles()((theme) => ({
     padding: '0 2rem',
 
     '& *': {
-      color: '#fff'
-    }
+      color: '#fff',
+    },
   },
   swaggerLinks: {
     display: 'flex',
@@ -41,8 +41,8 @@ const useStyles = makeStyles()((theme) => ({
       marginTop: '2rem',
 
       '&:hover': {
-        textDecoration: 'none'
-      }
-    }
-  }
-}))
+        textDecoration: 'none',
+      },
+    },
+  },
+}));

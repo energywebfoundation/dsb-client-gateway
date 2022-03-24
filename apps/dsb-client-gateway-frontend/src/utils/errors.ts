@@ -6,7 +6,7 @@ export enum HttpError {
   UNPROCESSABLE_ENTITY = 422,
   INTERNAL_SERVER_ERROR = 500,
   BAD_GATEWAY = 502,
-  SERVICE_UNAVAILABLE = 503
+  SERVICE_UNAVAILABLE = 503,
 }
 
 export enum ErrorCode {
@@ -57,37 +57,36 @@ export enum ErrorCode {
 
   // SIGNATURE ERRORS
   SIGNATURE_CHECK_FAILED = 'SIG::CHECK_FAILED',
-  SIGNATURE_DOES_NOT_MATCH = 'SIG::NO_MATCH'
+  SIGNATURE_DOES_NOT_MATCH = 'SIG::NO_MATCH',
 }
 
 export type ErrorBody = {
-  code: ErrorCode
-  reason?: string
-  additionalInformation?: any
-  returnCode?: ErrorCode
-  returnMessage?: string
-  timestamp?: string
-
-}
+  code: ErrorCode;
+  reason?: string;
+  additionalInformation?: any;
+  returnCode?: ErrorCode;
+  returnMessage?: string;
+  timestamp?: string;
+};
 
 export type ErrorBodySerialized = {
-  code: ErrorCode
-  returnCode: ErrorCode
-  returnMessage: string | null
-  reason: string | null
-  additionalInformation?: any
-}
+  code: ErrorCode;
+  returnCode: ErrorCode;
+  returnMessage: string | null;
+  reason: string | null;
+  additionalInformation?: any;
+};
 
 export const isGatewayError = (error: unknown): error is GatewayError => {
-  return (error as GatewayError).statusCode !== undefined
-}
+  return (error as GatewayError).statusCode !== undefined;
+};
 
 /**
  * Custom Error class with additional user information
  */
 export class GatewayError extends Error {
-  public readonly body: ErrorBody
-  public readonly statusCode: HttpError
+  public readonly body: ErrorBody;
+  public readonly statusCode: HttpError;
 
   constructor({
     code,
@@ -96,26 +95,25 @@ export class GatewayError extends Error {
     statusCode,
     returnCode,
     returnMessage,
-    timestamp
+    timestamp,
   }: {
-    statusCode: HttpError
-    code: ErrorCode
-    reason?: string
-    additionalInformation?: any
-    returnCode?: ErrorCode
-    returnMessage?: string
-    timestamp?: string
-
+    statusCode: HttpError;
+    code: ErrorCode;
+    reason?: string;
+    additionalInformation?: any;
+    returnCode?: ErrorCode;
+    returnMessage?: string;
+    timestamp?: string;
   }) {
-    super(code)
-    this.statusCode = statusCode
+    super(code);
+    this.statusCode = statusCode;
     this.body = {
       code,
       reason,
       additionalInformation,
       returnCode,
-      returnMessage
-    }
+      returnMessage,
+    };
   }
 
   public serialize(): ErrorBodySerialized {
@@ -124,8 +122,10 @@ export class GatewayError extends Error {
       returnMessage: this.body.returnMessage ? this.body.returnMessage : null,
       code: this.body.code ? this.body.code : null,
       reason: this.body.reason ? this.body.reason : null,
-      additionalInformation: this.body.additionalInformation ? this.body.additionalInformation : null
-    }
+      additionalInformation: this.body.additionalInformation
+        ? this.body.additionalInformation
+        : null,
+    };
   }
 }
 
@@ -138,8 +138,8 @@ export class NoPrivateKeyError extends GatewayError {
     super({
       statusCode: HttpError.FORBIDDEN,
       code: ErrorCode.ID_NO_PRIVATE_KEY,
-      reason: 'Gateway has no identity, please set private key first'
-    })
+      reason: 'Gateway has no identity, please set private key first',
+    });
   }
 }
 
@@ -148,8 +148,8 @@ export class InvalidPrivateKeyError extends GatewayError {
     super({
       statusCode: HttpError.BAD_REQUEST,
       code: ErrorCode.ID_INVALID_PRIVATE_KEY,
-      reason: 'Must be 64 bytes secp256k1 private key'
-    })
+      reason: 'Must be 64 bytes secp256k1 private key',
+    });
   }
 }
 
@@ -158,8 +158,8 @@ export class NotEnroledError extends GatewayError {
     super({
       statusCode: HttpError.FORBIDDEN,
       code: ErrorCode.ID_NOT_ENROLED,
-      reason: 'Gateway identity has not enroled as DSB user yet'
-    })
+      reason: 'Gateway identity has not enroled as DSB user yet',
+    });
   }
 }
 export class AlreadyEnroledError extends GatewayError {
@@ -167,8 +167,8 @@ export class AlreadyEnroledError extends GatewayError {
     super({
       statusCode: 403,
       code: ErrorCode.ID_ALREADY_ENROLED,
-      reason: 'Gateway identity has already been enroled, state restored'
-    })
+      reason: 'Gateway identity has already been enroled, state restored',
+    });
   }
 }
 export class NoBalanceError extends GatewayError {
@@ -176,8 +176,8 @@ export class NoBalanceError extends GatewayError {
     super({
       statusCode: HttpError.UNPROCESSABLE_ENTITY,
       code: ErrorCode.ID_NO_BALANCE,
-      reason: 'Gateway identity has no balance, use faucet to request funds'
-    })
+      reason: 'Gateway identity has no balance, use faucet to request funds',
+    });
   }
 }
 
@@ -186,8 +186,8 @@ export class BalanceCheckError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.ID_BALANCE_CHECK_FAILED,
-      reason: 'Failed to fetch balance, please check RPC node connection'
-    })
+      reason: 'Failed to fetch balance, please check RPC node connection',
+    });
   }
 }
 
@@ -196,8 +196,8 @@ export class IAMInitError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.ID_IAM_INIT_ERROR,
-      reason: 'Fatal: Unable to initialize connection to IAM services'
-    })
+      reason: 'Fatal: Unable to initialize connection to IAM services',
+    });
   }
 }
 
@@ -206,8 +206,8 @@ export class NoDIDError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.ID_NO_DID,
-      reason: 'Fatal: Unable to resolve or create DID'
-    })
+      reason: 'Fatal: Unable to resolve or create DID',
+    });
   }
 }
 
@@ -216,8 +216,8 @@ export class FetchClaimsError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.ID_FETCH_CLAIMS_FAILED,
-      reason: `Unable to fetch claims associated with DID`
-    })
+      reason: `Unable to fetch claims associated with DID`,
+    });
   }
 }
 
@@ -226,8 +226,8 @@ export class CreateClaimError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.ID_CREATE_CLAIM_FAILED,
-      reason: `Unable to create claim for role ${roleName}`
-    })
+      reason: `Unable to create claim for role ${roleName}`,
+    });
   }
 }
 
@@ -240,8 +240,10 @@ export class DSBRequestError extends GatewayError {
     super({
       statusCode: HttpError.BAD_GATEWAY,
       code: ErrorCode.DSB_REQUEST_FAILED,
-      reason: `Could not make request to DSB Message Broker${reason ? `: ${reason}` : ''}`
-    })
+      reason: `Could not make request to DSB Message Broker${
+        reason ? `: ${reason}` : ''
+      }`,
+    });
   }
 }
 
@@ -251,8 +253,8 @@ export class DSBHealthError extends GatewayError {
       statusCode: HttpError.SERVICE_UNAVAILABLE,
       code: ErrorCode.DSB_UNHEALTHY,
       reason: `The DSB Message Broker is running with issues`,
-      additionalInformation: error
-    })
+      additionalInformation: error,
+    });
   }
 }
 
@@ -264,13 +266,13 @@ export class DSBPayloadError extends GatewayError {
      * due to an update to the schema validation dependency), so we try to
      * preserve backwards-compat here in case.
      */
-    const [reason, topicOrError, error] = errorMessage
+    const [reason, topicOrError, error] = errorMessage;
     super({
       statusCode: HttpError.UNPROCESSABLE_ENTITY,
       code: ErrorCode.DSB_INVALID_PAYLOAD,
       reason,
-      additionalInformation: error?.[0] ?? topicOrError
-    })
+      additionalInformation: error?.[0] ?? topicOrError,
+    });
   }
 }
 
@@ -279,8 +281,8 @@ export class DSBLoginError extends GatewayError {
     super({
       statusCode: HttpError.UNAUTHORIZED,
       code: ErrorCode.DSB_LOGIN_FAILED,
-      reason
-    })
+      reason,
+    });
   }
 }
 
@@ -289,8 +291,8 @@ export class DSBChannelNotFoundError extends GatewayError {
     super({
       statusCode: HttpError.NOT_FOUND,
       code: ErrorCode.DSB_CHANNEL_NOT_FOUND,
-      reason
-    })
+      reason,
+    });
   }
 }
 
@@ -299,8 +301,8 @@ export class DSBChannelUnauthorizedError extends GatewayError {
     super({
       statusCode: HttpError.UNAUTHORIZED,
       code: ErrorCode.DSB_CHANNEL_UNAUTHORIZED,
-      reason
-    })
+      reason,
+    });
   }
 }
 
@@ -309,8 +311,8 @@ export class DSBForbiddenError extends GatewayError {
     super({
       statusCode: HttpError.FORBIDDEN,
       code: ErrorCode.DSB_FORBIDDEN_RESOURCE,
-      reason
-    })
+      reason,
+    });
   }
 }
 
@@ -323,8 +325,9 @@ export class SignatureCheckError extends GatewayError {
     super({
       statusCode: HttpError.BAD_REQUEST,
       code: ErrorCode.SIGNATURE_CHECK_FAILED,
-      reason: 'Unable to verify public key used to sign payload, please check signature format and try again'
-    })
+      reason:
+        'Unable to verify public key used to sign payload, please check signature format and try again',
+    });
   }
 }
 
@@ -337,8 +340,8 @@ export class DiskWriteError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.DISK_WRITE_FAILED,
-      reason: `Failed to write to disk: ${reason}`
-    })
+      reason: `Failed to write to disk: ${reason}`,
+    });
   }
 }
 
@@ -347,8 +350,8 @@ export class Web3ProviderError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.WEB3_PROVIDER_ERROR,
-      reason: `Could not connect to RPC node, please check connection`
-    })
+      reason: `Could not connect to RPC node, please check connection`,
+    });
   }
 }
 
@@ -357,8 +360,8 @@ export class BadRequestError extends GatewayError {
     super({
       statusCode: HttpError.BAD_REQUEST,
       code: ErrorCode.BAD_REQUEST,
-      reason
-    })
+      reason,
+    });
   }
 }
 
@@ -367,19 +370,18 @@ export class UnknownError extends GatewayError {
     super({
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.UNKNOWN_ERROR,
-      reason: err instanceof Error ? err.message : err
-    })
+      reason: err instanceof Error ? err.message : err,
+    });
   }
 }
-
 
 export class DSBTopicUnauthorizedError extends GatewayError {
   constructor(reason: string) {
     super({
       statusCode: HttpError.UNAUTHORIZED,
       code: ErrorCode.DSB_TOPIC_UNAUTHORIZED,
-      reason
-    })
+      reason,
+    });
   }
 }
 
@@ -388,7 +390,7 @@ export class DSBTopicNotFoundError extends GatewayError {
     super({
       statusCode: HttpError.NOT_FOUND,
       code: ErrorCode.DSB_CHANNEL_NOT_FOUND,
-      reason
-    })
+      reason,
+    });
   }
 }

@@ -4,12 +4,11 @@ import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interf
 
 @Injectable()
 export class TlsAgentService {
-  constructor(
-    protected readonly secretsEngineService: SecretsEngineService,
-  ) {}
+  constructor(protected readonly secretsEngineService: SecretsEngineService) {}
 
   public async create(): Promise<Agent | undefined> {
-    const certificateDetails = await this.secretsEngineService.getCertificateDetails();
+    const certificateDetails =
+      await this.secretsEngineService.getCertificateDetails();
 
     if (!certificateDetails) {
       return undefined;
@@ -18,7 +17,7 @@ export class TlsAgentService {
     return new Agent({
       cert: certificateDetails.certificate,
       key: certificateDetails.privateKey,
-      ca: certificateDetails.caCertificate
+      ca: certificateDetails.caCertificate,
     });
   }
 }

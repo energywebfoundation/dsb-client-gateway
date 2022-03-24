@@ -4,10 +4,7 @@ import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interf
 
 @Injectable()
 export class CertificateService {
-  constructor(
-    protected readonly secretsEngineService: SecretsEngineService,
-  ) {
-  }
+  constructor(protected readonly secretsEngineService: SecretsEngineService) {}
 
   public async save(
     cert: Express.Multer.File,
