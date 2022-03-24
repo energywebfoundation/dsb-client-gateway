@@ -35,15 +35,12 @@ jobs:
       with:
         node-version: '14'
 
-    - name: Check dependency versions
-      run: node common/scripts/install-run-rush.js check
-
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: 'Build and push image (Back-end)'
+    - name: 'Build and push image (Front-end)'
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
@@ -54,7 +51,7 @@ jobs:
         docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
 
-    - name: 'Build and push image (Front-end)'
+    - name: 'Build and push image (Back-end)'
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
