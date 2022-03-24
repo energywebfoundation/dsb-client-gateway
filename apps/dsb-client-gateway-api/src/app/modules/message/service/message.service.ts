@@ -77,6 +77,7 @@ export class MessageService {
     const symmetricKey = 'ShVmYq3t6w9z$C&F' // generate this from function after discussiin with Kris
     const responseSendMessageInternal = []
 
+
     IsSchemaValid(topic.schema, dto.payload)
     const clientGatewayMessageId: string = uuidv4();
     const signature = await this.identityService.signPayload(JSON.stringify(dto.payload));
@@ -96,9 +97,14 @@ export class MessageService {
       clientGatewayMessageId,
       dto.transactionId
     )
-    console.log('responseSendMesssage', responseSendMesssage)
-
-    return responseSendMesssage
+    const tracker = {
+      total: recipients.length,
+      sent: responseSendMesssage.success.length,
+      failed: responseSendMesssage.failed.length
+    }
+    const response = Object.assign(responseSendMesssage)
+    response.recipients = tracker
+    return response
 
   }
 
