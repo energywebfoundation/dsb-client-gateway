@@ -13,6 +13,7 @@ import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.e
 
 import { v4 as uuidv4 } from 'uuid';
 
+
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
   BULK = 'BULK',
@@ -64,14 +65,12 @@ export class MessageService {
     const topic = await this.topicService.getTopic(dto.topicName, dto.topicOwner, dto.topicVersion)
     const recipients = await this.channelService.getChannelQualifiedDids(dto.fqcn).qualifiedDids;
 
-    IsSchemaValid(topic.schema, dto.payload)
+    if (!topic) {
+      throw new TopicNotFoundException()
+    }
 
     if (channel.type !== 'pub') {
       throw new ChannelTypeNotPubException()
-    }
-
-    if (!topic) {
-      throw new TopicNotFoundException()
     }
 
     const symmetricKey = 'ShVmYq3t6w9z$C&F' // generate this from function after discussiin with Kris
@@ -79,6 +78,7 @@ export class MessageService {
     const sent = []
     const failed = []
 
+    IsSchemaValid(topic.schema, dto.payload)
     const clientGatewayMessageId: string = uuidv4();
     const signature = await this.identityService.signPayload(JSON.stringify(dto.payload));
 
@@ -87,7 +87,7 @@ export class MessageService {
       responseSendMessageInternal.push(response)
     }))
 
-    console.log('responseSendMessageInternal', responseSendMessageInternal)
+
     const responseSendMesssage = await this.dsbApiService.sendMessage(
       recipients,
       dto.payload,
@@ -97,8 +97,6 @@ export class MessageService {
       clientGatewayMessageId,
       dto.transactionId
     )
-
-    console.log('responseSendMesssage', responseSendMesssage)
 
   }
 
