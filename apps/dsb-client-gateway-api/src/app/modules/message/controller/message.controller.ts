@@ -13,6 +13,7 @@ import {
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SendMessageDto } from '../dto/request/send-message.dto';
 import { MessageService } from '../service/message.service'
+import { SendMessageResponse } from '../entity/message.entity'
 
 
 
@@ -40,7 +41,7 @@ export class MessageControlller {
     @HttpCode(HttpStatus.CREATED)
     public async create(
         @Body() dto: SendMessageDto
-    ): Promise<void> {
-        await this.messageService.sendMessage(dto)
+    ): Promise<SendMessageResponse> {
+        return await this.messageService.sendMessage(dto)
     }
 }

@@ -10,17 +10,17 @@ import {
   Channel,
   Message,
   SendMessageData,
-  SendMessageResult,
+  SendInetrnalMessageResponse,
   SendTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersionResponse,
-  ShareSymmetricKeyData,
-  SendSymmetricKeyData
+  SendInternalMessageRequestDTO,
+  SendMessageResponse
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
-import { v4 as uuidv4 } from 'uuid';
+
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
@@ -323,7 +323,7 @@ export class DsbApiService implements OnModuleInit {
     clientGatewayMessageId: string,
     transactionId?: string,
 
-  ): Promise<SendMessageResult> {
+  ): Promise<SendMessageResponse> {
 
     const messageData: SendMessageData = {
       fqcns,
@@ -361,9 +361,9 @@ export class DsbApiService implements OnModuleInit {
     fqcn: string,
     clientGatewayMessageId: string,
     payload: string
-  ): Promise<SendSymmetricKeyData> {
+  ): Promise<SendInetrnalMessageResponse> {
 
-    const requestData: ShareSymmetricKeyData = {
+    const requestData: SendInternalMessageRequestDTO = {
       fqcn,
       clientGatewayMessageId,
       payload: JSON.stringify(payload)

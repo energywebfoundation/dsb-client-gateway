@@ -23,6 +23,7 @@ export interface TopicVersion {
   schemaType: string;
   tags: string[];
   version: string;
+  topicId: string
 }
 
 export type TopicVersionResponse = PaginatedData<TopicVersion>;
@@ -123,41 +124,41 @@ export interface SendMessageData {
   topicVersion: string
   signature: string
 }
-export interface ShareSymmetricKeyData {
+export interface SendInternalMessageRequestDTO {
   fqcn: string
   clientGatewayMessageId: string
   payload: string
 }
 
-export interface ShareKeySuccessResponse {
+export interface SendMessageSuccessResponse {
   did: string
   messageId: string
   statusCode: number
   err: {
     code: string
     reason: string
-    additionalInformation: {}
+    additionalInformation: object
   }
 }
-export interface ShareKeyFailedResponse {
+export interface SendMessageFailedResponse {
   did: string
   messageId: string
   statusCode: number
   err: {
     code: string
     reason: string
-    additionalInformation: {}
+    additionalInformation: object
   }
 }
 
-export interface SendMessageResult {
+export interface SendInetrnalMessageResponse {
   id: string;
 }
-export interface SendSymmetricKeyData {
+export interface SendMessageResponse {
   clientGatewayMessageId: string
   did: string
-  success: ShareKeySuccessResponse[]
-  failed: ShareKeyFailedResponse[]
+  success: SendMessageSuccessResponse[]
+  failed: SendMessageFailedResponse[]
 }
 
 export interface Message {

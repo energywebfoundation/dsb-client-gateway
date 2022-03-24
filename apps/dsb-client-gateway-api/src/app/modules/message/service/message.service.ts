@@ -10,6 +10,7 @@ import { IdentityService } from '../../identity/service/identity.service'
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid'
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception'
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception'
+import { SendMessageResponse } from '../message.interface'
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -59,7 +60,7 @@ export class MessageService {
     });
   }
 
-  public async sendMessage(dto: SendMessageDto): Promise<void> {
+  public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
 
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn)
     const topic = await this.topicService.getTopic(dto.topicName, dto.topicOwner, dto.topicVersion)
@@ -75,8 +76,6 @@ export class MessageService {
 
     const symmetricKey = 'ShVmYq3t6w9z$C&F' // generate this from function after discussiin with Kris
     const responseSendMessageInternal = []
-    const sent = []
-    const failed = []
 
     IsSchemaValid(topic.schema, dto.payload)
     const clientGatewayMessageId: string = uuidv4();
@@ -91,12 +90,15 @@ export class MessageService {
     const responseSendMesssage = await this.dsbApiService.sendMessage(
       recipients,
       dto.payload,
-      '623b840346fda32e85f15460',
+      topic.topicId,
       topic.version,
       signature,
       clientGatewayMessageId,
       dto.transactionId
     )
+    console.log('responseSendMesssage', responseSendMesssage)
+
+    return responseSendMesssage
 
   }
 

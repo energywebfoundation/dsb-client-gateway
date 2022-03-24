@@ -1,5 +1,4 @@
 import {
-    IsJSON,
     IsNotEmpty,
     IsObject,
     IsOptional,
@@ -64,7 +63,7 @@ export class SendMessageDto {
         example: { "data": 49 },
         description: 'Payload to be sent to message',
     })
-    payload: {};
+    payload: object;
 
 }
 
