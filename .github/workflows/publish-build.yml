@@ -24,7 +24,7 @@ jobs:
       unique_id: ${{ steps.unique_id.outputs.id }}
 
   install-build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     needs: [cancel-previous, unique_id]
     steps:
     - uses: actions/checkout@v2
