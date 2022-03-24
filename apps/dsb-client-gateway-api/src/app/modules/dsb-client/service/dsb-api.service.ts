@@ -16,6 +16,8 @@ import {
   TopicResultDTO,
   TopicDataResponse,
   TopicVersionResponse,
+  ShareSymmetricKeyData,
+  SendSymmetricKeyData
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -95,9 +97,6 @@ export class DsbApiService implements OnModuleInit {
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
-
-    console.log(data);
-
     return data;
   }
 
@@ -166,9 +165,10 @@ export class DsbApiService implements OnModuleInit {
     name: string,
     owner: string
   ): Promise<TopicDataResponse> {
+
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.get('http://localhost:8080/topic', {
+        this.httpService.get(this.baseUrl + '/topics', {
           params: {
             owner,
             name,
@@ -323,26 +323,29 @@ export class DsbApiService implements OnModuleInit {
   }
 
   public async sendMessage(
-    fqcn: string,
-    topic: string,
-    payload: object
+    fqcns: string[],
+    payload: object,
+    topicId: string,
+    topicVersion: string,
+    signature: string,
+    clientGatewayMessageId: string,
+    transactionId?: string,
+
   ): Promise<SendMessageResult> {
-    const signature = 'asd';
-    const transactionId: string = uuidv4();
 
     const messageData: SendMessageData = {
-      topic,
-      fqcn,
-      payload: JSON.stringify(payload),
+      fqcns,
       transactionId,
+      payload: JSON.stringify(payload),
+      topicId,
+      topicVersion,
       signature,
+      clientGatewayMessageId
     };
-
-    const requestData = this.translateIdempotencyKey(messageData, true);
 
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.post(this.baseUrl + '/message', requestData, {
+        this.httpService.post(this.baseUrl + '/messages', messageData, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`
@@ -351,9 +354,45 @@ export class DsbApiService implements OnModuleInit {
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
-    return {
-      id: data,
+    return data
+
+  }
+
+
+  /**
+  * Sends a decryption ciphertext to each  qualified did
+  *
+  * @returns
+  */
+
+  public async sendMessageInternal(
+    fqcn: string,
+    clientGatewayMessageId: string,
+    payload: string
+  ): Promise<SendSymmetricKeyData> {
+
+    const requestData: ShareSymmetricKeyData = {
+      fqcn,
+      clientGatewayMessageId,
+      payload: JSON.stringify(payload)
     };
+
+
+    console.log('url', this.baseUrl + '/messages/internal')
+
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.post(this.baseUrl + '/messages/internal', requestData, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data
+
   }
 
   protected async handleRequestWithRetry(e, retry): Promise<any> {

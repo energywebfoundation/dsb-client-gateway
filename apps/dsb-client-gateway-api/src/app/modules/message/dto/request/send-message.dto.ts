@@ -1,11 +1,13 @@
 import {
     IsJSON,
     IsNotEmpty,
+    IsObject,
     IsOptional,
     IsString,
 } from 'class-validator';
 import { IsValidChannelName } from '../../../utils/validator/decorators/IsValidChannelName';
 import { ApiProperty } from '@nestjs/swagger';
+
 
 export class SendMessageDto {
 
@@ -56,14 +58,13 @@ export class SendMessageDto {
     })
     transactionId: string;
 
-    @IsJSON()
+    @IsObject()
     @IsNotEmpty()
     @ApiProperty({
-        type: {},
-        example: "{\n        \"data\": \"sample data\"\n    }",
+        example: { "data": 49 },
         description: 'Payload to be sent to message',
     })
-    payload: JSON;
+    payload: {};
 
 }
 

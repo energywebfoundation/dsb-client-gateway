@@ -9,6 +9,7 @@ import { TopicService } from '../../channel/service/topic.service'
 import { IdentityService } from '../../identity/service/identity.service'
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid'
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception'
+import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception'
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -61,15 +62,43 @@ export class MessageService {
 
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn)
     const topic = await this.topicService.getTopic(dto.topicName, dto.topicOwner, dto.topicVersion)
-    const recipients = await this.channelService.getChannelQualifiedDids(dto.fqcn);
+    const recipients = await this.channelService.getChannelQualifiedDids(dto.fqcn).qualifiedDids;
+
+    IsSchemaValid(topic.schema, dto.payload)
+
+    if (channel.type !== 'pub') {
+      throw new ChannelTypeNotPubException()
+    }
 
     if (!topic) {
       throw new TopicNotFoundException()
     }
 
-    const isSchemaValid = IsSchemaValid(topic.schema, dto.payload)
+    const symmetricKey = 'ShVmYq3t6w9z$C&F' // generate this from function after discussiin with Kris
+    const responseSendMessageInternal = []
+    const sent = []
+    const failed = []
+
     const clientGatewayMessageId: string = uuidv4();
     const signature = await this.identityService.signPayload(JSON.stringify(dto.payload));
+
+    await Promise.all(recipients.map(async (recipient: string) => {
+      const response = await this.dsbApiService.sendMessageInternal(recipient, clientGatewayMessageId, JSON.stringify(dto.payload))
+      responseSendMessageInternal.push(response)
+    }))
+
+    console.log('responseSendMessageInternal', responseSendMessageInternal)
+    const responseSendMesssage = await this.dsbApiService.sendMessage(
+      recipients,
+      dto.payload,
+      '623b840346fda32e85f15460',
+      topic.version,
+      signature,
+      clientGatewayMessageId,
+      dto.transactionId
+    )
+
+    console.log('responseSendMesssage', responseSendMesssage)
 
   }
 

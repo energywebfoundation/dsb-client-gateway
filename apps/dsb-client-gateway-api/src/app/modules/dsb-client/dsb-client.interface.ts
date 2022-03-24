@@ -115,15 +115,49 @@ export interface Channel {
 }
 
 export interface SendMessageData {
-  fqcn: string;
-  topic: string;
-  payload: string;
-  transactionId?: string;
-  signature: string;
+  fqcns: string[]
+  payload: string
+  clientGatewayMessageId: string,
+  transactionId?: string
+  topicId: string
+  topicVersion: string
+  signature: string
+}
+export interface ShareSymmetricKeyData {
+  fqcn: string
+  clientGatewayMessageId: string
+  payload: string
+}
+
+export interface ShareKeySuccessResponse {
+  did: string
+  messageId: string
+  statusCode: number
+  err: {
+    code: string
+    reason: string
+    additionalInformation: {}
+  }
+}
+export interface ShareKeyFailedResponse {
+  did: string
+  messageId: string
+  statusCode: number
+  err: {
+    code: string
+    reason: string
+    additionalInformation: {}
+  }
 }
 
 export interface SendMessageResult {
   id: string;
+}
+export interface SendSymmetricKeyData {
+  clientGatewayMessageId: string
+  did: string
+  success: ShareKeySuccessResponse[]
+  failed: ShareKeyFailedResponse[]
 }
 
 export interface Message {
