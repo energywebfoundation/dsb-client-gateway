@@ -11,6 +11,17 @@ COPY . .
 ENV NODE_ENV $NODE_ENV
 
 RUN npm install --quiet --no-progress -g nx && \
-    npm ci --quiet --no-progress \
+    npm ci --quiet --no-progress
+RUN nx build dsb-client-gateway-frontend
 
-CMD ["nx", "serve", "dsb-client-gateway-frontend"]
+
+FROM $IMAGE
+
+WORKDIR /usr/app
+
+USER node
+
+COPY --chown=node:node --from=build /usr/app/dist/apps/dsb-client-gateway-frontend/* /usr/app/
+RUN npm install --production
+
+CMD ["npm", "start"]

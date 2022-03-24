@@ -10,8 +10,7 @@ ENV NODE_ENV $NODE_ENV
 
 RUN npm install --quiet --no-progress -g nx && \
     npm ci --quiet --no-progress && \
-    nx build dsb-client-gateway-api && \
-    npm prune --production
+    nx build dsb-client-gateway-api
 
 FROM $IMAGE
 
@@ -19,7 +18,9 @@ WORKDIR /usr/app
 
 USER node
 
-COPY --chown=node:node --from=build /usr/app/dist /usr/app/dist
-COPY --chown=node:node --from=build /usr/app/node_modules /usr/app/node_modules
+COPY --chown=node:node --from=build /usr/app/dist/apps/dsb-client-gateway-api/* /usr/app/
+COPY --chown=node:node --from=build /usr/app/package-lock.json /usr/app/
 
-CMD ["node", "dist/apps/dsb-client-gateway-api/main.js"]
+RUN npm ci --production
+
+CMD ["node", "main.js"]
