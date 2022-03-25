@@ -20,11 +20,18 @@ export interface SendMessageFailedResponse {
     }
 }
 
+export interface recipients {
+    total: number
+    sent: number
+    failed: number
+}
+
 export interface SendInetrnalMessageResponse {
     id: string;
 }
 export interface SendMessageResponse {
     clientGatewayMessageId: string
+    recipients: recipients
     did: string
     success: SendMessageSuccessResponse[]
     failed: SendMessageFailedResponse[]

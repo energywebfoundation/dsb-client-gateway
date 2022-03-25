@@ -28,7 +28,7 @@ export class IamService {
   constructor(
     protected readonly iamFactoryService: IamFactoryService,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   public async setVerificationMethod(
     publicKey: string,
@@ -79,6 +79,7 @@ export class IamService {
   public async getApplicationsByOwner(
     ownerDid: string
   ): Promise<ApplicationDTO[]> {
+
     const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, {
       isAccepted: true,
     });

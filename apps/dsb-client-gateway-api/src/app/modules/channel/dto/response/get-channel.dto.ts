@@ -48,7 +48,7 @@ export class ChannelConditions {
 
 export class GetChannelResponseDto {
   @ApiProperty({
-    description: 'Channel type',
+    description: 'Channel Name',
     type: String,
     example: 'channel.name',
   })

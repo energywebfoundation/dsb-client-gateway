@@ -3,11 +3,6 @@ export interface SendMessageSuccessResponse {
     did: string
     messageId: string
     statusCode: number
-    err: {
-        code: string
-        reason: string
-        additionalInformation: object
-    }
 }
 export interface SendMessageFailedResponse {
     did: string
@@ -31,8 +26,8 @@ export interface recipients {
 }
 export interface SendMessageResponse {
     clientGatewayMessageId: string
-    recipients: recipients
     did: string
+    recipients: recipients
     success: SendMessageSuccessResponse[]
     failed: SendMessageFailedResponse[]
 }

@@ -90,16 +90,15 @@ export class IdentityService {
    */
   public async signPayload(payload: string): Promise<string> {
 
-    this.logger.log('signing payload');
-    this.logger.log('fetching private key');
+    this.logger.debug('signing payload');
+    this.logger.debug('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey()
     if (!privateKey) {
       throw new NoPrivateKeyException();
     }
 
     const signer = this.ethersService.getWalletFromPrivateKey(privateKey)
-    const sig = await signer.signMessage(payload);
-    return sig;
+    return signer.signMessage(payload);
   }
 
 

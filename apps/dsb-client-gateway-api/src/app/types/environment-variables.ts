@@ -19,8 +19,8 @@ export enum NODE_ENV {
 }
 
 export class EnvironmentVariables {
-  // @IsString()
-  // @IsEnum(NODE_ENV)
+  @IsString()
+  @IsEnum(NODE_ENV)
   NODE_ENV: NODE_ENV;
 
   @IsNumber()

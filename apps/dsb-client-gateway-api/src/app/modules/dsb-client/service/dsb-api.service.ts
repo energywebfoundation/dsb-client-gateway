@@ -369,9 +369,6 @@ export class DsbApiService implements OnModuleInit {
       payload: JSON.stringify(payload)
     };
 
-
-    console.log('url', this.baseUrl + '/messages/internal')
-
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
         this.httpService.post(this.baseUrl + '/messages/internal', requestData, {

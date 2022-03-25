@@ -1,23 +1,19 @@
 import {
     Body,
     Controller,
-    Delete,
-    Get,
     HttpCode,
     HttpStatus,
-    Param,
     Post,
-    Put,
-    UseInterceptors,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SendMessageDto } from '../dto/request/send-message.dto';
 import { MessageService } from '../service/message.service'
-import { SendMessageResponse } from '../entity/message.entity'
-
-
+import { DigestGuard } from '../../utils/guards/digest.guard';
+import { SendMessagelResponseDto } from '../dto/response/send-message.dto'
 
 @Controller('message')
+@UseGuards(DigestGuard)
 @ApiTags('send-message')
 
 export class MessageControlller {
@@ -26,8 +22,9 @@ export class MessageControlller {
 
     @Post()
     @ApiResponse({
-        status: HttpStatus.CREATED,
-        description: 'message sent successfully',
+        status: HttpStatus.OK,
+        description: 'Message sent successfully',
+        type: () => SendMessagelResponseDto,
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST,
@@ -38,10 +35,14 @@ export class MessageControlller {
         status: HttpStatus.UNAUTHORIZED,
         description: 'Unauthorized',
     })
+    @ApiResponse({
+        status: HttpStatus.NOT_FOUND,
+        description: 'Channel not found or Topic not found',
+    })
     @HttpCode(HttpStatus.CREATED)
     public async create(
         @Body() dto: SendMessageDto
-    ): Promise<SendMessageResponse> {
-        return await this.messageService.sendMessage(dto)
+    ): Promise<SendMessagelResponseDto> {
+        return this.messageService.sendMessage(dto)
     }
 }
