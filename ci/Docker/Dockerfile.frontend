@@ -2,7 +2,7 @@ ARG IMAGE=node:14.17-alpine
 ARG NODE_ENV=production
 
 FROM $IMAGE as build
-ENV CYPRESS_INSTALL_BINARY false
+ENV CYPRESS_INSTALL_BINARY=false
 
 WORKDIR /usr/usr/app
 
