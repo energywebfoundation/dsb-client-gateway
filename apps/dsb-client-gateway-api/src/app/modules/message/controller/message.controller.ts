@@ -17,7 +17,6 @@ import { MessageService } from '../service/message.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileUploadBodyDto } from '../../dsb-client/dto';
 
 @Controller('message')
 @UseGuards(DigestGuard)

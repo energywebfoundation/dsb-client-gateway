@@ -1,15 +1,5 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, UseGuards } from '@nestjs/common';
 import { DigestGuard } from '../../utils/guards/digest.guard';
-import { DsbApiService } from '../service/dsb-api.service';
-import { FileUploadBodyDto } from '../dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('dsb')

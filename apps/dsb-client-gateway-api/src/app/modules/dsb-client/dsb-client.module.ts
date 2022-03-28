@@ -16,7 +16,6 @@ import { DsbHealthController } from './controller/dsb-health.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DsbApplicationsController } from './controller/dsb-applications.controller';
 
-
 @Module({
   imports: [
     CqrsModule,
@@ -39,7 +38,7 @@ import { DsbApplicationsController } from './controller/dsb-applications.control
     UtilsModule,
     SecretsEngineModule,
     KeysModule,
-    DidAuthModule
+    DidAuthModule,
   ],
   providers: [DsbApiService, TlsAgentService],
   controllers: [
@@ -48,8 +47,8 @@ import { DsbApplicationsController } from './controller/dsb-applications.control
     DsbMessagesController,
     DsbTopicsController,
     DsbFilesController,
-    DsbApplicationsController
+    DsbApplicationsController,
   ],
   exports: [DsbApiService],
 })
-export class DsbClientModule { }
+export class DsbClientModule {}
