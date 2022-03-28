@@ -44,7 +44,7 @@
     "form-data": "^4.0.0",
     "formidable": "^2.0.1",
     "hdkey": "^2.0.1",
-    "iam-client-lib": "^4.0.1",
+    "iam-client-lib": "4.0.1",
     "lokijs": "^1.5.12",
     "match-sorter": "^4.0.0",
     "moment": "^2.29.1",
