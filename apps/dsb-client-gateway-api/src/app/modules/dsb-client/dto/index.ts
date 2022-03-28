@@ -6,7 +6,7 @@ import {
   IsString,
   IsArray,
   ArrayUnique,
-  IsNumber
+  IsNumber,
 } from 'class-validator';
 import { IsDID } from '../../utils/validator/decorators/IsDid';
 import { Topic } from '../dsb-client.interface';
@@ -32,19 +32,10 @@ export class SendMessageBodyDto {
 
   @IsString()
   @IsNotEmpty()
-  public topicName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public topicOwner: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public transactionId: string;
+  public topic: string;
 
   @IsNotEmpty()
   public payload: object;
-
 }
 
 export class GetMessagesQueryDto {
@@ -83,7 +74,6 @@ export class GetTopicsCountQueryDto {
 }
 
 export class PaginatedResponse {
-
   @IsNumber()
   public count: number;
   @IsNumber()
@@ -92,8 +82,5 @@ export class PaginatedResponse {
   public page: number;
   @ArrayUnique()
   @IsArray()
-  public records: Topic[]
-
+  public records: Topic[];
 }
-
-
