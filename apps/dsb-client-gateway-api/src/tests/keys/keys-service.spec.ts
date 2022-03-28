@@ -6,6 +6,11 @@ import { Wallet } from 'ethers';
 
 const secretsEngineServiceMock = {
   getPrivateKey: jest.fn(),
+<<<<<<< HEAD
+=======
+  getRSAPrivateKey: jest.fn().mockImplementation(async () => 'key'),
+  setRSAPrivateKey: jest.fn(),
+>>>>>>> f5e33543b7fc2f0362332bd26d06b0cd3c640727
 };
 
 const iamServiceMock = {
@@ -54,6 +59,7 @@ const mockDid = {
       publicKeyHex:
         '035b8e0d54d389b05c8f0a4f03d6b5015fe55c39aab50d9cfe2da07da59d141f91',
     },
+<<<<<<< HEAD
     {
       id: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993#dsb-symmetric-encryption',
       type: 'Rsapub',
@@ -74,6 +80,9 @@ const mockDid = {
         '740/gLWEKRDhxe9yk1FkJvUCAwEAAQ==\n' +
         '-----END PUBLIC KEY-----\n',
     },
+=======
+    ,
+>>>>>>> f5e33543b7fc2f0362332bd26d06b0cd3c640727
   ],
   proof: null,
   updated: null,
@@ -93,6 +102,7 @@ describe('KeysService (SPEC)', () => {
 
   describe('encryptSymmetricKey and decryptSymmetricKey', () => {
     it('should encrypt symmetric key', async () => {
+<<<<<<< HEAD
       const symmetricKey = 'RANDOM';
 
       const { privateKey, publicKey } = keysService.deriveRSAKey('KEY');
@@ -100,12 +110,34 @@ describe('KeysService (SPEC)', () => {
       mockDid.publicKey[0].publicKeyHex = publicKey;
 
       iamServiceMock.getDid = jest.fn().mockImplementation(async () => mockDid);
+=======
+      const genRandomString = () =>
+        (Math.random() + 1).toString(36).substring(7);
+
+      const rsaPassword = genRandomString();
+      const symmetricKey = genRandomString();
+
+      const { privateKey, publicKey } = keysService.deriveRSAKey(rsaPassword);
+
+      iamServiceMock.getDid = jest.fn().mockImplementation(async () => ({
+        ...mockDid,
+        publicKey: [
+          {
+            id: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993#dsb-symmetric-encryption',
+            type: 'Rsapub',
+            controller: '0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
+            publicKeyHex: publicKey,
+          },
+        ],
+      }));
+>>>>>>> f5e33543b7fc2f0362332bd26d06b0cd3c640727
 
       const encryptedSymmetricKey = await keysService.encryptSymmetricKey(
         symmetricKey,
         mockDid.id
       );
 
+<<<<<<< HEAD
       console.log(Buffer.from(encryptedSymmetricKey).byteLength);
 
       const decryptedSymmetricKey = keysService.decryptSymmetricKey(
@@ -140,6 +172,15 @@ describe('KeysService (SPEC)', () => {
       );
 
       expect(firstKey).toEqual(secondKey);
+=======
+      const decryptedSymmetricKey = keysService.decryptSymmetricKey(
+        privateKey,
+        encryptedSymmetricKey,
+        rsaPassword
+      );
+
+      expect(symmetricKey).toEqual(decryptedSymmetricKey);
+>>>>>>> f5e33543b7fc2f0362332bd26d06b0cd3c640727
     });
   });
 
@@ -220,6 +261,13 @@ describe('KeysService (SPEC)', () => {
         .fn()
         .mockImplementation(async () => randomPrivateKey);
 
+<<<<<<< HEAD
+=======
+      secretsEngineServiceMock.getRSAPrivateKey = jest
+        .fn()
+        .mockImplementation(async () => null);
+
+>>>>>>> f5e33543b7fc2f0362332bd26d06b0cd3c640727
       await keysService.onModuleInit();
 
       expect(iamServiceMock.setVerificationMethod).toBeCalledTimes(1);

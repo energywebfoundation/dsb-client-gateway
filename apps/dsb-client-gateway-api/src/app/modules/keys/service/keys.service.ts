@@ -137,7 +137,7 @@ export class KeysService implements OnModuleInit {
   public async encryptSymmetricKey(
     symmetricKey: string,
     receiverDid: string
-  ): Promise<string | null> {
+  ): Promise<any | null> {
     const did = await this.iamService.getDid(receiverDid);
 
     if (!did) {
@@ -160,13 +160,10 @@ export class KeysService implements OnModuleInit {
       return;
     }
 
-    console.log(symmetricKey);
-
     const encryptedData = crypto.publicEncrypt(
       {
         key: key.publicKeyHex,
         padding: this.rsaPadding,
-        // oaepHash: this.hashAlgorithm,
       },
       Buffer.from(symmetricKey)
     );
@@ -176,21 +173,20 @@ export class KeysService implements OnModuleInit {
 
   public decryptSymmetricKey(
     privateKey: string,
-    encryptedSymmetricKey: string,
+    encryptedSymmetricKey: any,
     passphrase: string
   ): string {
-    // const derivedPrivateKeyHash = crypto
-    //   .createHash('sha256')
-    //   .update(passphrase)
-    //   .digest('hex');
+    const derivedPrivateKeyHash = crypto
+      .createHash('sha256')
+      .update(passphrase)
+      .digest('hex');
 
     return crypto
-      .publicDecrypt(
+      .privateDecrypt(
         {
           key: privateKey,
           padding: this.rsaPadding,
-          // oaepHash: this.hashAlgorithm,
-          passphrase: passphrase,
+          passphrase: derivedPrivateKeyHash,
         },
         Buffer.from(encryptedSymmetricKey, 'base64')
       )
@@ -215,11 +211,16 @@ export class KeysService implements OnModuleInit {
       return;
     }
 
-    const derivedKeyAtDay: HDKEY = this.getDerivedKey(rootKey);
+    const existingRSAKey: string | null =
+      await this.secretsEngineService.getRSAPrivateKey();
 
-    const { publicKey } = this.deriveRSAKey(
-      derivedKeyAtDay.publicKey.toString('hex')
-    );
+    if (existingRSAKey) {
+      this.logger.log('RSA key already generated');
+
+      return;
+    }
+
+    const { publicKey, privateKey } = this.deriveRSAKey(rootKey);
 
     await this.iamService.setVerificationMethod(
       publicKey,
@@ -227,28 +228,32 @@ export class KeysService implements OnModuleInit {
     );
     console.log(await this.iamService.getDid());
 
+    await this.secretsEngineService.setRSAPrivateKey(privateKey);
+
     this.logger.log('Updated DID document with public key');
+    this.logger.debug(await this.iamService.getDid());
   }
 
   public deriveRSAKey(derivedKeyPrivateKey: string): {
     privateKey: string;
     publicKey: string;
   } {
-    // const derivedPrivateKeyHash = crypto
-    //   .createHash('sha256')
-    //   .update(derivedKeyPrivateKey)
-    //   .digest('hex');
+    const derivedPrivateKeyHash = crypto
+      .createHash('sha256')
+      .update(derivedKeyPrivateKey)
+      .digest('hex');
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
       modulusLength: 4096,
       publicKeyEncoding: {
-        type: 'spki',
+        type: 'pkcs1',
         format: 'pem',
       },
       privateKeyEncoding: {
-        type: 'pkcs8',
+        type: 'pkcs1',
         format: 'pem',
-        passphrase: derivedKeyPrivateKey,
+        passphrase: derivedPrivateKeyHash,
+        cipher: 'aes-256-cbc',
       },
     });
 
