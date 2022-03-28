@@ -25,9 +25,9 @@ ENV NODE_ENV=$NODE_ENV
 
 WORKDIR /usr/app
 
-USER node
-
 COPY --chown=node:node ./dist/apps/dsb-client-gateway-frontend/* /usr/app/
 RUN npm install --production
+
+USER node
 
 CMD ["npm", "start"]
