@@ -12,7 +12,7 @@
       "rules": {
         "@next/next/no-html-link-for-pages": [
           "error",
-          "/usr/usr/app/apps/dsb-client-gateway-frontend/pages"
+          "apps/dsb-client-gateway-frontend/pages"
         ]
       }
     },
