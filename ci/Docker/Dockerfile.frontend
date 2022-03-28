@@ -1,16 +1,33 @@
-ARG IMAGE=node:14.17-alpine
+ARG IMAGE=node:16.10-alpine
 ARG NODE_ENV=production
 
-FROM $IMAGE as build
-ENV CYPRESS_INSTALL_BINARY false
+# FROM $IMAGE as build
+# ENV CYPRESS_INSTALL_BINARY=0
 
-WORKDIR /usr/usr/app
+# WORKDIR /usr/usr/app
 
-COPY . .
+# COPY . .
 
-ENV NODE_ENV $NODE_ENV
+# ENV NODE_ENV=$NODE_ENV
+# RUN echo $pwd
+# RUN apk --no-cache --virtual build-dependencies add \
+#         python \
+#         make \
+#         g++ \
+#         && npm install --quiet --no-progress -g nx && \
+#     npm install --quiet --no-progress
+# RUN nx build dsb-client-gateway-frontend
 
-RUN npm install --quiet --no-progress -g nx && \
-    npm ci --quiet --no-progress \
 
-CMD ["nx", "serve", "dsb-client-gateway-frontend"]
+FROM $IMAGE
+
+ENV NODE_ENV=$NODE_ENV
+
+WORKDIR /usr/app
+
+USER node
+
+COPY --chown=node:node ./dist/apps/dsb-client-gateway-frontend/* /usr/app/
+RUN npm install --production
+
+CMD ["npm", "start"]
