@@ -83,6 +83,8 @@ jobs:
       - name: Generate unique id
         id: unique_id
         run: echo "::set-output name=id::$(uuidgen)"
+    outputs:
+      unique_id: ${{ steps.unique_id.outputs.id }}
 
   build-be:
     name: Build Backend
