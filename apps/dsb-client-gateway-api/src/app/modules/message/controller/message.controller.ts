@@ -24,7 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class MessageControlller {
   constructor(protected readonly messageService: MessageService) {}
 
-  @Post('message/sendMessages')
+  @Post('sendMessages')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Message sent successfully',
@@ -50,7 +50,7 @@ export class MessageControlller {
     return this.messageService.sendMessage(dto);
   }
 
-  @Post('message/uploadMessages')
+  @Post('uploadMessages')
   @UseInterceptors(FileInterceptor('file'))
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,

@@ -1,32 +1,42 @@
 export interface SendMessageSuccessResponse {
-    did: string
-    messageId: string
-    statusCode: number
+  did: string;
+  messageId: string;
+  statusCode: number;
 }
 export interface SendMessageFailedResponse {
-    did: string
-    messageId: string
-    statusCode: number
-    err: {
-        code: string
-        reason: string
-        additionalInformation: object
-    }
+  did: string;
+  messageId: string;
+  statusCode: number;
+  err: {
+    code: string;
+    reason: string;
+    additionalInformation: object;
+  };
 }
 
 export interface SendInetrnalMessageResponse {
-    id: string;
+  id: string;
 }
 
 export interface recipients {
-    total: number
-    sent: number
-    failed: number
+  total: number;
+  sent: number;
+  failed: number;
+}
+
+export interface details {
+  did?: string;
+  messageId?: string;
+  statusCode?: number;
+}
+
+export interface status {
+  details: details[];
+  name: string;
 }
 export interface SendMessageResponse {
-    clientGatewayMessageId: string
-    did: string
-    recipients: recipients
-    success: SendMessageSuccessResponse[]
-    failed: SendMessageFailedResponse[]
+  clientGatewayMessageId: string;
+  did: string;
+  recipients: recipients;
+  status: status[];
 }

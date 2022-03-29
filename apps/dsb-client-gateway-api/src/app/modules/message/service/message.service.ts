@@ -110,14 +110,8 @@ export class MessageService {
       clientGatewayMessageId,
       dto.transactionId
     );
-    const tracker = {
-      total: recipients.length,
-      sent: responseSendMesssage.success.length,
-      failed: responseSendMesssage.failed.length,
-    };
-    const response = Object.assign(responseSendMesssage);
-    response.recipients = tracker;
-    return response;
+
+    return responseSendMesssage;
   }
 
   public async uploadMessage(
