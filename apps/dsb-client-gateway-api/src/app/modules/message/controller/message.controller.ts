@@ -8,7 +8,7 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   SendMessageDto,
   uploadMessageBodyDto,
@@ -51,6 +51,26 @@ export class MessageControlller {
   }
 
   @Post('upload')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'File Upload Successfully',
+    type: () => SendMessagelResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Channel not found or Topic not found',
+  })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,

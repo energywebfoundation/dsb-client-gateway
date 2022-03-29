@@ -60,6 +60,13 @@ export class SendMessageDto {
 }
 
 export class uploadMessageBodyDto {
+  @IsString()
+  @ApiProperty({
+    type: 'string',
+    description: 'File uploaded',
+  })
+  file: { type: 'string'; format: 'binary' };
+
   @IsValidChannelName({
     message:
       '$value is invalid channel name. Should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
