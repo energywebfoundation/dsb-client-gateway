@@ -14,7 +14,7 @@ import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
 import { SendMessageResponse } from '../message.interface';
-import { FileUploadBodyDto } from '../../dsb-client/dto';
+import { ChannelType } from '../../../modules/channel/channel.const';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -69,20 +69,20 @@ export class MessageService {
       dto.topicOwner,
       dto.topicVersion
     );
-    const recipients = await this.channelService.getChannelQualifiedDids(
+    const { qualifiedDids } = await this.channelService.getChannelQualifiedDids(
       dto.fqcn
-    ).qualifiedDids;
+    );
 
     if (!topic) {
       throw new TopicNotFoundException();
     }
 
-    if (channel.type !== 'pub') {
+    if (channel.type !== ChannelType.PUB) {
       throw new ChannelTypeNotPubException();
     }
 
     const symmetricKey = 'ShVmYq3t6w9z$C&F'; // generate this from function after discussiin with Kris
-    const responseSendMessageInternal = [];
+    const responseSendMessageInternal: Array<unknown> = [];
 
     IsSchemaValid(topic.schema, dto.payload);
     const clientGatewayMessageId: string = uuidv4();
@@ -90,8 +90,8 @@ export class MessageService {
       JSON.stringify(dto.payload)
     );
 
-    await Promise.all(
-      recipients.map(async (recipient: string) => {
+    await Promise.allSettled(
+      qualifiedDids.map(async (recipient: string) => {
         const response = await this.dsbApiService.sendMessageInternal(
           recipient,
           clientGatewayMessageId,
@@ -101,8 +101,8 @@ export class MessageService {
       })
     );
 
-    const responseSendMesssage = await this.dsbApiService.sendMessage(
-      recipients,
+    return this.dsbApiService.sendMessage(
+      qualifiedDids,
       dto.payload,
       topic.topicId,
       topic.version,
@@ -110,8 +110,6 @@ export class MessageService {
       clientGatewayMessageId,
       dto.transactionId
     );
-
-    return responseSendMesssage;
   }
 
   public async uploadMessage(

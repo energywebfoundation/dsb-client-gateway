@@ -14,7 +14,7 @@ export interface SendMessageFailedResponse {
   };
 }
 
-export interface SendInetrnalMessageResponse {
+export interface SendInternalMessageResponse {
   id: string;
 }
 

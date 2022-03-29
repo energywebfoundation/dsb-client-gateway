@@ -10,7 +10,7 @@ import {
   Channel,
   Message,
   SendMessageData,
-  SendInetrnalMessageResponse,
+  SendInternalMessageResponse,
   SendTopicBodyDTO,
   Topic,
   TopicDataResponse,
@@ -356,7 +356,7 @@ export class DsbApiService implements OnModuleInit {
     fqcn: string,
     clientGatewayMessageId: string,
     payload: string
-  ): Promise<SendInetrnalMessageResponse> {
+  ): Promise<SendInternalMessageResponse> {
     const requestData: SendInternalMessageRequestDTO = {
       fqcn,
       clientGatewayMessageId,
@@ -493,8 +493,6 @@ export class DsbApiService implements OnModuleInit {
   }
 
   protected async initExtChannel(): Promise<void> {
-    console.log(this.baseUrl + '/channel/initExtChannel');
-
     try {
       const { data } = await promiseRetry(async (retry, attempt) => {
         return lastValueFrom(
