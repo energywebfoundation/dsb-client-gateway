@@ -124,20 +124,20 @@ export class DsbApiService implements OnModuleInit {
 
   public async uploadFile(
     file: Express.Multer.File,
-    fileName: string,
     fqcns: string[],
     topicId: string,
     topicVersion: string,
     signature: string,
     clientGatewayMessageId: string,
     transactionId?: string
-  ): Promise<void> {
+  ): Promise<SendMessageResponse> {
+    this.logger.log('Uploading File');
     try {
       const formData = new FormData();
 
       formData.append('file', file.buffer);
-      formData.append('fileName', fileName);
-      formData.append('fqcn', fqcns);
+      formData.append('fileName', file.originalname);
+      formData.append('fqcns', fqcns.join(','));
       formData.append('signature', signature);
       formData.append('topicId', topicId);
       formData.append('topicVersion', topicVersion);
@@ -146,7 +146,7 @@ export class DsbApiService implements OnModuleInit {
 
       const { data } = await promiseRetry(async (retry, attempt) => {
         return lastValueFrom(
-          this.httpService.post(this.baseUrl + '/message/upload', formData, {
+          this.httpService.post(this.baseUrl + '/messages/upload', formData, {
             maxContentLength: Infinity,
             maxBodyLength: Infinity,
             httpsAgent: this.getTLS(),
@@ -155,8 +155,12 @@ export class DsbApiService implements OnModuleInit {
               ...formData.getHeaders(),
             },
           })
-        ).catch((err) => this.handleRequestWithRetry(err, retry));
+        ).catch((err) => {
+          return this.handleRequestWithRetry(err, retry);
+        });
       });
+      this.logger.log('File Uploaded Successfully');
+      return data;
     } catch (e) {
       this.logger.error(e);
     }
@@ -342,6 +346,7 @@ export class DsbApiService implements OnModuleInit {
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
+    this.logger.log('Message Sent Successfully!');
 
     return data;
   }

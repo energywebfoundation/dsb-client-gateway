@@ -18,13 +18,13 @@ import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-@Controller('message')
+@Controller('messages')
 @UseGuards(DigestGuard)
 @ApiTags('send-message')
 export class MessageControlller {
   constructor(protected readonly messageService: MessageService) {}
 
-  @Post('sendMessages')
+  @Post('send')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Message sent successfully',
@@ -50,12 +50,12 @@ export class MessageControlller {
     return this.messageService.sendMessage(dto);
   }
 
-  @Post('uploadMessages')
+  @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto
-  ): Promise<void> {
-    await this.messageService.uploadMessage(file, dto);
+  ): Promise<SendMessagelResponseDto> {
+    return this.messageService.uploadMessage(file, dto);
   }
 }

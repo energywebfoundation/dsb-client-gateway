@@ -82,7 +82,6 @@ export class MessageService {
     }
 
     const symmetricKey = 'ShVmYq3t6w9z$C&F'; // generate this from function after discussiin with Kris
-    const responseSendMessageInternal: Array<unknown> = [];
 
     IsSchemaValid(topic.schema, dto.payload);
     const clientGatewayMessageId: string = uuidv4();
@@ -90,16 +89,19 @@ export class MessageService {
       JSON.stringify(dto.payload)
     );
 
+    this.logger.log('Sending CipherText as Internal Message');
+
     await Promise.allSettled(
       qualifiedDids.map(async (recipient: string) => {
-        const response = await this.dsbApiService.sendMessageInternal(
+        await this.dsbApiService.sendMessageInternal(
           recipient,
           clientGatewayMessageId,
           JSON.stringify(dto.payload)
         );
-        responseSendMessageInternal.push(response);
       })
     );
+
+    this.logger.log('Sending Message');
 
     return this.dsbApiService.sendMessage(
       qualifiedDids,
@@ -116,8 +118,6 @@ export class MessageService {
     file: Express.Multer.File,
     dto: uploadMessageBodyDto
   ): Promise<SendMessageResponse> {
-    const formData = new FormData();
-
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
     const topic = await this.topicService.getTopic(
       dto.topicName,
@@ -132,33 +132,34 @@ export class MessageService {
       throw new TopicNotFoundException();
     }
 
-    if (channel.type !== 'pub') {
+    if (channel.type !== ChannelType.PUB) {
       throw new ChannelTypeNotPubException();
     }
 
     const symmetricKey = 'ShVmYq3t6w9z$C&F'; // generate this from function after discussiin with Kris
-    const responseSendMessageInternal = [];
 
     const clientGatewayMessageId: string = uuidv4();
 
     const signature = await this.identityService.signPayload(
-      JSON.stringify('take data from file')
+      JSON.stringify({ data: 'take encrypted data' })
     );
 
-    await Promise.all(
+    this.logger.log(
+      'Sending CipherText as Internal Message to all qualified dids'
+    );
+
+    await Promise.allSettled(
       qualifiedDids.map(async (recipient: string) => {
-        const response = await this.dsbApiService.sendMessageInternal(
+        await this.dsbApiService.sendMessageInternal(
           recipient,
           clientGatewayMessageId,
-          JSON.stringify('take data from file')
+          JSON.stringify({ data: 'take encrypted data' })
         );
-        responseSendMessageInternal.push(response);
       })
     );
 
-    const responseSendMesssage = await this.dsbApiService.uploadFile(
+    return this.dsbApiService.uploadFile(
       file,
-      'fileName',
       qualifiedDids,
       topic.topicId,
       dto.topicVersion,
@@ -166,14 +167,5 @@ export class MessageService {
       clientGatewayMessageId,
       dto.transactionId
     );
-
-    // const tracker = {
-    //   total: recipients.length,
-    //   sent: responseSendMesssage.success.length,
-    //   failed: responseSendMesssage.failed.length,
-    // };
-    // const response = Object.assign(responseSendMesssage);
-    // response.recipients = tracker;
-    return;
   }
 }
