@@ -86,9 +86,6 @@ export class MessageService {
       throw new ChannelTypeNotPubException();
     }
 
-    const enrolment = this.enrolmentRepository.getEnrolment();
-    const ownerDID = enrolment.did;
-
     this.logger.log('Validating schema');
     IsSchemaValid(topic.schema, dto.payload);
 
@@ -160,22 +157,36 @@ export class MessageService {
       throw new ChannelTypeNotPubException();
     }
 
+    this.logger.log('generating Client Gateway Message Id');
     const clientGatewayMessageId: string = uuidv4();
 
-    const signature = await this.identityService.signPayload(
-      JSON.stringify({ data: 'take encrypted data' })
+    this.logger.log('Generating Random Key');
+    const randomKey: string = await this.keyService.generateRandomKey();
+
+    this.logger.log('Encrypting Payload');
+    const encryptedMessage = await this.keyService.encryptMessage(
+      JSON.stringify(file.buffer),
+      randomKey,
+      'utf-8'
     );
+
+    const signature = await this.identityService.signPayload(encryptedMessage);
 
     this.logger.log(
       'Sending CipherText as Internal Message to all qualified dids'
     );
 
     await Promise.allSettled(
-      qualifiedDids.map(async (recipient: string) => {
+      qualifiedDids.map(async (recipientDid: string) => {
+        const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
+          randomKey,
+          recipientDid
+        );
+
         await this.dsbApiService.sendMessageInternal(
-          recipient,
+          recipientDid,
           clientGatewayMessageId,
-          JSON.stringify({ data: 'take encrypted data' })
+          decryptionCiphertext
         );
       })
     );

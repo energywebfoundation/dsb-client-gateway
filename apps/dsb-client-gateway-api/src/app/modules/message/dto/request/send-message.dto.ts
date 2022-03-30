@@ -60,12 +60,11 @@ export class SendMessageDto {
 }
 
 export class uploadMessageBodyDto {
-  @IsString()
   @ApiProperty({
-    type: 'string',
+    type: 'binary',
     description: 'File uploaded',
   })
-  file: { type: 'string'; format: 'binary' };
+  file: 'binary';
 
   @IsValidChannelName({
     message:
