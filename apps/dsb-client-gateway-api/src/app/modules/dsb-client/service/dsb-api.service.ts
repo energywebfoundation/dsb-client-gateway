@@ -266,6 +266,7 @@ export class DsbApiService implements OnModuleInit {
    * @returns
    */
   public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
+    console.log(this.baseUrl + '/topics');
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
         this.httpService.post(this.baseUrl + '/topics', data, {
@@ -288,7 +289,7 @@ export class DsbApiService implements OnModuleInit {
   public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.patch(this.baseUrl + '/topics', data, {
+        this.httpService.put(this.baseUrl + '/topics', data, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -297,6 +298,7 @@ export class DsbApiService implements OnModuleInit {
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
+    console.log('result', result);
     return result.data;
   }
   public async getMessages(

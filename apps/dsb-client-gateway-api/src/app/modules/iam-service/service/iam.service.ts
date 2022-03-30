@@ -88,7 +88,7 @@ export class IamService {
 
     didClaims.forEach((didClaim) => {
       if (
-        didClaim.claimType.startsWith(`${roleName}`) &&
+        didClaim.claimType.startsWith(`${roleName}.`) &&
         didClaim.namespace !== this.configService.get('DID_CLAIM_NAMESPACE')
       ) {
         namespaceList.push(didClaim.namespace);

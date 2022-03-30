@@ -75,7 +75,6 @@ export type SendTopicBodyDTO = {
   schemaType: string;
   schema: string;
   version: string;
-  signature: string;
   owner: string;
   tags: string[];
 };
