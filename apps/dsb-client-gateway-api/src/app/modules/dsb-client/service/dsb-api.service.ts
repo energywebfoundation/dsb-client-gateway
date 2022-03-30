@@ -202,21 +202,19 @@ export class DsbApiService implements OnModuleInit {
     }
   }
 
-  public async getTopics(ownerDID?: string): Promise<TopicDataResponse> {
-    if (!ownerDID) {
-      const enrolment = this.enrolmentRepository.getEnrolment();
+  public async getTopics(): Promise<TopicDataResponse> {
+    const enrolment = this.enrolmentRepository.getEnrolment();
 
-      if (!enrolment) {
-        return {
-          count: 0,
-          limit: 0,
-          page: 1,
-          records: [],
-        };
-      }
-
-      ownerDID = enrolment.did;
+    if (!enrolment) {
+      return {
+        count: 0,
+        limit: 0,
+        page: 1,
+        records: [],
+      };
     }
+
+    const ownerDID = enrolment.did;
 
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
@@ -260,11 +258,6 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
-  /**
-   * Sends a POST /postTopics request to the broker
-   *
-   * @returns
-   */
   public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
     console.log(this.baseUrl + '/topics');
     const result = await promiseRetry(async (retry, attempt) => {
@@ -281,11 +274,6 @@ export class DsbApiService implements OnModuleInit {
     return result.data;
   }
 
-  /**
-   * Sends a Update /Topics request to the broker
-   *
-   * @returns
-   */
   public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
@@ -297,8 +285,6 @@ export class DsbApiService implements OnModuleInit {
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
-
-    console.log('result', result);
     return result.data;
   }
   public async getMessages(
