@@ -17,6 +17,7 @@ import { ApplicationDTO } from '../dsb-client.interface';
 import { GetApplicationsQueryDto } from '../dto';
 
 @Controller('dsb')
+@ApiTags('dsb')
 @UseGuards(DigestGuard)
 export class DsbApplicationsController {
   constructor(

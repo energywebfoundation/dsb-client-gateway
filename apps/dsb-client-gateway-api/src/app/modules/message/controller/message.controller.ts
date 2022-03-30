@@ -20,11 +20,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('messages')
 @UseGuards(DigestGuard)
-@ApiTags('send-message')
+@ApiTags('Messaging')
 export class MessageControlller {
   constructor(protected readonly messageService: MessageService) {}
 
-  @Post('send')
+  @Post('/')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Message sent successfully',

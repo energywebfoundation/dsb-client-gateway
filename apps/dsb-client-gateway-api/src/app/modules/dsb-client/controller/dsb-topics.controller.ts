@@ -12,7 +12,6 @@ import {
 import { DsbApiService } from '../service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { SendTopicBodyDTO } from '../dsb-client.interface';
 import {
   GetTopicsCountQueryDto,
   PaginatedResponse,
@@ -23,7 +22,7 @@ import {
 
 @Controller('dsb')
 @UseGuards(DigestGuard)
-@ApiTags('dsb', 'topics')
+@ApiTags('dsb')
 export class DsbTopicsController {
   constructor(protected readonly dsbClientService: DsbApiService) {}
 

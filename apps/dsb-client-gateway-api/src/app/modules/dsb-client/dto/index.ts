@@ -9,6 +9,7 @@ import {
   ArrayUnique,
   IsNumber,
   IsObject,
+  isArray,
 } from 'class-validator';
 
 export class Topic {
@@ -113,7 +114,7 @@ export class SendTopicBodyDto {
   })
   schemaType: string;
 
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
   @ApiProperty({
     description: 'tags of the topic',
