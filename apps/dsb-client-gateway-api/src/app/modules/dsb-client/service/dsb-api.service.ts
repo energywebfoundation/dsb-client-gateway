@@ -197,7 +197,7 @@ export class DsbApiService implements OnModuleInit {
       const ownerDID = enrolment.did;
       return this.iamService.getApplicationsByOwnerAndRole(roleName, ownerDID);
     } catch (e) {
-      this.logger.error(e);
+      this.logger.error('error while getting applications', e);
       return e;
     }
   }
@@ -335,7 +335,7 @@ export class DsbApiService implements OnModuleInit {
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
-    this.logger.log('Message Sent Successfully!');
+    this.logger.log('Message Sent Successfully!', data.clientGatewayMessageId);
 
     return data;
   }

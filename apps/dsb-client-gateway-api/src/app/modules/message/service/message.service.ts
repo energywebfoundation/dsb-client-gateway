@@ -176,20 +176,20 @@ export class MessageService {
       'Sending CipherText as Internal Message to all qualified dids'
     );
 
-    await Promise.allSettled(
-      qualifiedDids.map(async (recipientDid: string) => {
-        const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
-          randomKey,
-          recipientDid
-        );
+    try {
+      await Promise.allSettled(
+        qualifiedDids.map(async (recipientDid: string) => {
+          const decryptionCiphertext =
+            await this.keyService.encryptSymmetricKey(randomKey, recipientDid);
 
-        await this.dsbApiService.sendMessageInternal(
-          recipientDid,
-          clientGatewayMessageId,
-          decryptionCiphertext
-        );
-      })
-    );
+          await this.dsbApiService.sendMessageInternal(
+            recipientDid,
+            clientGatewayMessageId,
+            decryptionCiphertext
+          );
+        })
+      );
+    } catch (e) {}
 
     return this.dsbApiService.uploadFile(
       file,

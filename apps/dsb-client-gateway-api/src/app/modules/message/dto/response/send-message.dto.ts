@@ -109,7 +109,7 @@ export class SendMessageFailedResponse {
   err: Error;
 }
 
-export class recipients {
+export class Recipients {
   @ApiProperty({
     description: 'total number of recipients',
     type: Number,
@@ -195,9 +195,9 @@ export class SendMessagelResponseDto {
 
   @ApiProperty({
     description: 'recipients',
-    type: () => recipients,
+    type: () => Recipients,
   })
-  recipients: recipients;
+  recipients: Recipients;
 
   @ApiProperty({
     description: 'status of messages sent',

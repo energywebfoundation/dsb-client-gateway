@@ -1,29 +1,15 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Body,
-  Post,
-  Patch,
-  HttpStatus,
-  Query,
-  Param,
-} from '@nestjs/common';
-import { DsbApiService } from '../service/dsb-api.service';
-import { IamService } from '../../../modules/iam-service/service/iam.service';
+import { Controller, Get, UseGuards, HttpStatus, Query } from '@nestjs/common';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApplicationDTO } from '../dsb-client.interface';
 import { GetApplicationsQueryDto } from '../dto';
+import { TopicService } from '../service/dsb-topic.service';
 
 @Controller('dsb')
 @ApiTags('dsb')
 @UseGuards(DigestGuard)
 export class DsbApplicationsController {
-  constructor(
-    protected readonly dsbClientService: DsbApiService,
-    protected readonly iamService: IamService
-  ) {}
+  constructor(protected readonly topicService: TopicService) {}
 
   @Get('applications')
   @ApiOperation({
@@ -35,22 +21,6 @@ export class DsbApplicationsController {
     description: 'List of applications',
   })
   public async getApplications(@Query() { roleName }: GetApplicationsQueryDto) {
-    const applications =
-      await this.dsbClientService.getApplicationsByOwnerAndRole(roleName);
-
-    const nameSpaces = await applications.map(
-      (application) => application.namespace
-    );
-
-    const topicsCount = await this.dsbClientService.getTopicsCountByOwner(
-      nameSpaces
-    );
-    const finalApllicationsResult = applications.map((application) => {
-      application.topicsCount = topicsCount[application.namespace]
-        ? topicsCount[application.namespace]
-        : 0;
-      return application;
-    });
-    return finalApllicationsResult;
+    return this.topicService.getApplications(roleName);
   }
 }

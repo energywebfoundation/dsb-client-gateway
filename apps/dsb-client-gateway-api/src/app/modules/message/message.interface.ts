@@ -18,7 +18,7 @@ export interface SendInternalMessageResponse {
   id: string;
 }
 
-export interface recipients {
+export interface Recipients {
   total: number;
   sent: number;
   failed: number;
@@ -37,6 +37,6 @@ export interface status {
 export interface SendMessageResponse {
   clientGatewayMessageId: string;
   did: string;
-  recipients: recipients;
+  recipients: Recipients;
   status: status[];
 }
