@@ -202,25 +202,12 @@ export class DsbApiService implements OnModuleInit {
     }
   }
 
-  public async getTopics(): Promise<TopicDataResponse> {
-    const enrolment = this.enrolmentRepository.getEnrolment();
-
-    if (!enrolment) {
-      return {
-        count: 0,
-        limit: 0,
-        page: 1,
-        records: [],
-      };
-    }
-
-    const ownerDID = enrolment.did;
-
+  public async getTopics(owner: string): Promise<TopicDataResponse> {
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
         this.httpService.get(this.baseUrl + '/topics', {
           params: {
-            owner: ownerDID,
+            owner: owner,
           },
           httpsAgent: this.getTLS(),
           headers: {
@@ -277,7 +264,7 @@ export class DsbApiService implements OnModuleInit {
   public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.put(this.baseUrl + '/topics', data, {
+        this.httpService.patch(this.baseUrl + '/topics', data, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,

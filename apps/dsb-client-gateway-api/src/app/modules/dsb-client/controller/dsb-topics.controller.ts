@@ -8,6 +8,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  Put,
 } from '@nestjs/common';
 import { DsbApiService } from '../service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
@@ -18,6 +19,7 @@ import {
   TopicsCountResponse,
   Topic,
   SendTopicBodyDto,
+  GetTopicsQueryDto,
 } from '../dto';
 
 @Controller('dsb')
@@ -36,8 +38,8 @@ export class DsbTopicsController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  public async getTopics() {
-    return this.dsbClientService.getTopics();
+  public async getTopics(@Query() { owner }: GetTopicsQueryDto) {
+    return this.dsbClientService.getTopics(owner);
   }
 
   @Get('topics/count')
@@ -72,7 +74,7 @@ export class DsbTopicsController {
     return this.dsbClientService.postTopics(data);
   }
 
-  @Patch('topics')
+  @Put('topics')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',

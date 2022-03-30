@@ -191,6 +191,11 @@ export class GetTopicsCountQueryDto {
   public owner: string[];
 }
 
+export class GetTopicsQueryDto {
+  @IsNotEmpty()
+  @IsString()
+  public owner: string;
+}
 export class PaginatedResponse {
   @IsNumber()
   @ApiProperty({
