@@ -76,7 +76,8 @@ export class IamService {
     return this.claimsService.getClaimById(id);
   }
 
-  public async getApplicationsByOwner(
+  public async getApplicationsByOwnerAndRole(
+    roleName: string,
     ownerDid: string
   ): Promise<ApplicationDTO[]> {
     const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, {
@@ -87,7 +88,7 @@ export class IamService {
 
     didClaims.forEach((didClaim) => {
       if (
-        didClaim.claimType.startsWith('topiccreator') &&
+        didClaim.claimType.startsWith(`${roleName}`) &&
         didClaim.namespace !== this.configService.get('DID_CLAIM_NAMESPACE')
       ) {
         namespaceList.push(didClaim.namespace);

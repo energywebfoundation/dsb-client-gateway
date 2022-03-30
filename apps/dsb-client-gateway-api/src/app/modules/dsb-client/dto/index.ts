@@ -59,11 +59,7 @@ export class GetMessagesQueryDto {
 export class GetApplicationsQueryDto {
   @IsNotEmpty()
   @IsString()
-  @IsDID({
-    each: true,
-    message: 'Malformed DID',
-  })
-  public ownerDid: string;
+  public roleName: string;
 }
 
 export class GetTopicsCountQueryDto {

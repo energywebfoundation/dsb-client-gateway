@@ -18,6 +18,7 @@ import {
   TopicVersionResponse,
   SendInternalMessageRequestDTO,
   SendMessageResponse,
+  ApplicationDTO,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
@@ -188,6 +189,19 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
+  public async getApplicationsByOwnerAndRole(
+    roleName: string
+  ): Promise<ApplicationDTO[]> {
+    try {
+      const enrolment = this.enrolmentRepository.getEnrolment();
+      const ownerDID = enrolment.did;
+      return this.iamService.getApplicationsByOwnerAndRole(roleName, ownerDID);
+    } catch (e) {
+      this.logger.error(e);
+      return e;
+    }
+  }
+
   public async getTopics(ownerDID?: string): Promise<TopicDataResponse> {
     if (!ownerDID) {
       const enrolment = this.enrolmentRepository.getEnrolment();
@@ -228,7 +242,7 @@ export class DsbApiService implements OnModuleInit {
 
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.get(this.baseUrl + 'topics/count', {
+        this.httpService.get(this.baseUrl + '/topics/count', {
           params: {
             owner: owners,
           },
