@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable, Logger } from '@nestjs/common';
 import { EventsGateway } from '../gateway/events.gateway';
 import { ConfigService } from '@nestjs/config';
 import { Message } from '../../dsb-client/dsb-client.interface';
@@ -15,6 +15,9 @@ import { TopicNotFoundException } from '../exceptions/topic-not-found.exception'
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
 import { SendMessageResponse } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
+import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
+
+import { KeysService } from '../../keys/service/keys.service';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -33,7 +36,9 @@ export class MessageService {
     protected readonly dsbApiService: DsbApiService,
     protected readonly channelService: ChannelService,
     protected readonly topicService: TopicService,
-    protected readonly identityService: IdentityService
+    protected readonly identityService: IdentityService,
+    protected readonly keyService: KeysService,
+    protected readonly enrolmentRepository: EnrolmentRepository
   ) {}
 
   public async sendMessagesToSubscribers(
@@ -81,22 +86,41 @@ export class MessageService {
       throw new ChannelTypeNotPubException();
     }
 
-    const symmetricKey = 'ShVmYq3t6w9z$C&F'; // generate this from function after discussiin with Kris
+    const enrolment = this.enrolmentRepository.getEnrolment();
+    const ownerDID = enrolment.did;
 
+    this.logger.log('Validating schema');
     IsSchemaValid(topic.schema, dto.payload);
+
+    this.logger.log('generating Client Gateway Message Id');
     const clientGatewayMessageId: string = uuidv4();
-    const signature = await this.identityService.signPayload(
-      JSON.stringify(dto.payload)
+
+    this.logger.log('Generating Random Key');
+    const randomKey: string = await this.keyService.generateRandomKey();
+
+    this.logger.log('Encrypting Payload');
+    const encryptedMessage = await this.keyService.encryptMessage(
+      JSON.stringify(dto.payload),
+      randomKey,
+      'utf-8'
     );
+
+    this.logger.log('Generating Signature');
+    const signature = await this.identityService.signPayload(encryptedMessage);
 
     this.logger.log('Sending CipherText as Internal Message');
 
     await Promise.allSettled(
-      qualifiedDids.map(async (recipient: string) => {
+      qualifiedDids.map(async (recipientDid: string) => {
+        const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
+          randomKey,
+          recipientDid
+        );
+
         await this.dsbApiService.sendMessageInternal(
-          recipient,
+          recipientDid,
           clientGatewayMessageId,
-          JSON.stringify(dto.payload)
+          decryptionCiphertext
         );
       })
     );
@@ -135,8 +159,6 @@ export class MessageService {
     if (channel.type !== ChannelType.PUB) {
       throw new ChannelTypeNotPubException();
     }
-
-    const symmetricKey = 'ShVmYq3t6w9z$C&F'; // generate this from function after discussiin with Kris
 
     const clientGatewayMessageId: string = uuidv4();
 

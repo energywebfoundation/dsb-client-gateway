@@ -264,7 +264,7 @@ export class DsbApiService implements OnModuleInit {
   public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.patch(this.baseUrl + '/topics', data, {
+        this.httpService.put(this.baseUrl + '/topics', data, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
