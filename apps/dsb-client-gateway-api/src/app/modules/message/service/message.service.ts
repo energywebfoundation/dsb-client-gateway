@@ -1,4 +1,4 @@
-import { ConsoleLogger, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventsGateway } from '../gateway/events.gateway';
 import { ConfigService } from '@nestjs/config';
 import { Message } from '../../dsb-client/dsb-client.interface';
@@ -7,12 +7,16 @@ import {
   SendMessageDto,
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
+
+import { GetMessagesDto } from '../dto/request/get-messages.dto';
+
 import { ChannelService } from '../../channel/service/channel.service';
 import { TopicService } from '../../channel/service/topic.service';
 import { IdentityService } from '../../identity/service/identity.service';
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
+import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
 import { SendMessageResponse } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
@@ -67,6 +71,22 @@ export class MessageService {
     });
   }
 
+  public async getMessages({
+    topicId,
+    clientId,
+    amount,
+    from,
+    senderId,
+  }: GetMessagesDto): Promise<void> {
+    const messages = await this.dsbApiService.messagesSearch(
+      topicId,
+      senderId,
+      clientId,
+      from,
+      amount
+    );
+  }
+
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
     const topic = await this.topicService.getTopic(
@@ -74,12 +94,17 @@ export class MessageService {
       dto.topicOwner,
       dto.topicVersion
     );
+
+    if (!topic) {
+      throw new TopicNotFoundException();
+    }
+
     const { qualifiedDids } = await this.channelService.getChannelQualifiedDids(
       dto.fqcn
     );
 
-    if (!topic) {
-      throw new TopicNotFoundException();
+    if (qualifiedDids.length === 0) {
+      throw new RecipientsNotFoundException();
     }
 
     if (channel.type !== ChannelType.PUB) {
@@ -99,7 +124,7 @@ export class MessageService {
     const encryptedMessage = await this.keyService.encryptMessage(
       JSON.stringify(dto.payload),
       randomKey,
-      'utf-8'
+      'utf-8' // put it const file
     );
 
     this.logger.log('Generating Signature');
@@ -189,7 +214,12 @@ export class MessageService {
           );
         })
       );
-    } catch (e) {}
+    } catch (e) {
+      this.logger.error(
+        'error while sending internal messages in file upload',
+        e
+      );
+    }
 
     return this.dsbApiService.uploadFile(
       file,

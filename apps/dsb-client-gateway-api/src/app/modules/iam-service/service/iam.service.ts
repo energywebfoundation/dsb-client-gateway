@@ -80,6 +80,8 @@ export class IamService {
     roleName: string,
     ownerDid: string
   ): Promise<ApplicationDTO[]> {
+    this.logger.debug('start: ApplicationsByOwnerAndRole');
+
     const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, {
       isAccepted: true,
     });
@@ -106,6 +108,8 @@ export class IamService {
     );
 
     const uniqueApplications = [...new Set(applications)];
+
+    this.logger.debug('end: ApplicationsByOwnerAndRole');
 
     return uniqueApplications;
   }

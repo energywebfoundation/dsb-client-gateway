@@ -24,19 +24,19 @@ export interface Recipients {
   failed: number;
 }
 
-export interface details {
+export interface Details {
   did?: string;
   messageId?: string;
   statusCode?: number;
 }
 
-export interface status {
-  details: details[];
+export interface Status {
+  details: Details[];
   name: string;
 }
 export interface SendMessageResponse {
   clientGatewayMessageId: string;
   did: string;
   recipients: Recipients;
-  status: status[];
+  status: Status[];
 }

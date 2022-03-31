@@ -192,13 +192,17 @@ export class DsbApiService implements OnModuleInit {
   public async getApplicationsByOwnerAndRole(
     roleName: string
   ): Promise<ApplicationDTO[]> {
+    this.logger.debug('start: dsb API service getApplicationsByOwnerAndRole ');
     try {
       const enrolment = this.enrolmentRepository.getEnrolment();
       const ownerDID = enrolment.did;
+      this.logger.debug('sucessfully fetched owner did');
       return this.iamService.getApplicationsByOwnerAndRole(roleName, ownerDID);
     } catch (e) {
       this.logger.error('error while getting applications', e);
       return e;
+    } finally {
+      this.logger.debug('end: dsb API service getApplicationsByOwnerAndRole ');
     }
   }
 
@@ -246,7 +250,6 @@ export class DsbApiService implements OnModuleInit {
   }
 
   public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
-    console.log(this.baseUrl + '/topics');
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
         this.httpService.post(this.baseUrl + '/topics', data, {
@@ -274,6 +277,47 @@ export class DsbApiService implements OnModuleInit {
     });
     return result.data;
   }
+
+  public async messagesSearch(
+    topicId: string[],
+    senderId: string[],
+    clientId?: string,
+    from?: string,
+    amount?: number
+  ): Promise<Message[]> {
+    try {
+      const requestBody = {
+        topicId,
+        clientId,
+        amount,
+        from,
+        senderId,
+      };
+      const { data } = await promiseRetry(async (retry, attempt) => {
+        return lastValueFrom(
+          this.httpService.post(
+            this.baseUrl + '/messages/search',
+            requestBody,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              },
+            }
+          )
+        ).catch((err) => this.handleRequestWithRetry(err, retry));
+      });
+
+      console.log('data', data);
+
+      return data;
+    } catch (e) {
+      this.logger.error(e);
+
+      return [];
+    }
+  }
+
   public async getMessages(
     fqcn: string,
     from?: string,

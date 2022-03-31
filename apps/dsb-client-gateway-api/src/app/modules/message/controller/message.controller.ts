@@ -7,12 +7,16 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
+  Get,
 } from '@nestjs/common';
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   SendMessageDto,
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
+import { GetMessagesDto } from '../dto/request/get-messages.dto';
+
 import { MessageService } from '../service/message.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
@@ -23,6 +27,31 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @ApiTags('Messaging')
 export class MessageControlller {
   constructor(protected readonly messageService: MessageService) {}
+
+  @Get('/')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Message sent successfully',
+    type: () => SendMessagelResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Channel not found or Topic not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async getMessage(@Query() dto: GetMessagesDto): Promise<void> {
+    console.log('dto', dto);
+    return this.messageService.getMessages(dto);
+  }
 
   @Post('/')
   @ApiResponse({
@@ -43,7 +72,7 @@ export class MessageControlller {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found or Topic not found',
   })
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   public async create(
     @Body() dto: SendMessageDto
   ): Promise<SendMessagelResponseDto> {
