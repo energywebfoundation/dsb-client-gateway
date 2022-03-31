@@ -10,6 +10,7 @@ import {
 
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 
+import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { ChannelService } from '../../channel/service/channel.service';
 import { TopicService } from '../../channel/service/topic.service';
 import { IdentityService } from '../../identity/service/identity.service';
@@ -35,6 +36,7 @@ export class MessageService {
   protected readonly logger = new Logger(MessageService.name);
 
   constructor(
+    protected readonly secretsEngineService: SecretsEngineService,
     protected readonly gateway: EventsGateway,
     protected readonly configService: ConfigService,
     protected readonly dsbApiService: DsbApiService,
@@ -127,8 +129,14 @@ export class MessageService {
       'utf-8' // put it const file
     );
 
+    this.logger.log('fetching private key');
+    const privateKey = await this.secretsEngineService.getPrivateKey();
+
     this.logger.log('Generating Signature');
-    const signature = await this.identityService.signPayload(encryptedMessage);
+    const signature = await this.keyService.createSignature(
+      encryptedMessage,
+      privateKey
+    );
 
     this.logger.log('Sending CipherText as Internal Message');
 
@@ -195,7 +203,14 @@ export class MessageService {
       'utf-8'
     );
 
-    const signature = await this.identityService.signPayload(encryptedMessage);
+    this.logger.log('fetching private key');
+    const privateKey = await this.secretsEngineService.getPrivateKey();
+
+    this.logger.log('Generating Signature');
+    const signature = await this.keyService.createSignature(
+      encryptedMessage,
+      privateKey
+    );
 
     this.logger.log(
       'Sending CipherText as Internal Message to all qualified dids'

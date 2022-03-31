@@ -10,6 +10,7 @@ import { StorageModule } from '../storage/storage.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { IdentityModule } from '../identity/identity.module';
 import { KeysModule } from '../keys/keys.module';
+import { SecretsEngineModule } from '../secrets-engine/secrets-engine.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { KeysModule } from '../keys/keys.module';
     IdentityModule,
     StorageModule,
     KeysModule,
+    SecretsEngineModule,
   ],
   providers: [EventsGateway, MessageService, ChannelRepository],
   exports: [MessageService],
