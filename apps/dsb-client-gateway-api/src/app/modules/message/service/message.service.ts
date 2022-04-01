@@ -18,7 +18,12 @@ import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
 import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
-import { SendMessageResponse } from '../message.interface';
+import { MessagesNotFoundException } from '../exceptions/messages-not-found.exception';
+import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
+import {
+  SendMessageResponse,
+  SearchMessageResponseDto,
+} from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 
@@ -79,42 +84,147 @@ export class MessageService {
     amount,
     from,
     senderId,
-  }: GetMessagesDto): Promise<void> {
-    const messages = await this.dsbApiService.messagesSearch(
-      topicId,
-      senderId,
-      clientId,
-      from,
-      amount
-    );
+  }: GetMessagesDto): Promise<any> {
+    const encryptedMessageResponse: Array<unknown> = [];
+
+    const messages: SearchMessageResponseDto[] =
+      await this.dsbApiService.messagesSearch(
+        topicId,
+        senderId,
+        clientId,
+        from,
+        1
+      );
+
+    if (messages.length === 0) {
+      throw new MessagesNotFoundException();
+    }
+
+    console.log('messages', messages);
+
+    try {
+      const result = await Promise.allSettled(
+        messages.map(async (message: SearchMessageResponseDto) => {
+          if (!message.isFile) {
+            const isSignatureValid = await this.keyService.verifySignature(
+              message.senderDid,
+              message.signature,
+              message.payload
+            );
+
+            console.log('isSignatureValid', isSignatureValid);
+
+            if (isSignatureValid) {
+              const decryptedMessage = await this.keyService.decryptMessage(
+                message.payload,
+                message.clientGatewayMessageId,
+                message.senderDid
+              );
+              console.log('decryptedMessage', decryptedMessage);
+              encryptedMessageResponse.push(decryptedMessage);
+            } else {
+              this.logger.error('Signature Not Matched');
+              throw new MessageSignatureNotValidException();
+            }
+          }
+        })
+      );
+
+      return result;
+    } catch (e) {
+      this.logger.error('Error while decryting messages in get messages ', e);
+      throw new MessageSignatureNotValidException();
+    }
+  }
+
+  public async downloadMessages({
+    topicId,
+    clientId,
+    amount,
+    from,
+    senderId,
+  }: GetMessagesDto): Promise<Array<unknown>> {
+    const messages: SearchMessageResponseDto[] =
+      await this.dsbApiService.messagesSearch(
+        topicId,
+        senderId,
+        clientId,
+        from,
+        amount
+      );
+    const encryptedMessageResponse: Array<unknown> = [];
+
+    try {
+      await Promise.allSettled(
+        messages.map(async (message: SearchMessageResponseDto) => {
+          if (!message.isFile) {
+            const isSignatureValid = await this.keyService.verifySignature(
+              message.senderDid,
+              message.signature,
+              JSON.stringify(message.payload)
+            );
+            if (isSignatureValid) {
+              const decryptedMessage = this.keyService.decryptMessage(
+                JSON.stringify(message.payload),
+                message.clientGatewayMessageId,
+                message.senderDid
+              );
+              console.log('decryptedMessage', decryptedMessage);
+              encryptedMessageResponse.push(decryptedMessage);
+            }
+          }
+        })
+      );
+    } catch (e) {
+      this.logger.error('Error while decryting messages in get messages ', e);
+    }
+    return encryptedMessageResponse;
   }
 
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
+
+    console.log('channel', channel);
+
     const topic = await this.topicService.getTopic(
       dto.topicName,
       dto.topicOwner,
       dto.topicVersion
     );
 
-    if (!topic) {
-      throw new TopicNotFoundException();
-    }
+    // if (!topic) {
+    //   throw new TopicNotFoundException();
+    // }
+    console.log('topic', topic);
 
     const { qualifiedDids } = await this.channelService.getChannelQualifiedDids(
       dto.fqcn
     );
 
+    // const qualifiedDids = [
+    //   'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+    // ];
+
     if (qualifiedDids.length === 0) {
       throw new RecipientsNotFoundException();
     }
 
-    if (channel.type !== ChannelType.PUB) {
-      throw new ChannelTypeNotPubException();
-    }
+    // if (channel.type !== ChannelType.PUB) {
+    //   throw new ChannelTypeNotPubException();
+    // }
 
     this.logger.log('Validating schema');
-    IsSchemaValid(topic.schema, dto.payload);
+    IsSchemaValid(
+      {
+        type: 'object',
+        properties: {
+          data: {
+            type: 'number',
+          },
+        },
+      },
+      dto.payload
+    );
 
     this.logger.log('generating Client Gateway Message Id');
     const clientGatewayMessageId: string = uuidv4();
@@ -123,20 +233,27 @@ export class MessageService {
     const randomKey: string = await this.keyService.generateRandomKey();
 
     this.logger.log('Encrypting Payload');
+
+    console.log('randomKey', randomKey);
     const encryptedMessage = await this.keyService.encryptMessage(
       JSON.stringify(dto.payload),
       randomKey,
       'utf-8' // put it const file
     );
 
+    console.log('encryptedMessage', encryptedMessage);
+
     this.logger.log('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
 
     this.logger.log('Generating Signature');
+
     const signature = await this.keyService.createSignature(
       encryptedMessage,
-      privateKey
+      '0x' + privateKey
     );
+
+    console.log('signature', signature);
 
     this.logger.log('Sending CipherText as Internal Message');
 
@@ -159,9 +276,9 @@ export class MessageService {
 
     return this.dsbApiService.sendMessage(
       qualifiedDids,
-      dto.payload,
-      topic.topicId,
-      topic.version,
+      encryptedMessage,
+      '62453a51ab8d1b108a880af7',
+      '2.0.0',
       signature,
       clientGatewayMessageId,
       dto.transactionId
@@ -209,7 +326,7 @@ export class MessageService {
     this.logger.log('Generating Signature');
     const signature = await this.keyService.createSignature(
       encryptedMessage,
-      privateKey
+      '0x' + privateKey
     );
 
     this.logger.log(

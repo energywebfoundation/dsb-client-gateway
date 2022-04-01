@@ -19,6 +19,7 @@ import {
   SendInternalMessageRequestDTO,
   SendMessageResponse,
   ApplicationDTO,
+  SearchMessageResponseDto,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
@@ -284,38 +285,26 @@ export class DsbApiService implements OnModuleInit {
     clientId?: string,
     from?: string,
     amount?: number
-  ): Promise<Message[]> {
-    try {
-      const requestBody = {
-        topicId,
-        clientId,
-        amount,
-        from,
-        senderId,
-      };
-      const { data } = await promiseRetry(async (retry, attempt) => {
-        return lastValueFrom(
-          this.httpService.post(
-            this.baseUrl + '/messages/search',
-            requestBody,
-            {
-              httpsAgent: this.getTLS(),
-              headers: {
-                Authorization: `Bearer ${this.didAuthService.getToken()}`,
-              },
-            }
-          )
-        ).catch((err) => this.handleRequestWithRetry(err, retry));
-      });
-
-      console.log('data', data);
-
-      return data;
-    } catch (e) {
-      this.logger.error(e);
-
-      return [];
-    }
+  ): Promise<SearchMessageResponseDto[]> {
+    const requestBody = {
+      topicId,
+      clientId,
+      amount,
+      from,
+      senderId,
+    };
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+    console.log('data', data);
+    return data;
   }
 
   public async getMessages(
@@ -352,7 +341,7 @@ export class DsbApiService implements OnModuleInit {
 
   public async sendMessage(
     fqcns: string[],
-    payload: object,
+    payload: string,
     topicId: string,
     topicVersion: string,
     signature: string,
@@ -445,7 +434,15 @@ export class DsbApiService implements OnModuleInit {
       throw new Error();
     }
 
+    e.statusCode = status;
+    e.message = e.response.data;
+
     throw new Error(e);
+    // return {
+    //   statusCode: e.response.status,
+    //   message: e.response.data,
+    // };
+
     // return retry();
   }
 

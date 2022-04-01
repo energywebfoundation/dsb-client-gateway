@@ -184,3 +184,16 @@ export interface Message {
   timestampNanos: number;
   transactionId?: string;
 }
+
+export interface SearchMessageResponseDto {
+  id: string;
+  topicId: string;
+  topicVersion: string;
+  transactionId: string;
+  signature: string;
+  payload: string;
+  senderDid: string;
+  timestampNanos: string;
+  isFile: Boolean;
+  clientGatewayMessageId: string;
+}

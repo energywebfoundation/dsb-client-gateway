@@ -40,3 +40,16 @@ export interface SendMessageResponse {
   recipients: Recipients;
   status: Status[];
 }
+
+export interface SearchMessageResponseDto {
+  id: string;
+  topicId: string;
+  topicVersion: string;
+  transactionId: string;
+  signature: string;
+  payload: string;
+  senderDid: string;
+  timestampNanos: string;
+  isFile: Boolean;
+  clientGatewayMessageId: string;
+}
