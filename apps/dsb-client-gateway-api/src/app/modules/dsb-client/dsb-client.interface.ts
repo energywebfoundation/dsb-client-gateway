@@ -186,7 +186,7 @@ export interface Message {
 }
 
 export interface SearchMessageResponseDto {
-  id: string;
+  messageId: string;
   topicId: string;
   topicVersion: string;
   transactionId: string;
@@ -194,6 +194,6 @@ export interface SearchMessageResponseDto {
   payload: string;
   senderDid: string;
   timestampNanos: string;
-  isFile: Boolean;
+  isFile: boolean;
   clientGatewayMessageId: string;
 }

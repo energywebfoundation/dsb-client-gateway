@@ -102,39 +102,42 @@ export class MessageService {
 
     console.log('messages', messages);
 
-    try {
-      const result = await Promise.allSettled(
-        messages.map(async (message: SearchMessageResponseDto) => {
-          if (!message.isFile) {
-            const isSignatureValid = await this.keyService.verifySignature(
-              message.senderDid,
-              message.signature,
-              message.payload
+    await Promise.allSettled(
+      messages.map(async (message: SearchMessageResponseDto) => {
+        if (!message.isFile) {
+          const isSignatureValid = await this.keyService.verifySignature(
+            message.senderDid,
+            message.signature,
+            JSON.parse(message.payload)
+          );
+
+          this.logger.debug(
+            `signature matching result for message with id ${message.messageId}`,
+            isSignatureValid
+          );
+
+          if (isSignatureValid) {
+            const decryptedMessage = await this.keyService.decryptMessage(
+              JSON.parse(message.payload),
+              message.clientGatewayMessageId,
+              message.senderDid
             );
 
-            console.log('isSignatureValid', isSignatureValid);
+            this.logger.debug(
+              `decrypting Message for message with id ${message.messageId}`,
+              decryptedMessage
+            );
 
-            if (isSignatureValid) {
-              const decryptedMessage = await this.keyService.decryptMessage(
-                message.payload,
-                message.clientGatewayMessageId,
-                message.senderDid
-              );
-              console.log('decryptedMessage', decryptedMessage);
-              encryptedMessageResponse.push(decryptedMessage);
-            } else {
-              this.logger.error('Signature Not Matched');
-              throw new MessageSignatureNotValidException();
-            }
+            encryptedMessageResponse.push(decryptedMessage);
+          } else {
+            this.logger.error('Signature Not Matched');
+            throw new MessageSignatureNotValidException();
           }
-        })
-      );
+        }
+      })
+    );
 
-      return result;
-    } catch (e) {
-      this.logger.error('Error while decryting messages in get messages ', e);
-      throw new MessageSignatureNotValidException();
-    }
+    return encryptedMessageResponse;
   }
 
   public async downloadMessages({
@@ -231,6 +234,7 @@ export class MessageService {
 
     this.logger.log('Generating Random Key');
     const randomKey: string = await this.keyService.generateRandomKey();
+    console.log('randomKey', randomKey);
 
     this.logger.log('Encrypting Payload');
 
@@ -259,15 +263,17 @@ export class MessageService {
 
     await Promise.allSettled(
       qualifiedDids.map(async (recipientDid: string) => {
-        const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
+        const encryptedSymmetricKey = await this.keyService.encryptSymmetricKey(
           randomKey,
           recipientDid
         );
 
+        console.log('encryptedSymmetricKey', encryptedSymmetricKey);
+
         await this.dsbApiService.sendMessageInternal(
           recipientDid,
           clientGatewayMessageId,
-          decryptionCiphertext
+          encryptedSymmetricKey
         );
       })
     );

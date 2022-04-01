@@ -115,10 +115,8 @@ export class KeysService implements OnModuleInit {
     clientGatewayMessageId: string,
     senderDid: string
   ): Promise<string | null> {
-    const symmetricKey: KeysEntity | null = this.getSymmetricKey(
-      senderDid,
-      clientGatewayMessageId
-    );
+    const symmetricKey: string | null =
+      'S9zYbqLVrLPx4byUaUbiA4HhsW/M+dUJsWyAqUZPELh4exUOtDjJTn2U/8t3dfo3NYVf3drJDo/R8bS7oBjS303KOlUKIZbipiqf6iKFUYYVNeqBUaGLmpXWlsDZDJk6uKheQFh05lqLtPfU9yyud4M0XZuvaeguKijdQtHaDIaTlTinxOPOGQv1pji+9jxoFp7xvv2+ao2TT/NyeaXJQVRZroo187gClgD/+ku+pqrUzBiDIObGm1py9p4BKBQ5+oLq0awGf5F5NDff0xWjswE5RDWVu067gLKG5C3vNmVw9/nRlSVeW0xn5JWUPdQi0+OA6nNyP0u7NieNo+0TqtIRbSnRVaQ3NoCYSYHXh9YAaxcnmBMxksQ+D+wU2jXCTYQqd0lI9s3szqmkmRqgw62jZYQs4O3fco2n/Ns5eHfIQxB6E8px9pLgvNuScoTdf9/JWC65D76WAW9O5opkLKac/u/RYbmRAIOQ3wnoBNv9HKSXN6wSi/l4ueO7z9j6zoo6GkW+taAvtor+whmJniHgMcWVWA+nGOwsx/MjOfJxB6DcsHbHo1ClCYPjq/Xxf4GyAAQY/3Nb4xDbzDzlO57IPgCPtPHNJHrwVTGuP5ebOJj6HcsmG19mqXr70FobBRAPgIkjPJk8/K8p6yotakrIZGyJGa7DHOS+foq73IM=';
 
     if (!symmetricKey) {
       this.logger.error(
@@ -149,7 +147,7 @@ export class KeysService implements OnModuleInit {
 
     const decryptedKey: string = this.decryptSymmetricKey(
       privateKey,
-      symmetricKey.encryptedSymmetricKey,
+      symmetricKey,
       rootKey
     );
 
