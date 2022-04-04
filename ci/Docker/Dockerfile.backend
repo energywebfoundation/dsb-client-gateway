@@ -2,33 +2,26 @@ ARG IMAGE=node:16.10-alpine
 ARG NODE_ENV=production
 
 # FROM $IMAGE as build
-# ENV CYPRESS_INSTALL_BINARY=0
-
-# WORKDIR /usr/usr/app
+# WORKDIR /usr/app
 
 # COPY . .
 
-# ENV NODE_ENV=$NODE_ENV
-# RUN echo $pwd
-# RUN apk --no-cache --virtual build-dependencies add \
-#         python \
-#         make \
-#         g++ \
-#         && npm install --quiet --no-progress -g nx && \
-#     npm install --quiet --no-progress
-# RUN nx build dsb-client-gateway-frontend
+# ENV NODE_ENV $NODE_ENV
 
+# RUN npm install --quiet --no-progress -g nx && \
+#     npm ci --quiet --no-progress && \
+#     nx build dsb-client-gateway-api
 
 FROM $IMAGE
 
 ENV NODE_ENV=$NODE_ENV
 
-WORKDIR /usr/app
+COPY --chown=node:node dist/apps/dsb-client-gateway-api/* /usr/app/
+COPY --chown=node:node package-lock.json /usr/app/
 
-COPY --chown=node:node ./dist/apps/dsb-client-gateway-frontend/* /usr/app/
-RUN npm install next -g 
-RUN npm install --production
-# RUN next build
+WORKDIR /usr/app
+RUN npm ci --production
+
 USER node
 
-CMD ["npm", "start"]
+CMD ["node", "main.js"]
