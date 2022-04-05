@@ -51,7 +51,7 @@
     "moment": "^2.29.1",
     "nats.ws": "^1.7.2",
     "nedb": "^1.8.0",
-    "next": "12.1.0",
+    "next": "12.0.7",
     "node-vault": "^0.9.22",
     "nprogress": "^0.2.0",
     "promise-retry": "^2.0.1",
