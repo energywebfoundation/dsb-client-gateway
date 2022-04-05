@@ -13,6 +13,27 @@ export abstract class AbstractLokiRepository<T extends object = any> {
     this.client = lokiService.client;
   }
 
+  protected async createCollectionIfNotExistsAsync(
+    name: string,
+    indices: string[] = []
+  ): Promise<void> {
+    const collection = this.client.getCollection(name);
+
+    if (collection === null) {
+      if (indices.length > 0) {
+        this.client.addCollection(name, {
+          indices,
+        });
+
+        return;
+      }
+
+      this.client.addCollection(name);
+    }
+
+    // await this.lokiService.save();
+  }
+
   protected createCollectionIfNotExists(
     name: string,
     indices: string[] = []
@@ -20,9 +41,15 @@ export abstract class AbstractLokiRepository<T extends object = any> {
     const collection = this.client.getCollection(name);
 
     if (collection === null) {
-      this.client.addCollection(name, {
-        indices,
-      });
+      if (indices.length > 0) {
+        this.client.addCollection(name, {
+          indices,
+        });
+
+        return;
+      }
+
+      this.client.addCollection(name);
     }
   }
 

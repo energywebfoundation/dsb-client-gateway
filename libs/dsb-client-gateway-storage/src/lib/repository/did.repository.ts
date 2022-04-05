@@ -12,11 +12,11 @@ export class DidRepository
   private readonly logger = new Logger(DidRepository.name);
 
   constructor(protected readonly lokiService: LokiService) {
-    super('channel', lokiService);
+    super('did', lokiService);
   }
 
-  public onModuleInit(): void {
-    this.createCollectionIfNotExists(this.collection);
+  public async onModuleInit(): Promise<void> {
+    await this.createCollectionIfNotExistsAsync(this.collection);
   }
 
   public async upsertDid(
@@ -24,14 +24,18 @@ export class DidRepository
     publicRSAKey?: string,
     publicSignatureKey?: string
   ): Promise<void> {
-    const entity: DidEntity | null = this.getCollection().findOne({
-      id: did,
-    });
+    this.createCollectionIfNotExists(this.collection);
+
+    const entity: DidEntity | null = this.client
+      .getCollection<DidEntity>(this.collection)
+      .findOne({
+        id: did,
+      });
 
     if (!entity) {
       this.logger.log(`Storing DID ${did} in cache`);
 
-      this.getCollection().insert({
+      this.client.getCollection<DidEntity>(this.collection).insert({
         id: did,
         publicRSAKey,
         publicSignatureKey,
@@ -44,7 +48,7 @@ export class DidRepository
 
     this.logger.log(`Updating DID ${did}`);
 
-    this.getCollection().updateWhere(
+    this.client.getCollection<DidEntity>(this.collection).updateWhere(
       ({ id }) => id === did,
       (obj) => obj
     );
