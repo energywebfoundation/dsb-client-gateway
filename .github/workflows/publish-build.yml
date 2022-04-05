@@ -2,7 +2,7 @@ name: Pull Request
 
 on:
   push:
-    branches: [ AEMO-280-dockerization-export ]
+    branches: [ AEMO-280-dockerization-export-fe ]
 
 jobs:
   cancel-previous:
