@@ -34,7 +34,7 @@ import {
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { KeysService } from '../../keys/service/keys.service';
-import { VaultService } from '../../secrets-engine/service/vault.service';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import { join } from 'path';
@@ -53,7 +53,7 @@ export class MessageService {
   protected readonly logger = new Logger(MessageService.name);
 
   constructor(
-    // protected readonly secretsEngineService: SecretsEngineService,
+    protected readonly secretsEngineService: SecretsEngineService,
     protected readonly gateway: EventsGateway,
     protected readonly configService: ConfigService,
     protected readonly dsbApiService: DsbApiService,
@@ -62,7 +62,7 @@ export class MessageService {
     protected readonly identityService: IdentityService,
     protected readonly keyService: KeysService,
     protected readonly enrolmentRepository: EnrolmentRepository,
-    protected readonly vaultService: VaultService,
+    // protected readonly vaultService: VaultService,
     protected readonly internalMessageRepository: InternalMessageRepository,
     protected readonly commandBus: CommandBus
   ) {}
@@ -136,7 +136,7 @@ export class MessageService {
     );
 
     this.logger.log('fetching private key');
-    const privateKey = await this.vaultService.getPrivateKey();
+    const privateKey = await this.secretsEngineService.getPrivateKey();
 
     this.logger.log('Generating Signature');
 
@@ -341,7 +341,7 @@ export class MessageService {
     );
 
     this.logger.log('fetching private key');
-    const privateKey = await this.vaultService.getPrivateKey();
+    const privateKey = await this.secretsEngineService.getPrivateKey();
 
     this.logger.log('Generating Signature');
     const signature = await this.keyService.createSignature(

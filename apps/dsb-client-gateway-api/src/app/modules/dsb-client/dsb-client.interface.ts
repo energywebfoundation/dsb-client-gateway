@@ -35,15 +35,6 @@ export interface TopicData {
   version: string;
 }
 
-export class ApplicationDTO implements IAppDefinition {
-  appName: string;
-  logoUrl?: string;
-  websiteUrl?: string;
-  description?: string;
-  namespace?: string;
-  topicsCount?: number;
-}
-
 export interface ApplicationHeader {
   id?: string;
   Header?: string;
@@ -209,4 +200,13 @@ export interface SearchMessageResponseDto {
 
 export interface FileDownloadResposneDto {
   file: string;
+}
+
+export class ApplicationDTO implements IAppDefinition {
+  appName: string;
+  logoUrl?: string;
+  websiteUrl?: string;
+  description?: string;
+  namespace?: string;
+  topicsCount?: number;
 }
