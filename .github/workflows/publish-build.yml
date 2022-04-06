@@ -2,7 +2,7 @@ name: Pull Request
 
 on:
   push:
-    branches: [ AEMO-280-dockerization-export ]
+    branches: [ ddhub-dev ]
 
 jobs:
   cancel-previous:
@@ -72,6 +72,8 @@ jobs:
           docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
@@ -121,3 +123,5 @@ jobs:
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
           docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
