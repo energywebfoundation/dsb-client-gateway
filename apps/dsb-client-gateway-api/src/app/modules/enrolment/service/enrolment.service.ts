@@ -1,12 +1,6 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  Logger,
-  OnModuleInit,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, OnModuleInit, } from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
-import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { IamService } from '../../iam-service/service/iam.service';
 import { NatsListenerService } from './nats-listener.service';
 import { ConfigService } from '@nestjs/config';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
@@ -14,7 +8,7 @@ import {
   BalanceState,
   Enrolment,
   EnrolmentState,
-  RoleState,
+  RoleState
 } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { IdentityService } from '../../identity/service/identity.service';
 import { IdentityNotReadyException } from '../../identity/exceptions/identity-not-ready.exception';

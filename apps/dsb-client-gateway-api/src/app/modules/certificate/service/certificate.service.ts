@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { Multer } from 'multer';
+import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
 @Injectable()
 export class CertificateService {
-  constructor(protected readonly secretsEngineService: SecretsEngineService) {}
+  constructor(
+    protected readonly secretsEngineService: SecretsEngineService,
+  ) {
+  }
 
   public async save(
     cert: Express.Multer.File,

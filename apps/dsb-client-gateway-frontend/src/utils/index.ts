@@ -2,4 +2,3 @@ export * from './errors'
 export * from './functions'
 export * from './types'
 export * from './constants'
-export * from './query-client-options';

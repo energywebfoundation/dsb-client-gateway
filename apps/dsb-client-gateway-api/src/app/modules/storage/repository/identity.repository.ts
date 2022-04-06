@@ -1,9 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { AbstractLokiRepository } from './abstract-loki.repository';
 import { Identity } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
-import {
-  AbstractLokiRepository,
-  LokiService,
-} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { LokiService } from '../service/loki.service';
 
 @Injectable()
 export class IdentityRepository extends AbstractLokiRepository {

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { IamService } from '../../iam-service/service/iam.service';
 import { ChannelService } from './channel.service';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../identity/service/identity.service';

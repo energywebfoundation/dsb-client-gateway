@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - '*'
-env:
-  SECRETS_ENGINE: vault
 
 jobs:
   cancel-previous:
@@ -83,6 +81,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build
-        run: npm run export
+        run: nx export dsb-client-gateway-frontend
 
 

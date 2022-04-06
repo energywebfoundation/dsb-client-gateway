@@ -1,9 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import {
-  AbstractLokiRepository,
-  LokiService,
-} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { AbstractLokiRepository } from '../../storage/repository/abstract-loki.repository';
 import { ChannelEntity } from '../entity/channel.entity';
+import { LokiService } from '../../storage/service/loki.service';
 import { ChannelType } from '../channel.const';
 
 @Injectable()

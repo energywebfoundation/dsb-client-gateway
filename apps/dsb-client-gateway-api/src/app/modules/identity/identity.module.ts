@@ -3,13 +3,12 @@ import { UtilsModule } from '../utils/utils.module';
 import { IdentityService } from './service/identity.service';
 import { IdentityController } from './identity.controller';
 import { StorageModule } from '../storage/storage.module';
+import { SecretsEngineModule } from '../secrets-engine/secrets-engine.module';
 import { EnrolmentModule } from '../enrolment/enrolment.module';
-import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { IamInitService } from './service/iam-init.service';
 
 @Module({
   imports: [UtilsModule, StorageModule, SecretsEngineModule, EnrolmentModule],
-  providers: [IdentityService, IamInitService],
+  providers: [IdentityService],
   controllers: [IdentityController],
   exports: [IdentityService],
 })

@@ -1,13 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { w3cwebsocket } from 'websocket';
 import * as EventEmitter from 'events';
-import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { IamService } from '../../iam-service/service/iam.service';
 import { connect, JSONCodec } from 'nats.ws';
 import { ConfigService } from '@nestjs/config';
-import {
-  EnrolmentState,
-  RoleState,
-} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { EnrolmentState, RoleState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { Claim, ClaimEventType } from 'iam-client-lib';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 

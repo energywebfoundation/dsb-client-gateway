@@ -4,40 +4,32 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import Head from 'next/head';
 import Axios from 'axios';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { DDHubThemeProvider } from '../styles/theme';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
-import { Layout } from '../components/Layout';
-import { queryClientOptions } from '../utils';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
+import { Layout } from '../components/Layout';
 
-Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
+Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';
 
 let muiCache: EmotionCache | undefined = undefined;
-export const createMuiCache = () =>
-  (muiCache = createCache({ key: 'mui', prepend: true }));
+export const createMuiCache = () => muiCache = createCache({'key': 'mui', 'prepend': true});
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
 
 function MyApp(props: MyAppProps) {
-  const { Component, pageProps } = props;
-  const [queryClient] = React.useState(
-    () =>
-      new QueryClient({
-        defaultOptions: queryClientOptions,
-      })
-  );
+  const {Component, pageProps} = props;
 
-  const getLayout =
-    (Component as any).getLayout || ((page) => <Layout>{page}</Layout>);
+  const getLayout = (Component as any).getLayout  || ((page) => <Layout>
+    {page}
+  </Layout>)
 
   useEffect(() => {
-    NProgress.configure({ showSpinner: false });
+    NProgress.configure({showSpinner: false});
     Router.events.on('routeChangeStart', () => NProgress.start());
     Router.events.on('routeChangeComplete', () => NProgress.done());
     Router.events.on('routeChangeError', () => NProgress.done());
@@ -54,9 +46,7 @@ function MyApp(props: MyAppProps) {
       </Head>
       <DDHubThemeProvider>
         <CssBaseline />
-        <QueryClientProvider client={queryClient}>
-          {getLayout(<Component {...pageProps} />)}
-        </QueryClientProvider>
+        {getLayout(<Component {...pageProps} />)}
       </DDHubThemeProvider>
     </CacheProvider>
   );

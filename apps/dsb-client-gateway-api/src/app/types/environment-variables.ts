@@ -10,7 +10,7 @@ import {
 import { WebSocketImplementation } from '../modules/message/message.const';
 import { EventEmitMode } from '../modules/message/service/message.service';
 import { Transform } from 'class-transformer';
-import { SecretsEngine } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { SecretsEngine } from '../modules/secrets-engine/secrets-engine.const';
 
 export enum NODE_ENV {
   Production = 'production',

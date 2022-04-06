@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
-import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { IamService } from '../../iam-service/service/iam.service';
+import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { IdentityRepository } from '../../storage/repository/identity.repository';
@@ -10,10 +11,9 @@ import {
   Enrolment,
   Identity,
   IdentityWithEnrolment,
-  RoleState,
+  RoleState
 } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { Claim } from 'iam-client-lib';
-import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 @Injectable()
 export class IdentityService {
