@@ -1,76 +1,79 @@
 import { Topic as TopicType } from '../../utils'
-import Topic from './Topics'
-import Swal from 'sweetalert2';
-import { useState } from 'react'
-import axios from 'axios'
+import { Topics } from './Topics'
 
 type TopicContainerProps = {
     applicationNameSpace: string | string[] | undefined
     topics: TopicType[] | undefined
-    auth?: string
     did?: string
 
 }
 
-export const TopicContainer = ({ applicationNameSpace, auth, topics, did }: TopicContainerProps) => {
-    const [isLoading, setIsLoading] = useState(false)
+export const TopicContainer = ({ applicationNameSpace, topics, did }: TopicContainerProps) => {
 
-    const handlePostTopic = async (body: TopicType) => {
-        setIsLoading(true)
+    // const handlePostTopic = async (body: TopicType) => {
+    //     setIsLoading(true)
 
-        try {
-            const res = await axios.post(
-                `/v1/dsb/topics`,
-                body,
-                {
-                    headers: {
-                        Authorization: auth ? `Bearer ${auth}` : undefined,
-                        'content-type': 'application/json'
-                    }
-                }
-            )
-            console.log(res.data)
+    //     try {
+    //         const res = await axios.post(
+    //             `/v1/dsb/topics`,
+    //             body,
+    //             {
+    //                 headers: {
+    //                     Authorization: auth ? `Bearer ${auth}` : undefined,
+    //                     'content-type': 'application/json'
+    //                 }
+    //             }
+    //         )
+    //         console.log(res.data)
 
-            Swal.fire(`Success: `, `Topic Created Successfully`, 'success')
-        } catch (err) {
-            if (axios.isAxiosError(err)) {
-                Swal.fire('Error', err.response?.data?.err?.reason, 'error')
-            } else {
-                Swal.fire('Error', `Could not set identity: ${err}`, 'error')
-            }
-            setIsLoading(false)
-        }
+    //         Swal.fire(`Success: `, `Topic Created Successfully`, 'success')
+    //     } catch (err) {
+    //         if (axios.isAxiosError(err)) {
+    //             Swal.fire('Error', err.response?.data?.err?.reason, 'error')
+    //         } else {
+    //             Swal.fire('Error', `Could not set identity: ${err}`, 'error')
+    //         }
+    //         setIsLoading(false)
+    //     }
+    // }
+
+
+    // const handleUpdateTopic = async (body: TopicType) => {
+    //     setIsLoading(true)
+
+    //     try {
+    //         const res = await axios.patch(
+    //             `/v1/dsb/topics`,
+    //             body,
+    //             {
+    //                 headers: {
+    //                     Authorization: auth ? `Bearer ${auth}` : undefined,
+    //                     'content-type': 'application/json'
+    //                 }
+    //             }
+    //         )
+    //         console.log(res.data)
+
+    //         Swal.fire(`Success: `, `Topic Created Successfully`, 'success')
+    //     } catch (err) {
+    //         if (axios.isAxiosError(err)) {
+    //             Swal.fire('Error', err.response?.data?.err?.reason, 'error')
+    //         } else {
+    //             Swal.fire('Error', `Could not set identity: ${err}`, 'error')
+    //         }
+    //         setIsLoading(false)
+    //     }
+    // }
+
+    const handleUpdateTopic = async () => {
+      console.log('update');
     }
 
-
-    const handleUpdateTopic = async (body: TopicType) => {
-        setIsLoading(true)
-
-        try {
-            const res = await axios.patch(
-                `/v1/dsb/topics`,
-                body,
-                {
-                    headers: {
-                        Authorization: auth ? `Bearer ${auth}` : undefined,
-                        'content-type': 'application/json'
-                    }
-                }
-            )
-            console.log(res.data)
-
-            Swal.fire(`Success: `, `Topic Created Successfully`, 'success')
-        } catch (err) {
-            if (axios.isAxiosError(err)) {
-                Swal.fire('Error', err.response?.data?.err?.reason, 'error')
-            } else {
-                Swal.fire('Error', `Could not set identity: ${err}`, 'error')
-            }
-            setIsLoading(false)
-        }
+    const handlePostTopic = async () => {
+      console.log('update');
     }
 
-    return <Topic
+    return <Topics
         applicationName={applicationNameSpace}
         topics={topics} myDID={did}
         handlePostTopic={handlePostTopic}

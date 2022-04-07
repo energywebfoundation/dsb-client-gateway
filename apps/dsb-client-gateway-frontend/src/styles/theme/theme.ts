@@ -1,11 +1,11 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles';
+// import SequelSans from '../../assets/fonts/Sequel-Sans.ttf';
 
 // Create a theme instance.
 const dsbTheme: ThemeOptions = {
   palette: {
     primary: {
-      main: '#A466FF',
-      dark: '#293145'
+      main: '#A466FF'
     },
     secondary: {
       main: '#F6AFAF',
@@ -38,10 +38,23 @@ const dsbTheme: ThemeOptions = {
     }
   },
   typography: {
-    fontFamily: 'Rajdhani'
+    fontFamily: 'Rajdhani',
+    body2: {
+      fontFamily: 'Sequel Sans',
+      letterSpacing: '0.4px'
+    }
   },
   components: {
     // Name of the component
+    MuiCssBaseline: {
+      styleOverrides: `
+        @font-face {
+          font-family: 'Sequel Sans';
+          font-style: normal;
+          src: url('/fonts/Sequel-Sans.ttf') format('truetype');
+        }
+      `,
+    },
     MuiDrawer: {
       styleOverrides: {
         // Name of the slot

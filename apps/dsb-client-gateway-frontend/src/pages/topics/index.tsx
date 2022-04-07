@@ -9,6 +9,16 @@ export default function ListTopics({ owner, ownerDid, auth }) {
     const { classes } = useStyles()
 
     const [topics, setTopics] = useState<Topic[]>();
+    const topicsMock = [
+      {
+        id: '1',
+        name: 'Topic',
+        owner: 'iam',
+        schema: 'schema',
+        schemaType: 'schema type',
+        version: '1.0.0',
+      }
+    ]
 
     return (
         <div>
@@ -21,10 +31,9 @@ export default function ListTopics({ owner, ownerDid, auth }) {
             <main>
                 <Container maxWidth="lg">
                     <section className={classes.table}>
-                        {topics ? <TopicContainer
+                        {topicsMock ? <TopicContainer
                             applicationNameSpace={owner}
-                            auth={auth.some}
-                            topics={topics} /> : null}
+                            topics={topicsMock} /> : null}
                     </section>
 
                 </Container>

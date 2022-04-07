@@ -130,7 +130,7 @@ export const GatewayIdentity = ({
 const useStyles = makeStyles()((theme) => ({
   credentials: {
     borderRadius: '6px',
-    background: theme.palette.primary.dark,
+    background: theme.palette.background.paper,
     padding: '2rem',
     height: '550px',
     display: 'flex',
