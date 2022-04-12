@@ -22,7 +22,7 @@ export const useStyles = makeStyles()((theme) => ({
     lineHeight: '21px',
     fontWeight: 400,
     textAlign: 'center',
-    color: theme.palette.grey[300],
+    color: theme.palette.grey[400],
     fontFamily: theme.typography.body2.fontFamily,
   },
   closeButtonWrapper: {

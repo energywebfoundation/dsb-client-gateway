@@ -1,9 +1,10 @@
+import { alpha } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
     margin: 0,
-    background: 'rgba(22, 29, 49, 0.45)',
+    background: alpha(theme.palette.background.default, 0.45),
     borderRadius: 5,
     '& .MuiInputBase-root': {
       fontFamily: theme.typography.body2.fontFamily,
@@ -15,23 +16,20 @@ export const useStyles = makeStyles()((theme) => ({
       padding: '8px 10px 8px 15px',
     },
     '& .MuiOutlinedInput-notchedOutline': {
-      border: '1px solid #848484',
+      border: `1px solid ${theme.palette.grey[500]}`,
       borderRadius: 5
     },
     '& input': {
       padding: '8px 10px 8px 15px',
-      fontSize: 12,
-      color: '#fff',
-      minHeight: 22,
-      fontFamily: theme.typography.body2.fontFamily,
-      '&::placeholder': {
-        fontSize: 12,
-        lineHeight: '24px',
-        fontWeight: 400,
-        color: '#B9B9C3',
-        opacity: 1
-      },
+      fontFamily: theme.typography.body2.fontFamily
     }
+  },
+  placeholder: {
+    fontSize: 12,
+    lineHeight: '24px',
+    fontWeight: 400,
+    color: theme.palette.grey[300],
+    fontFamily: theme.typography.body2.fontFamily,
   },
   label: {
     fontSize: 12,
@@ -44,12 +42,14 @@ export const useStyles = makeStyles()((theme) => ({
   },
   menuItem: {
     fontSize: 12,
-    color: '#fff',
+    color: theme.palette.common.white,
     minHeight: 22,
     fontFamily: theme.typography.body2.fontFamily,
   },
   icon: {
-    top: 17,
-    right: 15
+    top: 9,
+    right: 15,
+    stroke: alpha(theme.palette.grey[200], 0.5),
+    width: 20
   }
 }));

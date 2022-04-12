@@ -32,7 +32,10 @@ const dsbTheme: ThemeOptions = {
       secondary: '#FFFFFF'
     },
     grey: {
-      300: '#B2B6BD'
+      200: '#F2F2F3',
+      300: '#B9B9C3',
+      400: '#B2B6BD',
+      500: '#848484'
     },
     background: {
       default: '#161D31',

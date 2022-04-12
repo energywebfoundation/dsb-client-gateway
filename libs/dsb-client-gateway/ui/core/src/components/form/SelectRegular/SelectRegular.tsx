@@ -1,8 +1,14 @@
 import React, { FC } from 'react';
-import { MenuItem, TextField, Box, InputLabel } from '@mui/material';
+import {
+  MenuItem,
+  TextField,
+  Box,
+  InputLabel,
+  Typography,
+} from '@mui/material';
 import { UseFormRegister, FieldValues } from 'react-hook-form';
-import { ReactComponent as ArrowDownIcon } from './arrow-down.svg';
 import { GenericFormField } from '../../../containers/GenericForm';
+import { ChevronDown } from 'react-feather';
 import { useStyles } from './SelectRegular.styles';
 
 export interface SelectRegularProps {
@@ -40,7 +46,6 @@ export const SelectRegular: FC<SelectRegularProps> = ({
         margin="normal"
         variant={variant}
         value={value}
-        defaultValue={value}
         onChange={onChange}
         disabled={disabled}
         required={field.required}
@@ -51,7 +56,20 @@ export const SelectRegular: FC<SelectRegularProps> = ({
           root: classes.root,
         }}
         SelectProps={{
-          IconComponent: ArrowDownIcon,
+          renderValue: (value: any) => {
+            const label = options.find(
+              (option) => option.value === value
+            )?.label;
+            return value ? (
+              label
+            ) : (
+              <Typography className={classes.placeholder}>
+                {field.inputProps?.placeholder}
+              </Typography>
+            );
+          },
+          displayEmpty: true,
+          IconComponent: ChevronDown,
           classes: {
             icon: classes.icon,
           },
