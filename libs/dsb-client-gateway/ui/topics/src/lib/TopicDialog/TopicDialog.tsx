@@ -13,7 +13,13 @@ import {
   Box,
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { CloseButton, FormInput, GenericFormField } from '@dsb-client-gateway/ui/core';
+import {
+  CloseButton,
+  FormInput,
+  FormSelect,
+  GenericFormField,
+  FormSelectOption,
+} from '@dsb-client-gateway/ui/core';
 import { useStyles } from './TopicDialog.styles';
 
 interface TopicDialogProps {
@@ -27,6 +33,7 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
   const { classes } = useStyles();
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -37,31 +44,43 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
     label: 'Topic name',
     formInputsWrapperProps: {
       width: 254,
-      marginRight: '15px'
+      marginRight: '15px',
     },
     inputProps: {
-      placeholder: 'Topic name'
-    }
-  }
+      placeholder: 'Topic name',
+    },
+  };
 
   const versionField: GenericFormField = {
     name: 'version',
     label: 'Version',
     formInputsWrapperProps: {
-      width: 145
+      width: 145,
     },
     inputProps: {
-      placeholder: 'Version'
-    }
-  }
+      placeholder: 'Version',
+    },
+  };
 
   const tagsField: GenericFormField = {
     name: 'version',
     label: 'Version',
     inputProps: {
-      placeholder: 'Version'
-    }
-  }
+      placeholder: 'Version',
+    },
+  };
+
+  const schemaTypeField: GenericFormField = {
+    name: 'schemaType',
+    label: 'Schema type',
+    options: [
+      { value: 'json', label: 'JSON' },
+      { value: 'xml', label: 'XML' },
+    ],
+    inputProps: {
+      placeholder: 'Schema type',
+    },
+  };
 
   return (
     <Dialog
@@ -75,26 +94,36 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
         <DialogContentText className={classes.subTitle}>
           Provide topic data with this form
         </DialogContentText>
-        <Grid container mt={4} pl={2.5}>
+        <Grid container mt={4}>
           <Grid item xs={4}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} pl={5}>
             <Box display="flex" mb={2.7}>
-            <FormInput
-              field={topicField}
-              register={register}
-              variant="outlined"
-            />
-            <FormInput
-              field={versionField}
-              register={register}
-              variant="outlined"
-            />
+              <FormInput
+                field={topicField}
+                register={register}
+                variant="outlined"
+              />
+              <FormInput
+                field={versionField}
+                register={register}
+                variant="outlined"
+              />
             </Box>
+            <Box mb={2.7}>
             <FormInput
               field={tagsField}
               register={register}
               variant="outlined"
             />
+            </Box>
+            <Box mb={2.7}>
+              <FormSelect
+                field={schemaTypeField}
+                register={register}
+                control={control}
+                variant="outlined"
+              />
+            </Box>
           </Grid>
         </Grid>
       </DialogContent>

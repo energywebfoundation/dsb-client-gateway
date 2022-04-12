@@ -1,7 +1,9 @@
 import React, { FC } from 'react';
-import { MenuItem, TextField } from '@mui/material';
+import { MenuItem, TextField, Box, InputLabel } from '@mui/material';
 import { UseFormRegister, FieldValues } from 'react-hook-form';
+import { ReactComponent as ArrowDownIcon } from './arrow-down.svg';
 import { GenericFormField } from '../../../containers/GenericForm';
+import { useStyles } from './SelectRegular.styles';
 
 export interface SelectRegularProps {
   field: GenericFormField;
@@ -21,15 +23,18 @@ export const SelectRegular: FC<SelectRegularProps> = ({
   errorText = '',
   variant = 'standard',
   value = '',
-  disabled = false
+  disabled = false,
 }) => {
+  const { classes } = useStyles();
   const options = field.options || [];
+
   return (
+    <Box {...field.formInputsWrapperProps} flexShrink={0}>
+      <InputLabel className={classes.label}>{field.label ?? ''}</InputLabel>
       <TextField
         select
         fullWidth
         name={`${field.name}`}
-        label={field.label}
         error={errorExists}
         helperText={errorText}
         margin="normal"
@@ -42,13 +47,27 @@ export const SelectRegular: FC<SelectRegularProps> = ({
         inputProps={{
           ...field.inputProps,
         }}
+        classes={{
+          root: classes.root,
+        }}
+        SelectProps={{
+          IconComponent: ArrowDownIcon,
+          classes: {
+            icon: classes.icon,
+          },
+        }}
         {...field.textFieldProps}
       >
         {options.map((option) => (
-          <MenuItem key={option.label} value={option.value}>
+          <MenuItem
+            key={option.label}
+            value={option.value}
+            className={classes.menuItem}
+          >
             {option.label}
           </MenuItem>
         ))}
       </TextField>
+    </Box>
   );
 };
