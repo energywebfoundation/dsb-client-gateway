@@ -6,8 +6,9 @@ import {
   Typography,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
+import { EnrolmentState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { CustomInput } from '../../components/CustomInput/CustomInput';
-import { EnrolmentState, snip, StringType } from '../../utils';
+import { snip, StringType } from '../../utils';
 import { makeStyles } from 'tss-react/mui';
 
 type GatewayIdentityProps = {

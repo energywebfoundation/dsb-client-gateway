@@ -31,6 +31,9 @@ const dsbTheme: ThemeOptions = {
       primary: '#CED1D5',
       secondary: '#FFFFFF'
     },
+    grey: {
+      300: '#B2B6BD'
+    },
     background: {
       default: '#161D31',
       paper: '#293145'
