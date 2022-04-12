@@ -56,8 +56,8 @@ dsb-client-gateway:
           - dsb-gateway-qa-pi.energyweb.org
 
   pvc:
-    enabled: false
-    mountPath: /mnt/azure
+    enabled: true
+    mountPath: /var/deployment/apps/dsb-client-gateway/data
 
   probes:
     liveness: false
