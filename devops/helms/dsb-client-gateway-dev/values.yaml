@@ -24,11 +24,11 @@ dsb-client-gateway:
 
   resources:
     limits:
-      cpu: "20m"
-      memory: "200Mi"
+      cpu: "200m"
+      memory: "500Mi"
     requests:
-      cpu: "10m"
-      memory: "120Mi"
+      cpu: "100m"
+      memory: "250Mi"
 
   podSecurityContext:
     fsGroup: 2000
