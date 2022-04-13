@@ -1,26 +1,25 @@
 import { EventEmitter } from 'events'
-import { ClaimEventType, IClaimIssuance } from 'iam-client-lib'
+import { IAM, NATS_EXCHANGE_TOPIC } from 'iam-client-lib'
+import { IClaimIssuance } from 'iam-client-lib/dist/src/iam'
+import { Claim } from 'iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types'
 import { connect, JSONCodec } from 'nats.ws'
 import { w3cwebsocket } from 'websocket'
 import { config } from '../config'
 import { EnrolmentState, RoleState, USER_ROLE } from '../utils'
 import { isApproved } from './identity.service'
 import { writeEnrolment } from './storage.service'
-import { IamService } from './iam.service'
 
 // shim websocket for nats.ws
 globalThis.WebSocket = w3cwebsocket as any
 
 export const events = new EventEmitter()
 
-export const NATS_EXCHANGE_TOPIC = 'claim-exchange' // pulled directly from IAM CACHE Server
-
-events.on('await_approval', async (iam: IamService) => {
+events.on('await_approval', async (iam: IAM) => {
   const state: EnrolmentState = {
     approved: false,
     waiting: true,
     roles: {
-      user: RoleState.AWAITING_APPROVAL
+      user: RoleState.AWAITING_APPROVAL,
       // messagebroker: RoleState.AWAITING_APPROVAL
     }
   }
@@ -29,9 +28,8 @@ events.on('await_approval', async (iam: IamService) => {
   const nc = await connect({ servers: `wss://${config.iam.eventServerUrl}` })
   console.log('Connected to identity events server')
 
-  const did = iam.getDIDAddress()
-
-  const topic = `${ClaimEventType.ISSUE_CREDENTIAL}.${NATS_EXCHANGE_TOPIC}.${did}.${config.iam.natsEnvironmentName}`
+  const did = iam.getDid()
+  const topic = `${iam.getDid()}.${NATS_EXCHANGE_TOPIC}`
   console.log('Listening for role approvals on', topic)
 
   const jc = JSONCodec<IClaimIssuance>()
@@ -50,11 +48,13 @@ events.on('await_approval', async (iam: IamService) => {
       if (claim.issuedToken) {
         console.log(`[${count}] Received claim has been issued`)
 
-        const decodedToken = await iam.decodeJWTToken(claim.issuedToken)
+        const decodedToken = (await iam.decodeJWTToken({
+          token: claim.issuedToken
+        })) as { [key: string]: Claim }
 
         if (decodedToken.claimData.claimType === USER_ROLE) {
           console.log(`[${count}] Received issued claim is ${USER_ROLE}`)
-          await iam.publishPublicClaim(claim.issuedToken)
+          await iam.publishPublicClaim({ token: claim.issuedToken })
           console.log(`[${count}] Synced ${USER_ROLE} claim to DID Document`)
           state.roles.user = RoleState.APPROVED
         }

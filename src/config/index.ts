@@ -9,11 +9,10 @@ const defaults = {
   websocket: 'NONE',
   chainId: '73799',
   rpcUrl: 'https://volta-rpc.energyweb.org/',
-  cacheServerUrl: 'https://identitycache-dev.energyweb.org/v1/',
-  eventServerUrl: 'https://identitycache-dev.energyweb.org/',
+  cacheServerUrl: 'https://volta-identitycache.energyweb.org/v1/',
+  eventServerUrl: 'https://volta-identityevents.energyweb.org/',
   inMemoryDbFilename: 'in-memory.json',
   parentNamespace: 'dsb.apps.energyweb.iam.ewc',
-  natsEnvironmentName: 'ewf-dev',
   dsbBaseUrl: 'https://dsb-demo.energyweb.org',
   websocketReconnect: 'true',
   websocketReconnectTimeout: '10000',
@@ -27,8 +26,6 @@ const takeIf = <T>(requirement?: any, subject?: T): T | undefined => (requiremen
 const asBool = (some?: string) => (some ? some === 'true' : false)
 
 const asEnum = (options: string[], some?: string) => (options.includes(some ?? '') ? some : undefined)
-
-console.log(process.env.PORT, process.env.PRIVATE_KEY, 'port')
 
 export const config = {
   server: {
@@ -51,14 +48,13 @@ export const config = {
     cacheServerUrl: process.env.CACHE_SERVER_URL ?? defaults.cacheServerUrl,
     eventServerUrl: process.env.EVENT_SERVER_URL ?? defaults.eventServerUrl,
     parentNamespace: process.env.PARENT_NAMESPACE ?? defaults.parentNamespace,
-    privateKey: process.env.PRIVATE_KEY,
-    natsEnvironmentName: process.env.NATS_ENVIRONMENT_NAME ?? defaults.natsEnvironmentName
+    privateKey: process.env.PRIVATE_KEY
   },
   storage: {
     inMemoryDbFile: path.join(process.cwd(), 'data', process.env.IN_MEMORY_DB_FILENAME ?? defaults.inMemoryDbFilename)
   },
   dsb: {
-    baseUrl: process.env.DSB_BASE_URL ?? defaults.dsbBaseUrl
+    baseUrl: process.env.DSB_BASE_URL ?? defaults.dsbBaseUrl,
     // controllable: asBool(process.env.DSB_CONTROLLABLE),
   },
   auth: {

@@ -1,32 +1,33 @@
 import { BigNumber, providers, utils, Wallet } from 'ethers'
-import { Claim } from 'iam-client-lib'
+import { IAM, RegistrationTypes, setCacheClientOptions } from 'iam-client-lib'
+import { Claim } from 'iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types'
 import { parseEther } from 'ethers/lib/utils'
 import {
-  BalanceCheckError,
   BalanceState,
-  CreateClaimError,
-  DiskWriteError,
-  EnrolmentManager,
   EnrolmentState,
-  FetchClaimsError,
-  IAMInitError,
   Identity,
-  InvalidPrivateKeyError,
-  NoBalanceError,
-  NoDIDError,
-  NoPrivateKeyError,
-  NotEnroledError,
-  PARENT_NAMESPACE,
+  EnrolmentManager,
   Result,
   RoleState,
   Storage,
+  MESSAGEBROKER_ROLE,
   USER_ROLE,
+  PARENT_NAMESPACE,
+  NoPrivateKeyError,
+  NotEnroledError,
+  NoBalanceError,
+  NoDIDError,
+  CreateClaimError,
+  DiskWriteError,
+  InvalidPrivateKeyError,
+  BalanceCheckError,
+  IAMInitError,
+  FetchClaimsError,
   Web3ProviderError
 } from '../utils'
 import { config } from '../config'
 import { getEnrolment, getIdentity, getStorage, writeEnrolment, writeIdentity } from './storage.service'
 import { events } from './events.service'
-import { IamService } from './iam.service'
 
 /**
  * Signs proof of private key ownership with current block to prevent replay attacks
@@ -42,7 +43,6 @@ export async function signProof(): Promise<Result<string>> {
   if (!enrolment || !enrolment.did) {
     return { err: new NotEnroledError() }
   }
-
   const signer = new Wallet(identity.privateKey)
   const header = {
     alg: 'ES256',
@@ -87,61 +87,61 @@ export async function signPayload(payload: string): Promise<Result<string>> {
  */
 export async function initEnrolment({ address, privateKey }: Identity): Promise<Result<EnrolmentManager>> {
   const { ok: balance, err: balanceError } = await validateBalance(address)
-
   if (balance === undefined) {
     return { err: balanceError }
   }
   if (balance === BalanceState.NONE) {
     return { err: new NoBalanceError() }
   }
-
-  try {
-    const iamService = await initIAM(privateKey)
-
-    const did = iamService.getDIDAddress()
-
-    if (!did) {
-      // IAM Client Library creates the DID for us so this *should* not occur
-      return { err: new NoDIDError() }
-    }
-
-    return {
-      ok: {
-        did,
-        getState: async () => {
-          const { ok: claims, err: fetchError } = await fetchClaims(iamService, did)
-          if (!claims) {
-            return { err: fetchError }
-          }
-          const state = readClaims(claims)
-          if (state.waiting) {
-            events.emit('await_approval', iamService)
-          }
-          if (state.approved) {
-            events.emit('approved')
-          }
-          return { ok: state }
-        },
-        handle: async ({ roles }: EnrolmentState) => {
-          if (roles.user === RoleState.NO_CLAIM) {
-            const { ok } = await createClaim(iamService, USER_ROLE)
-            if (!ok) {
-              return { err: new CreateClaimError(USER_ROLE) }
-            }
-          }
-          return { ok: true }
-        },
-        save: async (state: EnrolmentState) => {
-          const { ok, err } = await writeEnrolment({ did, state })
-          if (err) {
-            return { err: new DiskWriteError('enrolment data') }
-          }
-          return { ok }
+  const { ok: iam, err: iamError } = await initIAM(privateKey)
+  if (!iam) {
+    return { err: iamError }
+  }
+  const did = iam.getDid()
+  if (!did) {
+    // IAM Client Library creates the DID for us so this *should* not occur
+    return { err: new NoDIDError() }
+  }
+  return {
+    ok: {
+      did,
+      getState: async () => {
+        const { ok: claims, err: fetchError } = await fetchClaims(iam, did)
+        if (!claims) {
+          return { err: fetchError }
         }
+        const state = readClaims(claims)
+        if (state.waiting) {
+          events.emit('await_approval', iam)
+        }
+        if (state.approved) {
+          events.emit('approved')
+        }
+        return { ok: state }
+      },
+      handle: async ({ roles }: EnrolmentState) => {
+        // if (roles.messagebroker === RoleState.NO_CLAIM) {
+        //   const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
+        //   if (!ok) {
+        //     return { err: new CreateClaimError(MESSAGEBROKER_ROLE) }
+        //   }
+        // }
+        if (roles.user === RoleState.NO_CLAIM) {
+          const { ok } = await createClaim(iam, USER_ROLE)
+          if (!ok) {
+            return { err: new CreateClaimError(USER_ROLE) }
+          }
+        }
+        return { ok: true }
+      },
+      save: async (state: EnrolmentState) => {
+        const { ok, err } = await writeEnrolment({ did, state })
+        if (err) {
+          return { err: new DiskWriteError('enrolment data') }
+        }
+        return { ok }
       }
     }
-  } catch (e) {
-    return { err: e }
   }
 }
 
@@ -184,7 +184,6 @@ export async function validateBalance(address: string): Promise<Result<BalanceSt
   try {
     const provider = new providers.JsonRpcProvider(config.iam.rpcUrl)
     const balance = await provider.getBalance(address)
-
     if (balance.eq(BigNumber.from(0))) {
       return { ok: BalanceState.NONE }
     }
@@ -218,11 +217,11 @@ export async function refreshState(): Promise<Result<Storage>> {
     await writeIdentity(newState.identity)
   }
   if (storage?.enrolment?.did) {
-    const iamService = await initIAM(storage.identity?.privateKey!!)
-    if (!iamService) {
-      return { err: new IAMInitError() }
+    const { ok: iam, err: iamError } = await initIAM(storage.identity?.privateKey!!)
+    if (!iam) {
+      return { err: iamError }
     }
-    const { ok: claims, err: claimsError } = await fetchClaims(iamService, storage.enrolment.did)
+    const { ok: claims, err: claimsError } = await fetchClaims(iam, storage.enrolment.did)
     if (!claims) {
       return { err: claimsError }
     }
@@ -244,13 +243,28 @@ export async function refreshState(): Promise<Result<Storage>> {
  * @param privateKey the identity controlling to the DID
  * @returns initialized IAM object
  */
-export async function initIAM(privateKey: string): Promise<IamService> {
+export async function initIAM(privateKey: string): Promise<Result<IAM>> {
   try {
-    return IamService.initialize(privateKey, config.iam.rpcUrl, config.iam.chainId)
+    const iam = new IAM({
+      privateKey,
+      rpcUrl: config.iam.rpcUrl
+    })
+    setCacheClientOptions(config.iam.chainId, {
+      url: config.iam.cacheServerUrl
+    })
+    await iam.initializeConnection({
+      createDocument: true,
+      initCacheServer: false
+    })
+    await iam.connectToCacheServer()
+    return { ok: iam }
   } catch (err) {
-    console.error(`Failed to init IAM: ${err.message}`)
-
-    throw err
+    if (err instanceof Error) {
+      console.log(`Failed to init IAM: ${err.message}`)
+    }
+    return {
+      err: new IAMInitError()
+    }
   }
 }
 
@@ -261,12 +275,13 @@ export async function initIAM(privateKey: string): Promise<IamService> {
  * @param did subject of the claims
  * @returns array of claims
  */
-async function fetchClaims(iam: IamService, did: string): Promise<Result<Claim[]>> {
+async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[]>> {
   try {
     console.log('Fetching claims for', did, 'on', PARENT_NAMESPACE)
-
-    const claims = await iam.getClaimsByRequester(did)
-
+    const claims = await iam.getClaimsByRequester({
+      did,
+      parentNamespace: PARENT_NAMESPACE
+    })
     return { ok: claims }
   } catch (err) {
     if (err instanceof Error) {
@@ -290,7 +305,7 @@ function readClaims(claims: Claim[]): EnrolmentState {
     approved: false,
     waiting: false,
     roles: {
-      user: RoleState.NO_CLAIM
+      user: RoleState.NO_CLAIM,
       // messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
     }
   }
@@ -314,10 +329,16 @@ function readClaims(claims: Claim[]): EnrolmentState {
  * @param claim the type of claim (messagebroker, user, etc.)
  * @returns ok (boolean)
  */
-async function createClaim(iam: IamService, claim: string): Promise<Result<boolean, Error>> {
+async function createClaim(iam: IAM, claim: string): Promise<Result<boolean, Error>> {
   try {
-    await iam.requestClaim(claim)
-
+    await iam.createClaimRequest({
+      claim: {
+        claimType: claim,
+        claimTypeVersion: 1,
+        fields: []
+      },
+      registrationTypes: [RegistrationTypes.OnChain, RegistrationTypes.OffChain]
+    })
     return { ok: true }
   } catch (err) {
     if (err instanceof Error) {
