@@ -297,10 +297,20 @@ export class DsbApiService {
     }
     // use setTimeout instead of setInterval so we can control the interval
     const runner = async () => {
-      await job()
+      try {
+        console.log(`Runner heartbeat for pulling messages: ${new Date().toISOString()}`)
+
+        await job()
+      } catch (e) {
+        console.error(`Runner job failed: ${new Date().toISOString()}`, e)
+      }
+
       setTimeout(runner, interval * 1000)
     }
     runner()
+        .catch((e) => {
+          console.error(`Runner failed: ${new Date().toISOString()}`, e)
+        })
   }
 
   /**

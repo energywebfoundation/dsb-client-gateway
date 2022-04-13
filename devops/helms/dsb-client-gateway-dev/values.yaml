@@ -22,6 +22,14 @@ dsb-client-gateway:
   nameOverride: "dsb-client-gateway-dev"
   fullnameOverride: "dsb-client-gateway-dev"
 
+  resources:
+    limits:
+      cpu: "200m"
+      memory: "500Mi"
+    requests:
+      cpu: "100m"
+      memory: "250Mi"
+
   podSecurityContext:
     fsGroup: 2000
 
