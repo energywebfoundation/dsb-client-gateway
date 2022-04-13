@@ -10,23 +10,21 @@ import {
   Typography,
   Grid,
   Box,
+  CircularProgress,
 } from '@mui/material';
-import {
-  useForm,
-  SubmitHandler,
-  FieldValues,
-  Controller,
-} from 'react-hook-form';
-import Editor, { useMonaco } from '@monaco-editor/react';
+import { Controller } from 'react-hook-form';
+import Editor from '@monaco-editor/react';
 import {
   CloseButton,
   FormInput,
   FormSelect,
-  GenericFormField,
 } from '@dsb-client-gateway/ui/core';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { SendTopicBodyDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useStyles } from './TopicDialog.styles';
-import { getTopicsControllerGetTopicsMock } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useTopicDialogEffects } from './TopicDialog.effects';
+
+export type CreateTopicFormValues = SendTopicBodyDto;
 
 interface TopicDialogProps {
   open: boolean;
@@ -38,95 +36,35 @@ interface TopicDialogProps {
 export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
   const { classes } = useStyles();
   const {
+    fields,
     register,
     control,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<FieldValues>();
+    onSubmit,
+    buttonDisabled,
+    schemaTypeValue,
+  } = useTopicDialogEffects();
 
-  const formValues = watch();
   const monacoRef = useRef<monaco.editor.IStandaloneCodeEditor>();
-
-  // const monaco = useMonaco();
-
-  const topics = getTopicsControllerGetTopicsMock();
-  console.log(topics, 'topics');
 
   const [isEditorReady, setIsEditorReady] = useState(false);
   const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [isSchemaValid, setSchemaValid] = useState(false);
 
-  const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
+  const handleEditorValidation = (markers: monaco.editor.IMarker[]) => {
+    setSchemaValid(markers.length === 0);
+  };
+
+  const handleEditorDidMount = (
+    editor: monaco.editor.IStandaloneCodeEditor
+  ) => {
     setIsEditorReady(true);
     monacoRef.current = editor;
-    console.log(editor);
-      editor.onDidBlurEditorWidget(() => {
-        console.log('blur', editor.getValue());
-        if (!editor.getValue()) {
-          setShowPlaceholder(true);
-        }
-      });
-  }
-
-  const topicField: GenericFormField = {
-    name: 'topicName',
-    label: 'Topic name',
-    formInputsWrapperProps: {
-      width: 254,
-      marginRight: '15px',
-    },
-    inputProps: {
-      placeholder: 'Topic name',
-    },
+    editor.onDidBlurEditorWidget(() => {
+      if (!editor.getValue()) {
+        setShowPlaceholder(true);
+      }
+    });
   };
-
-  const versionField: GenericFormField = {
-    name: 'version',
-    label: 'Version',
-    formInputsWrapperProps: {
-      width: 145,
-    },
-    inputProps: {
-      placeholder: 'Version',
-    },
-  };
-
-  const tagsField: GenericFormField = {
-    name: 'tags',
-    label: 'Tags',
-    options: [],
-    autocomplete: true,
-    maxValues: 20,
-    multiple: true,
-    tags: true,
-    inputProps: {
-      placeholder: 'Tags',
-    },
-  };
-
-  const schemaTypeField: GenericFormField = {
-    name: 'schemaType',
-    label: 'Schema type',
-    options: [
-      { value: 'json', label: 'JSD7' },
-      { value: 'xml', label: 'XML' },
-      { value: 'csv', label: 'CSV' },
-      { value: 'tsv', label: 'TSV' },
-    ],
-    inputProps: {
-      placeholder: 'Schema type',
-    },
-  };
-
-  const schemaField: GenericFormField = {
-    name: 'schema',
-    label: 'Schema',
-    inputProps: {
-      placeholder: 'Schema',
-    },
-  };
-
-  const onSubmit: SubmitHandler<FieldValues> = (data) => console.log(data);
 
   return (
     <Dialog
@@ -136,7 +74,7 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
       classes={{ paper: classes.paper }}
     >
       <DialogTitle className={classes.title}>Create topic</DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={onSubmit}>
         <DialogContent sx={{ padding: 0 }}>
           <DialogContentText className={classes.subTitle}>
             Provide topic data with this form
@@ -146,19 +84,19 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
             <Grid item xs={8} pl={5}>
               <Box display="flex" mb={2.7}>
                 <FormInput
-                  field={topicField}
+                  field={fields.topicName}
                   register={register}
                   variant="outlined"
                 />
                 <FormInput
-                  field={versionField}
+                  field={fields.version}
                   register={register}
                   variant="outlined"
                 />
               </Box>
               <Box mb={2.7}>
                 <FormSelect
-                  field={tagsField}
+                  field={fields.tags}
                   register={register}
                   control={control}
                   variant="outlined"
@@ -166,7 +104,7 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
               </Box>
               <Box mb={2.7}>
                 <FormSelect
-                  field={schemaTypeField}
+                  field={fields.schemaType}
                   register={register}
                   control={control}
                   variant="outlined"
@@ -181,18 +119,24 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
                       width: '100%',
                       height: '100%',
                       top: 0,
-                      zIndex: 1
+                      zIndex: 1,
                     }}
                     onClick={() => {
+                      if (!isEditorReady) return;
+
                       setShowPlaceholder(false);
-                      console.log('click', monacoRef.current);
                       monacoRef.current && monacoRef.current?.layout();
                       monacoRef.current && monacoRef.current?.focus();
                     }}
                   >
                     <Typography className={classes.placeholder}>
-                      Schema
+                      {isEditorReady && 'Schema'}
                     </Typography>
+                    {!isEditorReady && (
+                      <CircularProgress
+                        style={{ width: '25px', height: '25px' }}
+                      />
+                    )}
                   </Box>
                 )}
 
@@ -206,16 +150,15 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
                   }}
                 >
                   <Controller
-                    key={`${schemaField.name}`}
-                    name={schemaField.name}
+                    key={`${fields.schema.name}`}
+                    name={fields.schema.name}
                     control={control}
                     render={({ field: { value, onChange } }) => {
-
                       return (
                         <Editor
                           height="calc(100% - 19px)"
                           theme="vs-dark"
-                          language={formValues['schemaType']}
+                          language={schemaTypeValue}
                           options={{
                             minimap: {
                               enabled: false,
@@ -242,6 +185,7 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
                           }}
                           value={value}
                           onMount={handleEditorDidMount}
+                          onValidate={handleEditorValidation}
                         />
                       );
                     }}
@@ -261,7 +205,12 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
               Cancel
             </Typography>
           </Button>
-          <Button variant="contained" type="submit" className={classes.button}>
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={buttonDisabled}
+            className={classes.button}
+          >
             <Typography variant="body2" className={classes.submitButtonText}>
               Save
             </Typography>

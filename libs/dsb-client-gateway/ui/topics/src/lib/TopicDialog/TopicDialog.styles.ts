@@ -61,8 +61,10 @@ export const useStyles = makeStyles()((theme) => ({
     cursor: 'text',
     border: '1px solid #848484',
     boxSizing: 'border-box',
-    padding: '8px 10px 8px 15px',
-    borderRadius: 5
+    borderRadius: 5,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   placeholder: {
     fontSize: 12,
@@ -70,5 +72,11 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     color: theme.palette.grey[300],
     fontFamily: theme.typography.body2.fontFamily,
+    position: 'absolute',
+    top: 8,
+    left: 15
+  },
+  loader: {
+
   }
 }));

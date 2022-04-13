@@ -39,6 +39,10 @@ a {
   background: var(--background-color) !important;
 }
 
+.swal2-container.swal2-center {
+  z-index: 2000;
+}
+
 .swal2-title {
   font-size: 21px;
   font-weight: 400;
