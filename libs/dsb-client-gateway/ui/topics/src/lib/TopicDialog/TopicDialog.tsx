@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useRef } from 'react';
 import clsx from 'clsx';
 import {
   Dialog,
@@ -11,14 +11,22 @@ import {
   Grid,
   Box,
 } from '@mui/material';
-import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import {
+  useForm,
+  SubmitHandler,
+  FieldValues,
+  Controller,
+} from 'react-hook-form';
+import Editor, { useMonaco } from '@monaco-editor/react';
 import {
   CloseButton,
   FormInput,
   FormSelect,
   GenericFormField,
 } from '@dsb-client-gateway/ui/core';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStyles } from './TopicDialog.styles';
+import { getTopicsControllerGetTopicsMock } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 interface TopicDialogProps {
   open: boolean;
@@ -38,6 +46,27 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
   } = useForm<FieldValues>();
 
   const formValues = watch();
+  const monacoRef = useRef<monaco.editor.IStandaloneCodeEditor>();
+
+  // const monaco = useMonaco();
+
+  const topics = getTopicsControllerGetTopicsMock();
+  console.log(topics, 'topics');
+
+  const [isEditorReady, setIsEditorReady] = useState(false);
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
+
+  const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
+    setIsEditorReady(true);
+    monacoRef.current = editor;
+    console.log(editor);
+      editor.onDidBlurEditorWidget(() => {
+        console.log('blur', editor.getValue());
+        if (!editor.getValue()) {
+          setShowPlaceholder(true);
+        }
+      });
+  }
 
   const topicField: GenericFormField = {
     name: 'topicName',
@@ -89,6 +118,14 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
     },
   };
 
+  const schemaField: GenericFormField = {
+    name: 'schema',
+    label: 'Schema',
+    inputProps: {
+      placeholder: 'Schema',
+    },
+  };
+
   const onSubmit: SubmitHandler<FieldValues> = (data) => console.log(data);
 
   return (
@@ -134,6 +171,82 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
                   control={control}
                   variant="outlined"
                 />
+              </Box>
+              <Box mb={2.7} height={132} sx={{ position: 'relative' }}>
+                {showPlaceholder && (
+                  <Box
+                    className={classes.placeholderWrapper}
+                    sx={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      top: 0,
+                      zIndex: 1
+                    }}
+                    onClick={() => {
+                      setShowPlaceholder(false);
+                      console.log('click', monacoRef.current);
+                      monacoRef.current && monacoRef.current?.layout();
+                      monacoRef.current && monacoRef.current?.focus();
+                    }}
+                  >
+                    <Typography className={classes.placeholder}>
+                      Schema
+                    </Typography>
+                  </Box>
+                )}
+
+                <Box
+                  className={classes.placeholderWrapper}
+                  sx={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    top: 0,
+                  }}
+                >
+                  <Controller
+                    key={`${schemaField.name}`}
+                    name={schemaField.name}
+                    control={control}
+                    render={({ field: { value, onChange } }) => {
+
+                      return (
+                        <Editor
+                          height="calc(100% - 19px)"
+                          theme="vs-dark"
+                          language={formValues['schemaType']}
+                          options={{
+                            minimap: {
+                              enabled: false,
+                            },
+                            scrollbar: {
+                              vertical: 'auto',
+                            },
+                            automaticLayout: true,
+                            wordBasedSuggestions: false,
+                            quickSuggestions: false,
+                            snippetSuggestions: 'none',
+                            autoClosingBrackets: 'always',
+                            autoClosingQuotes: 'always',
+                            formatOnPaste: true,
+                            formatOnType: true,
+                            scrollBeyondLastLine: true,
+                            fontSize: 10,
+                            lineNumbersMinChars: 3,
+                            lineDecorationsWidth: 3,
+                            suggestOnTriggerCharacters: false,
+                          }}
+                          onChange={(value: string | undefined) => {
+                            onChange(value);
+                          }}
+                          value={value}
+                          onMount={handleEditorDidMount}
+                        />
+                      );
+                    }}
+                  />
+                </Box>
               </Box>
             </Grid>
           </Grid>
