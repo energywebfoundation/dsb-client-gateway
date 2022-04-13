@@ -17,34 +17,26 @@ import {
   FormSelect,
   Editor,
 } from '@dsb-client-gateway/ui/core';
-import { SendTopicBodyDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useStyles } from './TopicDialog.styles';
-import { useTopicDialogEffects } from './TopicDialog.effects';
+import { useStyles } from './CreateTopicDialog.styles';
+import { useCreateTopicDialogEffects } from './CreateTopicDialog.effects';
 
-export type CreateTopicFormValues = SendTopicBodyDto;
-
-interface TopicDialogProps {
-  open: boolean;
-  title?: string;
-  handleClose: () => void;
-  closeButton?: boolean;
-}
-
-export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
+export const CreateTopicDialog: FC = () => {
   const { classes } = useStyles();
   const {
+    open,
+    closeModal,
     fields,
     register,
     control,
     onSubmit,
     buttonDisabled,
     schemaTypeValue,
-  } = useTopicDialogEffects();
+  } = useCreateTopicDialogEffects();
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={closeModal}
       fullWidth
       classes={{ paper: classes.paper }}
     >
@@ -122,7 +114,7 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
         <DialogActions className={classes.actions}>
           <Button
             variant="outlined"
-            onClick={handleClose}
+            onClick={closeModal}
             className={clsx(classes.button, classes.cancelButton)}
           >
             <Typography variant="body2" className={classes.cancelButtonText}>
@@ -140,7 +132,7 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
             </Typography>
           </Button>
           <Box className={classes.closeButtonWrapper}>
-            <CloseButton onClose={handleClose} />
+            <CloseButton onClose={closeModal} />
           </Box>
         </DialogActions>
       </form>

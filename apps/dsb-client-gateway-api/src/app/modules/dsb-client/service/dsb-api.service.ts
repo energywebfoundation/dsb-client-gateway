@@ -387,8 +387,9 @@ export class DsbApiService implements OnApplicationBootstrap {
   }
 
   public async postTopics(topicData: SendTopicBodyDTO): Promise<Topic> {
+    console.log(topicData, 'topicData');
     try {
-      const { data } = await this.request<null>(
+      const res = await this.request<null>(
         this.httpService.post(this.baseUrl + '/topics', topicData, {
           httpsAgent: this.getTLS(),
           headers: {
@@ -400,9 +401,9 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('post topics successful', data);
+      this.logger.log('post topics successful', res?.data);
 
-      return data;
+      return res.data;
     } catch (e) {
       this.logger.error('post topics failed', e);
       throw new Error(e);
@@ -696,10 +697,10 @@ export class DsbApiService implements OnApplicationBootstrap {
       throw e;
     }
 
-    const { status } = e.response;
+    const status = e?.response?.status;
 
     this.logger.error('Request failed', e.request.path);
-    this.logger.error(e.response.data);
+    this.logger.error(e?.response.data);
 
     if (defaults.stopOnStatusCodes.includes(status)) {
       this.logger.error(
@@ -712,12 +713,12 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
 
     if (
-      e.response.data.returnCode &&
-      defaults.stopOnResponseCodes.includes(e.response.data.returnCode)
+      e?.response?.data.returnCode &&
+      defaults.stopOnResponseCodes.includes(e?.response?.data?.returnCode)
     ) {
       this.logger.error(
         'Request stopped because of stopOnResponseCodes rule',
-        e.response.data.returnCode,
+        e?.response?.data.returnCode,
         defaults.stopOnResponseCodes
       );
 
@@ -805,13 +806,13 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       return { statusCode: 200 };
     } catch (e) {
-      if (e.response) {
-        this.logger.error(`DSB Health failed - ${e.response.data}`);
+      if (e?.response) {
+        this.logger.error(`DSB Health failed - ${e?.response?.data}`);
       }
 
       return {
-        statusCode: e.response.status,
-        message: e.response.data,
+        statusCode: e?.response?.status,
+        message: e?.response?.data,
       };
     }
   }

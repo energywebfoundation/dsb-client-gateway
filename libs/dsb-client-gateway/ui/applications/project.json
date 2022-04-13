@@ -1,6 +1,6 @@
 {
-  "root": "libs/dsb-client-gateway/ui/topics",
-  "sourceRoot": "libs/dsb-client-gateway/ui/topics/src",
+  "root": "libs/dsb-client-gateway/ui/applications",
+  "sourceRoot": "libs/dsb-client-gateway/ui/applications/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -9,15 +9,15 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "libs/dsb-client-gateway/ui/topics/**/*.{ts,tsx,js,jsx}"
+          "libs/dsb-client-gateway/ui/applications/**/*.{ts,tsx,js,jsx}"
         ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/dsb-client-gateway/ui/topics"],
+      "outputs": ["coverage/libs/dsb-client-gateway/ui/applications"],
       "options": {
-        "jestConfig": "libs/dsb-client-gateway/ui/topics/jest.config.js",
+        "jestConfig": "libs/dsb-client-gateway/ui/applications/jest.config.js",
         "passWithNoTests": true
       }
     }

@@ -18,7 +18,7 @@ export class DidAuthApiService {
       this.logger.error('Login failed');
 
       this.logger.error(e.message);
-      this.logger.error(e.response.data);
+      this.logger.error(e?.response?.data);
 
       throw e;
     });
@@ -43,7 +43,7 @@ export class DidAuthApiService {
       this.logger.error('Refresh token failed');
 
       this.logger.error(e.message);
-      this.logger.error(e.response.data);
+      this.logger.error(e?.response?.data);
 
       throw e;
     });

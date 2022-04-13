@@ -4,6 +4,12 @@ import { FormSelectOption } from '@dsb-client-gateway/ui/core';
 import { SendTopicBodyDto, useTopicsControllerPostTopics } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import {
+  useApplicationsModalsStore,
+  useApplicationsModalsDispatch,
+  ApplicationsModalsActionsEnum,
+} from '../../context';
+
 
 const useCreateTopic = () => {
   const { mutate } = useTopicsControllerPostTopics({
@@ -26,13 +32,9 @@ const useCreateTopic = () => {
   }
 }
 
-export const useTopicDialogEffects = () => {
-  const initialValues = {
-    name: '',
-    // TODO: remove and set owner
-    owner: 'aemo',
+export const useCreateTopicDialogEffects = () => {
+  const initialValues: SendTopicBodyDto = {
     schema: '',
-    schemaType: '',
     tags: [],
     version: '',
   };
@@ -66,6 +68,21 @@ export const useTopicDialogEffects = () => {
   });
 
   const { createTopicHandler } = useCreateTopic();
+  const {
+    createTopic: { open },
+  } = useApplicationsModalsStore();
+  const dispatch = useApplicationsModalsDispatch();
+
+  const closeModal = () => {
+    dispatch({
+      type: ApplicationsModalsActionsEnum.SHOW_CREATE_TOPIC,
+      payload: {
+        open: false,
+        hide: false,
+        application: null,
+      },
+    });
+  };
 
   const schemaTypeOptions: FormSelectOption[] = [
     { value: 'json', label: 'JSD7' },
@@ -99,7 +116,7 @@ export const useTopicDialogEffects = () => {
     tags: {
       name: 'tags',
       label: 'Tags',
-      options: [],
+      options: [] as FormSelectOption[],
       autocomplete: true,
       maxValues: 20,
       multiple: true,
@@ -127,14 +144,8 @@ export const useTopicDialogEffects = () => {
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as SendTopicBodyDto;
-    const formattedValues = {
-      ...data,
-      schemaType: schemaTypeOptions.find(
-        (option) => option.value === values.schemaType
-      )?.label,
-    };
-    console.log(formattedValues);
-    createTopicHandler(formattedValues as SendTopicBodyDto);
+    console.log(values);
+    createTopicHandler(values as SendTopicBodyDto);
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);
@@ -143,6 +154,8 @@ export const useTopicDialogEffects = () => {
   const buttonDisabled = !isValid;
 
   return {
+    open,
+    closeModal,
     fields,
     register,
     control,
