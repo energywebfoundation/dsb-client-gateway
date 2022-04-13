@@ -46,7 +46,7 @@ export const Editor: FC<EditorProps> = memo(({
           <Typography className={classes.placeholder}>
             {isEditorReady && field.inputProps?.placeholder}
           </Typography>
-          {!isEditorReady && <CircularProgress className={classes.progress} />}
+          {!isEditorReady && <CircularProgress style={{ width: '25px', height: '25px' }} />}
         </Box>
       )}
 

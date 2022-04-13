@@ -53,6 +53,23 @@ export const useStyles = makeStyles()((theme) => ({
     textTransform: 'capitalize'
   },
   actions: {
-    padding: 0
+    padding: 0,
+    marginTop: 10
+  },
+  appImage: {
+    width: 49,
+    height: 49
+  },
+  label: {
+    fontSize: 12,
+    lineHeight: '24px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+  },
+  value: {
+    fontSize: 12,
+    lineHeight: '14px',
+    fontWeight: 400,
+    color: theme.palette.grey[400],
   }
 }));

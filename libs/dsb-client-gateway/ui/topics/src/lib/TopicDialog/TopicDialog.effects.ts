@@ -1,8 +1,30 @@
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import Swal from 'sweetalert2'
 import { FormSelectOption } from '@dsb-client-gateway/ui/core';
-import { SendTopicBodyDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { SendTopicBodyDto, useTopicsControllerPostTopics } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+
+const useCreateTopic = () => {
+  const { mutate } = useTopicsControllerPostTopics({
+    mutation: {
+      onError: (error) => {
+        console.log(error);
+        return Swal.fire('Error', 'Please enter channel name', 'error')
+      }
+    }
+  });
+
+  const createTopicHandler = (values: SendTopicBodyDto) => {
+    mutate({
+      data: values
+    })
+  }
+
+  return {
+    createTopicHandler
+  }
+}
 
 export const useTopicDialogEffects = () => {
   const initialValues = {
@@ -20,7 +42,7 @@ export const useTopicDialogEffects = () => {
       name: yup.string().required(),
       schema: yup.string().required(),
       schemaType: yup.string().required(),
-      tags: yup.array().required(),
+      tags: yup.array().min(1).required(),
       version: yup
         .string()
         .required()
@@ -42,6 +64,8 @@ export const useTopicDialogEffects = () => {
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
+
+  const { createTopicHandler } = useCreateTopic();
 
   const schemaTypeOptions: FormSelectOption[] = [
     { value: 'json', label: 'JSD7' },
@@ -101,7 +125,7 @@ export const useTopicDialogEffects = () => {
     },
   };
 
-  const createTopicHandler: SubmitHandler<FieldValues> = (data) => {
+  const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as SendTopicBodyDto;
     const formattedValues = {
       ...data,
@@ -110,9 +134,10 @@ export const useTopicDialogEffects = () => {
       )?.label,
     };
     console.log(formattedValues);
+    createTopicHandler(formattedValues as SendTopicBodyDto);
   };
 
-  const onSubmit = handleSubmit(createTopicHandler);
+  const onSubmit = handleSubmit(topicSubmitHandler);
 
   const schemaTypeValue = watch('schemaType');
   const buttonDisabled = !isValid;

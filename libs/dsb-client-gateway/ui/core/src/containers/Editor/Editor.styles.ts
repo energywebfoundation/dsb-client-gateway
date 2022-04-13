@@ -24,9 +24,5 @@ export const useStyles = makeStyles()((theme) => ({
     position: 'absolute',
     top: 8,
     left: 15,
-  },
-  progress: {
-    width: 25,
-    height: 25,
-  },
+  }
 }));

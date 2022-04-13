@@ -55,8 +55,31 @@ export const TopicDialog: FC<TopicDialogProps> = ({ open, handleClose }) => {
             Provide topic data with this form
           </DialogContentText>
           <Grid container mt={4}>
-            <Grid item xs={4}></Grid>
-            <Grid item xs={8} pl={5}>
+            <Grid item xs={4}>
+              {/* TODO: remove mock */}
+              <img
+                className={classes.appImage}
+                src="/appIcon.svg"
+                alt="app icon"
+              />
+              <Box mt={2.5}>
+                <Typography variant="body2" className={classes.label}>
+                  Application name
+                </Typography>
+                <Typography variant="body2" className={classes.value}>
+                  Application name 1
+                </Typography>
+              </Box>
+              <Box mt={2.5}>
+                <Typography variant="body2" className={classes.label}>
+                  Namespace
+                </Typography>
+                <Typography variant="body2" className={classes.value}>
+                  edge.apps.aemo.iam.ewc
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={8} pl={5} mt={1.7}>
               <Box display="flex" mb={2.7}>
                 <FormInput
                   field={fields.topicName}
