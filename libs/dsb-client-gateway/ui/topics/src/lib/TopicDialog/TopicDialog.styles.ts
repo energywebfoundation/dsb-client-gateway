@@ -54,29 +54,5 @@ export const useStyles = makeStyles()((theme) => ({
   },
   actions: {
     padding: 0
-  },
-  placeholderWrapper: {
-    height: 132,
-    background: '#1E1E1E',
-    cursor: 'text',
-    border: '1px solid #848484',
-    boxSizing: 'border-box',
-    borderRadius: 5,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  placeholder: {
-    fontSize: 12,
-    lineHeight: '24px',
-    fontWeight: 400,
-    color: theme.palette.grey[300],
-    fontFamily: theme.typography.body2.fontFamily,
-    position: 'absolute',
-    top: 8,
-    left: 15
-  },
-  loader: {
-
   }
 }));

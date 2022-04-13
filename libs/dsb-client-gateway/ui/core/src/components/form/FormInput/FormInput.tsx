@@ -3,8 +3,7 @@ import {
   InputAdornment,
   TextField,
   Box,
-  InputLabel,
-  Typography,
+  InputLabel
 } from '@mui/material';
 import { FormInputProps } from './FormInput.types';
 import { useStyles } from './FormInput.styles';

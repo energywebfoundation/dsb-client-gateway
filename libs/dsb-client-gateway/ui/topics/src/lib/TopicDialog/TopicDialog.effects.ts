@@ -7,6 +7,7 @@ import * as yup from 'yup';
 export const useTopicDialogEffects = () => {
   const initialValues = {
     name: '',
+    // TODO: remove and set owner
     owner: 'aemo',
     schema: '',
     schemaType: '',
