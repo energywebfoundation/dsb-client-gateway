@@ -66,6 +66,17 @@ export class WebSocketServer {
 
   constructor(server: Server, public path: string) {
     this.ws = new WsServer({ httpServer: server })
+
+    const ws = this.ws
+
+    setInterval(function ping() {
+      console.log(`Pinging ${ws.connections.length} clients at ${new Date().toISOString()}`);
+
+      ws.connections.forEach((conn) => {
+        conn.ping({})
+      })
+    }, 5000)
+
     this.ws.on('request', (req) => {
       // must be requesting {path} e.g. /events
       if (req.resource !== this.path) {
@@ -83,6 +94,19 @@ export class WebSocketServer {
 
       // accept connection request and listen for messages
       const connection = req.accept('dsb-messages')
+
+      connection.on('pong', () => {
+        console.log(`Received pong ${new Date().toISOString()}`)
+      })
+
+      connection.on('ping', () => {
+        console.log(`Received ping ${new Date().toISOString()}`)
+      })
+
+      connection.on('close', (reasonCode, description) => {
+        console.log(`Connection closed with reason ${reasonCode} ${description} at ${new Date().toISOString()}`)
+      })
+
       connection.on('message', async (data) => {
         const message = parseMessage(data)
         try {
