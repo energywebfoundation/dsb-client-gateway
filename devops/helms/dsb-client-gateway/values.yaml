@@ -8,6 +8,7 @@ dsb-client-gateway:
       dsb_base_url: https://dsb-demo.energyweb.org
       # -- This allows the DSB Message Broker to be controlled by the DSB Client Gateway. In this situation, the identities of both components are shared. This means that a single private key is used for each component and, in addition to the user DSB role, the gateway will enrol itself as a messagebroker. If a DSB_CONTROL_TYPE is also provided, the gateway may spawn a process with the chosen method, in order to configure it (i.e. setting the same private key).
       basic_auth_enabled: false
+      websocket_protocol: SERVER
   image:
     repository: aemocontainerregistry.azurecr.io/dsb/client-gateway
     pullPolicy: IfNotPresent
@@ -20,11 +21,11 @@ dsb-client-gateway:
 
   resources:
     limits:
-      cpu: "20m"
-      memory: "200Mi"
+      cpu: "200m"
+      memory: "500Mi"
     requests:
-      cpu: "10m"
-      memory: "120Mi"
+      cpu: "100m"
+      memory: "200Mi"
 
   service:
     type: ClusterIP
