@@ -1,6 +1,12 @@
 import { FC } from 'react';
-import { CreateTopicDialog } from './CreateTopicDialog';
+import { CreateTopic } from './CreateTopic';
+import { Cancel } from './Cancel';
 
 export const ApplicationsModalsCenter: FC = () => {
-  return <CreateTopicDialog />;
+  return (
+    <>
+      <CreateTopic />
+      <Cancel />
+    </>
+  );
 };

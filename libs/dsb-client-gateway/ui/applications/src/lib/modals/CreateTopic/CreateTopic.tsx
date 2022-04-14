@@ -17,28 +17,33 @@ import {
   FormSelect,
   Editor,
 } from '@dsb-client-gateway/ui/core';
-import { useStyles } from './CreateTopicDialog.styles';
-import { useCreateTopicDialogEffects } from './CreateTopicDialog.effects';
+import { useStyles } from './CreateTopic.styles';
+import { useCreateTopicEffects } from './CreateTopic.effects';
 
-export const CreateTopicDialog: FC = () => {
+export const CreateTopic: FC = () => {
   const { classes } = useStyles();
   const {
     open,
+    hide,
     closeModal,
+    openCancelModal,
     fields,
     register,
     control,
     onSubmit,
     buttonDisabled,
     schemaTypeValue,
-  } = useCreateTopicDialogEffects();
+    application,
+  } = useCreateTopicEffects();
 
   return (
     <Dialog
       open={open}
       onClose={closeModal}
       fullWidth
-      classes={{ paper: classes.paper }}
+      className={classes.root}
+      classes={{ paper: classes.paper, container: classes.container }}
+      style={{ visibility: hide ? 'hidden' : 'visible' }}
     >
       <DialogTitle className={classes.title}>Create topic</DialogTitle>
       <form onSubmit={onSubmit}>
@@ -47,30 +52,31 @@ export const CreateTopicDialog: FC = () => {
             Provide topic data with this form
           </DialogContentText>
           <Grid container mt={4}>
-            <Grid item xs={4}>
-              {/* TODO: remove mock */}
-              <img
-                className={classes.appImage}
-                src="/appIcon.svg"
-                alt="app icon"
-              />
-              <Box mt={2.5}>
-                <Typography variant="body2" className={classes.label}>
-                  Application name
-                </Typography>
-                <Typography variant="body2" className={classes.value}>
-                  Application name 1
-                </Typography>
-              </Box>
-              <Box mt={2.5}>
-                <Typography variant="body2" className={classes.label}>
-                  Namespace
-                </Typography>
-                <Typography variant="body2" className={classes.value}>
-                  edge.apps.aemo.iam.ewc
-                </Typography>
-              </Box>
-            </Grid>
+            {application && (
+              <Grid item xs={4}>
+                <img
+                  className={classes.appImage}
+                  src={application.logoUrl}
+                  alt="app icon"
+                />
+                <Box mt={2.5}>
+                  <Typography variant="body2" className={classes.label}>
+                    Application name
+                  </Typography>
+                  <Typography variant="body2" className={classes.value}>
+                    {application.appName}
+                  </Typography>
+                </Box>
+                <Box mt={2.5}>
+                  <Typography variant="body2" className={classes.label}>
+                    Namespace
+                  </Typography>
+                  <Typography variant="body2" className={classes.value}>
+                    {application.namespace}
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
             <Grid item xs={8} pl={5} mt={1.7}>
               <Box display="flex" mb={2.7}>
                 <FormInput
@@ -114,7 +120,7 @@ export const CreateTopicDialog: FC = () => {
         <DialogActions className={classes.actions}>
           <Button
             variant="outlined"
-            onClick={closeModal}
+            onClick={openCancelModal}
             className={clsx(classes.button, classes.cancelButton)}
           >
             <Typography variant="body2" className={classes.cancelButtonText}>
@@ -122,8 +128,8 @@ export const CreateTopicDialog: FC = () => {
             </Typography>
           </Button>
           <Button
-            variant="contained"
             type="submit"
+            variant="contained"
             disabled={buttonDisabled}
             className={classes.button}
           >

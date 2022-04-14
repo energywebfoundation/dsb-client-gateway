@@ -6,25 +6,12 @@ import { useStyles } from './Application.styles';
 
 export const Application: FC = () => {
   const { classes } = useStyles();
-  const { openCreateTopic } = useApplicationEffects();
-
-  // TODO: remove mocks
-  const applicationName = 'applicationName';
-  const topics = [
-    {
-      id: '1',
-      name: 'Topic',
-      owner: 'iam',
-      schema: 'schema',
-      schemaType: 'schema type',
-      version: '1.0.0',
-    },
-  ];
+  const { openCreateTopic, application, topics } = useApplicationEffects();
 
   return (
     <section className={classes.table}>
       {topics ? (
-        <TopicsList applicationName={applicationName} topics={topics} />
+        <TopicsList applicationName={application.appName} topics={topics} />
       ) : null}
       <div className={classes.createTopicButtonWrapper}>
         <section className={classes.searchText}>

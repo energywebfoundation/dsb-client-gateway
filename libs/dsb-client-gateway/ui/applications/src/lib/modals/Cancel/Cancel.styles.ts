@@ -1,21 +1,31 @@
 import { makeStyles } from 'tss-react/mui';
-import { alpha } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
+  root: {
+    '& .MuiBackdrop-root': {
+      transition: 'none !important'
+    }
+  },
   paper: {
-    maxWidth: 756,
-    minHeight: 633,
-    padding: '37px 43px 32px 32px'
+    maxWidth: 512,
+    height: 300,
+    padding: 43,
+    alignItems: 'center',
+    borderRadius: 6
+  },
+  container: {
+    transition: 'none !important'
   },
   title: {
-    fontSize: 23,
-    lineHeight: '34px',
+    fontSize: 21,
+    lineHeight: '25px',
     fontWeight: 400,
     fontFamily: theme.typography.body1.fontFamily,
     color: theme.palette.common.white,
     padding: 0,
-    marginBottom: 8,
-    textAlign: 'center'
+    marginBottom: 7,
+    textAlign: 'center',
+    marginTop: 18
   },
   subTitle: {
     fontSize: 14,
@@ -25,24 +35,16 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.grey[400],
     fontFamily: theme.typography.body2.fontFamily,
   },
-  closeButtonWrapper: {
-    position: 'absolute',
-    top: 17,
-    right: 18
-  },
   button: {
     padding: '10px 22px',
+    margin: '0 10px',
     borderRadius: 5
-  },
-  cancelButton: {
-   border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
-   marginRight: 7
   },
   cancelButtonText: {
     fontSize: 14,
     lineHeight: '17px',
     fontWeight: 400,
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.main,
     textTransform: 'capitalize'
   },
   submitButtonText: {
@@ -54,22 +56,9 @@ export const useStyles = makeStyles()((theme) => ({
   },
   actions: {
     padding: 0,
-    marginTop: 10
+    marginTop: 26
   },
-  appImage: {
-    width: 49,
-    height: 49
-  },
-  label: {
-    fontSize: 12,
-    lineHeight: '24px',
-    fontWeight: 400,
-    color: theme.palette.common.white,
-  },
-  value: {
-    fontSize: 12,
-    lineHeight: '14px',
-    fontWeight: 400,
-    color: theme.palette.grey[400],
+  icon: {
+    stroke: theme.palette.warning.main
   }
 }));

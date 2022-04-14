@@ -1,7 +1,10 @@
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
-import Swal from 'sweetalert2'
+
 import { FormSelectOption } from '@dsb-client-gateway/ui/core';
-import { SendTopicBodyDto, useTopicsControllerPostTopics } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  SendTopicBodyDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {
@@ -10,36 +13,14 @@ import {
   ApplicationsModalsActionsEnum,
 } from '../../context';
 
-
-const useCreateTopic = () => {
-  const { mutate } = useTopicsControllerPostTopics({
-    mutation: {
-      onError: (error) => {
-        console.log(error);
-        return Swal.fire('Error', 'Please enter channel name', 'error')
-      }
-    }
-  });
-
-  const createTopicHandler = (values: SendTopicBodyDto) => {
-    mutate({
-      data: values
-    })
-  }
-
-  return {
-    createTopicHandler
-  }
-}
-
-export const useCreateTopicDialogEffects = () => {
+export const useCreateTopicEffects = () => {
   const initialValues: SendTopicBodyDto = {
     schema: '',
     tags: [],
     version: '',
   };
 
-  const schema = yup
+  const validationSchema = yup
     .object({
       name: yup.string().required(),
       schema: yup.string().required(),
@@ -61,15 +42,16 @@ export const useCreateTopicDialogEffects = () => {
     handleSubmit,
     watch,
     formState: { isValid },
+    reset
   } = useForm<FieldValues>({
     defaultValues: initialValues,
-    resolver: yupResolver(schema),
+    resolver: yupResolver(validationSchema),
     mode: 'onChange',
   });
 
   const { createTopicHandler } = useCreateTopic();
   const {
-    createTopic: { open },
+    createTopic: { open, hide, application },
   } = useApplicationsModalsStore();
   const dispatch = useApplicationsModalsDispatch();
 
@@ -80,6 +62,40 @@ export const useCreateTopicDialogEffects = () => {
         open: false,
         hide: false,
         application: null,
+      },
+    });
+    reset();
+  };
+
+  const hideModal = () => {
+    dispatch({
+      type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      payload: true
+    });
+  };
+
+  const showModal = () => {
+    dispatch({
+      type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      payload: false
+    });
+  };
+
+  const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
+    const values = data as SendTopicBodyDto;
+    createTopicHandler(values as SendTopicBodyDto, closeModal);
+  };
+
+  const onSubmit = handleSubmit(topicSubmitHandler);
+
+  const openCancelModal = () => {
+    hideModal();
+    dispatch({
+      type: ApplicationsModalsActionsEnum.SHOW_CANCEL,
+      payload: {
+        open: true,
+        onConfirm: closeModal,
+        onCancel: showModal,
       },
     });
   };
@@ -142,25 +158,20 @@ export const useCreateTopicDialogEffects = () => {
     },
   };
 
-  const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
-    const values = data as SendTopicBodyDto;
-    console.log(values);
-    createTopicHandler(values as SendTopicBodyDto);
-  };
-
-  const onSubmit = handleSubmit(topicSubmitHandler);
-
   const schemaTypeValue = watch('schemaType');
   const buttonDisabled = !isValid;
 
   return {
     open,
+    hide,
     closeModal,
+    openCancelModal,
     fields,
     register,
     control,
     onSubmit,
     buttonDisabled,
     schemaTypeValue,
+    application
   };
 };

@@ -7,6 +7,11 @@ export interface IApplicationsModalsStore {
     hide: boolean;
     application: ApplicationDTO;
   };
+  cancel: {
+    open: boolean;
+    onConfirm: () => void;
+    onCancel: () => void;
+  }
 }
 
 interface IShowCreateTopicAction {
@@ -18,5 +23,21 @@ interface IShowCreateTopicAction {
   };
 }
 
+interface IHideCreateTopicAction {
+  type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC;
+  payload: boolean;
+}
+
+interface IShowCancelAction {
+  type: ApplicationsModalsActionsEnum.SHOW_CANCEL;
+  payload: {
+    open: boolean;
+    onConfirm: () => void;
+    onCancel: () => void;
+  }
+}
+
 export type TApplicationsModalsAction =
   | IShowCreateTopicAction
+  | IHideCreateTopicAction
+  | IShowCancelAction
