@@ -25,7 +25,7 @@ dsb-client-gateway:
       memory: "500Mi"
     requests:
       cpu: "100m"
-      memory: "0Mi"
+      memory: "200Mi"
 
   service:
     type: ClusterIP
