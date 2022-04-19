@@ -146,6 +146,16 @@ export class EnvironmentVariables {
   @IsString()
   REFRESH_SYMMETRIC_KEY_CRON_TIME = '*/2 * * * * *';
 
+  @IsPositive()
+  @IsNumber()
+  @Transform(EnvironmentVariables.transformNumber('TTL'))
+  TTL = 120000;
+
+  @IsPositive()
+  @IsNumber()
+  @Transform(EnvironmentVariables.transformNumber('TTL_INTERVAL'))
+  TTL_INTERVAL = 120000;
+
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;
   }

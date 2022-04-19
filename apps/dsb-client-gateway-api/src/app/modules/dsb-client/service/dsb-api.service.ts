@@ -136,7 +136,7 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicVersionResponse> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + `/topics/${topicId}/version`, {
+        this.httpService.get(this.baseUrl + `/topics/${topicId}/versions`, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -147,10 +147,10 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('get Topic Versions successful');
+      this.logger.log('get topic versions successful');
       return result.data;
     } catch (e) {
-      this.logger.error('get Topic Versions failed', e);
+      this.logger.error('get topic versions failed', e);
       throw new Error(e);
     }
   }
@@ -798,11 +798,17 @@ export class DsbApiService implements OnApplicationBootstrap {
         overrideRetry
       );
 
-      this.logger.log(`get symmetric keys successful with dto: ${dto}`);
+      this.logger.log(
+        `get symmetric keys successful for ${dto.clientId} with amount: ${dto.amount}`,
+        data
+      );
 
       return data;
     } catch (e) {
-      this.logger.error(`get symmetric keys failed with dto: ${dto}`, e);
+      this.logger.error(
+        `get symmetric keys failed for ${dto.clientId} with amount: ${dto.amount}`,
+        e
+      );
       throw new Error(e);
     }
   }
@@ -1014,12 +1020,15 @@ export class DsbApiService implements OnApplicationBootstrap {
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
       const { data } = await this.request<TopicVersion | null>(
-        this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        this.httpService.get(
+          this.baseUrl + '/topics/' + topicId + '/versions',
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
         {
           stopOnResponseCodes: ['10'],
         }

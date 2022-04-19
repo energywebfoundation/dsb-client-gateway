@@ -7,6 +7,7 @@ import {
   AbstractLokiRepository,
   LokiService,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SymmetricKeysRepository
@@ -14,13 +15,26 @@ export class SymmetricKeysRepository
   implements OnModuleInit
 {
   private readonly logger = new Logger(SymmetricKeysRepository.name);
+  private ttlInterval;
+  private ttl;
 
-  constructor(protected readonly lokiService: LokiService) {
+  constructor(
+    protected readonly lokiService: LokiService,
+    protected readonly configService: ConfigService
+  ) {
     super('symmetric keys', lokiService);
+    this.ttlInterval = this.configService.get('TTL_INTERVAL');
+    this.ttl = this.configService.get('TTL');
   }
 
   public onModuleInit(): void {
-    this.createCollectionIfNotExists(this.collection);
+    this.createCollectionIfNotExists(this.collection, [], this.ttlInterval);
+    // just to ensure if data.db file is not deleted still TTL is set
+    const collection = this.client.getCollection<SymmetricKeyEntity>(
+      this.collection
+    );
+    this.logger.log('setting TTL for symmetric keys collection');
+    collection.setTTL(this.ttl, this.ttlInterval);
   }
 
   public async createOrUpdateSymmetricKey(

@@ -15,14 +15,22 @@ export abstract class AbstractLokiRepository<T extends object = any> {
 
   protected createCollectionIfNotExists(
     name: string,
-    indices: string[] = []
+    indices: string[] = [],
+    ttlInterval?: number
   ): void {
     const collection = this.client.getCollection(name);
 
+    const options: { indices: string[]; ttlInterval?: number; ttl?: number } = {
+      indices,
+    };
+
+    if (ttlInterval) {
+      options.ttl = ttlInterval;
+      options.ttlInterval = ttlInterval;
+    }
+
     if (collection === null) {
-      this.client.addCollection(name, {
-        indices,
-      });
+      this.client.addCollection(name, options);
     }
   }
 

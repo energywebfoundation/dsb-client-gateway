@@ -12,9 +12,9 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
   constructor() {
     this.client = new loki('data.db', {
       autoload: true,
-      persistenceMethod: 'fs',
+      // persistenceMethod: 'fs',
       autosave: true,
-      autosaveInterval: 1,
+      // autosaveInterval: 1,
       serializationMethod: 'pretty',
       throttledSaves: true,
     });
@@ -42,6 +42,8 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
   public async onModuleInit(): Promise<void> {
     const promise = () =>
       new Promise((resolve, reject) => {
+        console.log(' onModuleInit of loadDatabase ', this.client.loadDatabase);
+
         this.client.loadDatabase({}, (err) => {
           if (err) {
             console.error(err);
@@ -56,11 +58,11 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
     await promise();
   }
 
-  public createCollectionIfNotExists(name: string): void {
+  public createCollectionIfNotExists(name: string, options): void {
     const collection = this.client.getCollection(name);
 
     if (collection === null) {
-      this.client.addCollection(name);
+      this.client.addCollection(name, options);
     }
   }
 }
