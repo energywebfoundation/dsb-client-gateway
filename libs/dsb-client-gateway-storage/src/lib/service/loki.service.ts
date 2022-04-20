@@ -42,8 +42,6 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
   public async onModuleInit(): Promise<void> {
     const promise = () =>
       new Promise((resolve, reject) => {
-        console.log(' onModuleInit of loadDatabase ', this.client.loadDatabase);
-
         this.client.loadDatabase({}, (err) => {
           if (err) {
             console.error(err);
