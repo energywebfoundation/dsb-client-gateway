@@ -39,6 +39,24 @@ export class ChannelController {
     protected readonly commandbus: CommandBus
   ) {}
 
+  @Get()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Channel details',
+    type: () => [ChannelEntity]
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Channel not found',
+  })
+  public async getAll(): Promise<ChannelEntity[]> {
+    return this.channelService.getChannels();
+  }
+
   @Post()
   @ApiResponse({
     status: HttpStatus.CREATED,
