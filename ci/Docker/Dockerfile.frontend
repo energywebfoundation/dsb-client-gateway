@@ -2,6 +2,4 @@ ARG IMAGE=nginx:alpine
 
 FROM $IMAGE
 
-COPY --chown=node:node dist/apps/dsb-client-gateway-frontend/* /usr/share/nginx/html
-
-USER node
+COPY dist/apps/dsb-client-gateway-frontend/exported /usr/share/nginx/html
