@@ -16,6 +16,10 @@ import { DidAuthModule } from '@dsb-client-gateway/ddhub-client-gateway-did-auth
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
+import {
+  TopicRepositoryWrapper,
+  TopicRepository,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Module({})
 export class DdhubClientGatewayMessageBrokerModule {
@@ -55,6 +59,8 @@ export class DdhubClientGatewayMessageBrokerModule {
         DdhubMessagesService,
         DdhubLoginService,
         DdhubDidService,
+        TopicRepositoryWrapper,
+        TopicRepository,
       ],
       exports: [
         DdhubTopicsService,
@@ -63,6 +69,8 @@ export class DdhubClientGatewayMessageBrokerModule {
         DdhubMessagesService,
         DdhubLoginService,
         DdhubDidService,
+        TopicRepositoryWrapper,
+        TopicRepository,
       ],
       module: DdhubClientGatewayMessageBrokerModule,
     };

@@ -16,6 +16,8 @@ import {
 } from '../dto';
 import * as qs from 'qs';
 import { DdhubLoginService } from './ddhub-login.service';
+import { TopicEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { TopicRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class DdhubTopicsService extends DdhubBaseService {
@@ -24,7 +26,8 @@ export class DdhubTopicsService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
+    protected readonly topicRepositoryWrapper: TopicRepositoryWrapper
   ) {
     super(
       new Logger(DdhubTopicsService.name),
@@ -373,33 +376,39 @@ export class DdhubTopicsService extends DdhubBaseService {
     applicationNameSpace: string,
     page: number,
     tags: string[]
-  ): Promise<TopicDataResponse> {
+  ) {
     //replacing double quotes in order to pass correct input to MB
     const owner = applicationNameSpace.replace(/"/g, '');
+    const topicName = name ? name.replace(/"/g, '') : '';
 
     try {
-      const { data } = await this.request<TopicDataResponse>(
-        () =>
-          this.httpService.get('/topics', {
-            params: {
-              limit,
-              name,
-              owner,
-              page,
-              tags,
-            },
-            httpsAgent: this.tlsAgentService.get(),
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          }),
-        {
-          stopOnResponseCodes: ['10'],
-        }
-      );
+      const result: TopicEntity[] = [];
+      const topics =
+        await this.topicRepositoryWrapper.topicRepository.getTopicsBySearch(
+          limit,
+          topicName,
+          owner,
+          page,
+          tags
+        );
+
+      console.log('topics', topics);
+
+      const topicsGroupByVersion = topics.reduce(function (result, topic) {
+        result[topic.name] = result[topic.name] || [];
+        result[topic.name].push(topic);
+        return result;
+      }, Object.create(null));
+
+      console.log('groupByVersion', topicsGroupByVersion);
+
+      for (const topicName in topicsGroupByVersion) {
+        const length = topicsGroupByVersion[topicName].length;
+        result.push(topicsGroupByVersion[topicName][length - 1]);
+      }
 
       this.logger.log(`get topics with owner:${owner} successful`);
-      return data;
+      return result;
     } catch (e) {
       this.logger.error(`get topics with owner:${owner} failed`, e);
       throw e;
