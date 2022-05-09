@@ -14,7 +14,7 @@ export class WsClientService implements OnModuleInit {
   private connection: WsClientConnection;
   private retryCount = 0;
 
-  constructor(protected readonly configService: ConfigService) {}
+  constructor(protected readonly configService: ConfigService) { }
 
   public async onModuleInit(): Promise<void> {
     const websocketMode = this.configService.get(
@@ -126,5 +126,6 @@ export class WsClientService implements OnModuleInit {
     return this.retryCount < maxRetries;
   }
 
-  public async sendMessage(messages: Message[]): Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public async sendMessage(messages: Message[]): Promise<void> { }
 }

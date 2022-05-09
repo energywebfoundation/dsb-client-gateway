@@ -1,33 +1,38 @@
 import {
-  MessageBody,
   OnGatewayConnection,
   OnGatewayInit,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { MessageEvent, WebSocket, WebSocketServer as Server } from 'ws';
-import { Logger } from '@nestjs/common';
+import { WebSocket, WebSocketServer as Server } from 'ws';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
 import { AuthService } from '../../utils/service/auth.service';
+import { ChannelService } from '../../channel/service/channel.service';
+import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
+  path: '/events'
 })
+@Injectable()
 export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
   @WebSocketServer()
   public server: Server;
 
   private readonly logger = new Logger(EventsGateway.name);
   private readonly protocol: string = 'dsb-protocol';
+  private clientId = 'ws-default';
 
   constructor(
     protected readonly configService: ConfigService,
-    protected readonly authService: AuthService
-  ) {}
+    protected readonly authService: AuthService,
+    protected readonly channelService: ChannelService,
+    protected readonly dsbApiService: DsbApiService,
+  ) { }
 
   public async afterInit(server: Server) {
     const websocketMode = this.configService.get(
@@ -48,10 +53,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     // Also Auth Guards do not work with HandleConnection, that's why we are not using Guards
     server.on('connection', (socket, request) => {
       socket['request'] = request;
-
-      socket.onmessage = (event: MessageEvent) => {
-        console.log(event);
-      };
+      // eslint-disable-next-line prefer-const
+      let _clientId = new URLSearchParams(request.url).get("/events?clientId");
+      if (_clientId) {
+        this.clientId = _clientId;
+      }
     });
   }
 
@@ -91,9 +97,5 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
 
     this.logger.log('New client connected');
   }
-
-  @SubscribeMessage('message')
-  public async handleMessage(@MessageBody() data): Promise<void> {
-    console.log(data);
-  }
 }
+

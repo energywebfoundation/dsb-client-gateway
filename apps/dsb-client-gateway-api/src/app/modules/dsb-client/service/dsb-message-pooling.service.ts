@@ -1,13 +1,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { DsbApiService } from './dsb-api.service';
-import { Channel, Message } from '../dsb-client.interface';
-import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../../message/message.const';
 import { MessageService } from '../../message/service/message.service';
-import { EnrolmentService } from '../../enrolment/service/enrolment.service';
-import { EnrolmentEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { ChannelService } from '../../channel/service/channel.service';
+import { GetMessageResponse } from '../../message/message.interface';
+import { EventsGateway } from '../../message/gateway/events.gateway';
+import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'messages',
@@ -19,11 +19,12 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
   constructor(
     protected readonly dsbApiService: DsbApiService,
-    protected readonly enrolmentService: EnrolmentService,
     protected readonly configService: ConfigService,
     protected readonly schedulerRegistry: SchedulerRegistry,
-    protected readonly messageService: MessageService
-  ) {}
+    protected readonly messageService: MessageService,
+    protected readonly channelService: ChannelService,
+    protected readonly gateway: EventsGateway,
+  ) { }
 
   public async onModuleInit(): Promise<void> {
     const websocketMode = this.configService.get(
@@ -56,24 +57,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
     try {
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
 
-      const enrolment: EnrolmentEntity | null =
-        await this.enrolmentService.get();
-
-      const isEnrolmentValid: boolean = this.validateEnrolment(enrolment);
-
-      if (!isEnrolmentValid) {
-        this.logger.error('User not enrolled, waiting for enrolment');
-
-        const timeout = setTimeout(callback, 60000);
-
-        this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
-
-        return;
-      }
-
-      const subscriptions: Channel[] = await this.getSubscribedChannels(
-        enrolment.did
-      );
+      const subscriptions: ChannelEntity[] = await (await this.channelService.getChannels()).filter((entity) => entity.type == 'sub');
 
       if (subscriptions.length === 0) {
         this.logger.log(
@@ -87,6 +71,15 @@ export class DsbMessagePoolingService implements OnModuleInit {
         return;
       }
 
+      if (this.gateway.server.clients.size == 0) {
+        return;
+      }
+
+      await this.dsbApiService.login().catch((e) => {
+        this.logger.error(`Login failed`, e);
+        return;
+      });
+
       await this.pullMessagesAndEmit(subscriptions);
     } catch (e) {
       this.logger.error(e);
@@ -97,10 +90,10 @@ export class DsbMessagePoolingService implements OnModuleInit {
     }
   }
 
-  private async pullMessagesAndEmit(subscriptions: Channel[]): Promise<void> {
+  private async pullMessagesAndEmit(subscriptions: ChannelEntity[]): Promise<void> {
     const clientId: string = this.configService.get<string>(
       'CLIENT_ID',
-      'WS_CONSUMER'
+      'WS-CONSUMER'
     );
     const messagesAmount: number = this.configService.get<number>(
       'EVENTS_MAX_PER_SECOND',
@@ -108,11 +101,14 @@ export class DsbMessagePoolingService implements OnModuleInit {
     );
 
     for (const subscription of subscriptions) {
-      const messages: Message[] = await this.dsbApiService.getMessages(
-        subscription.fqcn,
-        undefined,
+      const messages: GetMessageResponse[] = await this.messageService.getMessages({
+        fqcn: subscription.fqcn,
+        from: undefined,
+        amount: messagesAmount,
+        topicName: undefined,
+        topicOwner: undefined,
         clientId,
-        messagesAmount
+      }
       );
 
       this.logger.log(`Found ${messages.length} in ${subscription.fqcn}`);
@@ -122,25 +118,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
           messages,
           subscription.fqcn
         );
-        // const emitMode: EventEmitMode = this.configService.get(
-        //   'EVENT_EMIT_MODE',
-        //   EventEmitMode.BULK
-        // );
-        // this.eventsGateway.server.emit('messages', {});
       }
     }
-  }
-
-  private async getSubscribedChannels(did: string): Promise<Channel[]> {
-    const channels: Channel[] = await this.dsbApiService.getChannels();
-
-    return channels.filter(({ subscribers }) =>
-      subscribers ? subscribers?.includes(did) : true
-    );
-  }
-
-  private validateEnrolment(enrolment: Enrolment | null): boolean {
-    // @TODO - do we need this service?
-    return false;
   }
 }

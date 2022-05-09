@@ -15,7 +15,7 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { StorageModule } from '../storage/storage.module';
 import { SymmetricKeysRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { EnrolmentModule } from '../enrolment/enrolment.module';
-
+import { DsbMessagePoolingService } from '../dsb-client/service/dsb-message-pooling.service';
 @Module({
   imports: [
     DsbClientModule,
@@ -34,9 +34,10 @@ import { EnrolmentModule } from '../enrolment/enrolment.module';
     RefreshSymmetricKeysCacheCronService,
     RefreshSymmetricKeysCacheHandler,
     SymmetricKeysCacheService,
+    DsbMessagePoolingService,
     MessageService,
   ],
   exports: [MessageService],
   controllers: [MessageControlller],
 })
-export class MessageModule {}
+export class MessageModule { }
