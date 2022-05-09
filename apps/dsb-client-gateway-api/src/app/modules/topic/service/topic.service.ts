@@ -3,17 +3,14 @@ import {
   TopicEntity,
   TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-
+import { Span } from 'nestjs-otel';
 @Injectable()
 export class TopicService {
   protected readonly logger = new Logger(TopicService.name);
 
   constructor(protected readonly wrapper: TopicRepositoryWrapper) {}
 
-  public async createOrUpdateTopic(topicEntity: TopicEntity): Promise<void> {
-    await this.wrapper.topicRepository.save(topicEntity);
-  }
-
+  @Span('topics_getTopics')
   public async getTopics(
     limit: number,
     name: string,
