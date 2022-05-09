@@ -3,6 +3,8 @@ import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { Span } from 'nestjs-otel';
+import { ChannelType } from '../../channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
 import { EventsGateway } from '../gateway/events.gateway';
 import { WebSocketImplementation } from '../message.const';
@@ -10,7 +12,7 @@ import { GetMessageResponse } from '../message.interface';
 import { MessageService } from './message.service';
 
 enum SCHEDULER_HANDLERS {
-  MESSAGES = 'messages',
+  MESSAGES = 'ws-messages',
 }
 
 @Injectable()
@@ -43,12 +45,12 @@ export class DsbMessagePoolingService implements OnModuleInit {
     const callback = async () => {
       await this.handleInterval();
     };
-
     const timeout = setTimeout(callback, 5000);
-
     this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+
   }
 
+  @Span('ws_pool_messages')
   public async handleInterval(): Promise<void> {
     const callback = async () => {
       await this.handleInterval();
@@ -57,7 +59,13 @@ export class DsbMessagePoolingService implements OnModuleInit {
     try {
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
 
-      const subscriptions: ChannelEntity[] = await (await this.channelService.getChannels()).filter((entity) => entity.type == 'sub');
+      if (this.gateway.server.clients.size == 0) {
+        const timeout = setTimeout(callback, 5000);
+        this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        return;
+      }
+
+      const subscriptions: ChannelEntity[] = await (await this.channelService.getChannels()).filter((entity) => entity.type == ChannelType.SUB);
 
       if (subscriptions.length === 0) {
         this.logger.log(
@@ -65,27 +73,22 @@ export class DsbMessagePoolingService implements OnModuleInit {
         );
 
         const timeout = setTimeout(callback, 60000);
-
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
 
         return;
       }
 
-      if (this.gateway.server.clients.size == 0) {
-        return;
-      }
-
       await this.ddhubLoginService.login().catch((e) => {
         this.logger.error(`Login failed`, e);
+        const timeout = setTimeout(callback, 5000);
+        this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
       });
 
       await this.pullMessagesAndEmit(subscriptions);
     } catch (e) {
       this.logger.error(e);
-    } finally {
       const timeout = setTimeout(callback, 1000);
-
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     }
   }
