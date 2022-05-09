@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsGateway } from '../gateway/events.gateway';
 import { ConfigService } from '@nestjs/config';
-import { Message } from '../../dsb-client/dsb-client.interface';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import {
   SendMessageDto,
@@ -54,10 +53,10 @@ export class MessageService {
     protected readonly channelService: ChannelService,
     protected readonly topicService: TopicService,
     protected readonly keyService: KeysService
-  ) {}
+  ) { }
 
   public async sendMessagesToSubscribers(
-    messages: Message[],
+    messages: GetMessageResponse[],
     fqcn: string
   ): Promise<void> {
     const emitMode: EventEmitMode = this.configService.get(
@@ -71,7 +70,7 @@ export class MessageService {
       return;
     }
 
-    messages.forEach((message: Message) => {
+    messages.forEach((message: GetMessageResponse) => {
       this.broadcast({ ...message, fqcn });
     });
   }

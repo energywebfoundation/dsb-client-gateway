@@ -41,7 +41,7 @@ export class EnvironmentVariables {
   WEBSOCKET = WebSocketImplementation.NONE;
 
   @IsString()
-  CLIENT_ID = 'WS_CONSUMER';
+  CLIENT_ID = 'WS-CONSUMER';
 
   @IsPositive()
   EVENTS_MAX_PER_SECOND = 2;
