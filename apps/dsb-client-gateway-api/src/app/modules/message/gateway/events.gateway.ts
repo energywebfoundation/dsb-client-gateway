@@ -10,7 +10,6 @@ import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
 import { AuthService } from '../../utils/service/auth.service';
 import { ChannelService } from '../../channel/service/channel.service';
-import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 
 @WebSocketGateway({
   cors: {
@@ -31,7 +30,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     protected readonly configService: ConfigService,
     protected readonly authService: AuthService,
     protected readonly channelService: ChannelService,
-    protected readonly dsbApiService: DsbApiService,
   ) { }
 
   public async afterInit(server: Server) {
