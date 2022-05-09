@@ -11,9 +11,13 @@ import {
   IsNumber,
   IsEnum,
 } from 'class-validator';
-import { IsVersion } from '../../utils/validator/decorators/IsVersion';
+import { IsValidApplicationNameSpace } from '../../utils/validator/decorators/IsValidApplicationNameSpace';
 import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicName';
+import { ConfigService } from '@nestjs/config';
+import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
 export class GetTopicDto {
+  constructor(protected readonly configService: ConfigService) {}
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -62,6 +66,9 @@ export class GetTopicDto {
   })
   version: string;
 
+  @IsValidApplicationNameSpace(new ConfigService(), {
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -149,6 +156,9 @@ export class PostTopicDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsValidApplicationNameSpace(new ConfigService(), {
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
   @ApiProperty({
     description: 'owner of the topic',
     type: String,
@@ -359,10 +369,14 @@ export class GetTopicsQueryDto {
   })
   public name: string;
 
+  @IsValidApplicationNameSpace(new ConfigService(), {
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
     example: 'ddhub.apps.energyweb.iam.ewc',
+    required: true,
     type: String,
   })
   public owner: string;
@@ -580,6 +594,9 @@ export class PostTopicBodyDto {
   })
   schema: string;
 
+  @IsValidVersion({
+    message: 'Malformed version.',
+  })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -599,7 +616,6 @@ export class PostTopicBodyDto {
   owner: string;
 
   @IsArray()
-  @IsNotEmpty()
   @ArrayUnique()
   @ApiProperty({
     description: 'tags of the topic',
