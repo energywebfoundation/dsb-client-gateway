@@ -1,6 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { DsbApiService } from './dsb-api.service';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../../message/message.const';
 import { MessageService } from '../../message/service/message.service';
@@ -8,6 +7,7 @@ import { ChannelService } from '../../channel/service/channel.service';
 import { GetMessageResponse } from '../../message/message.interface';
 import { EventsGateway } from '../../message/gateway/events.gateway';
 import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'messages',
@@ -18,7 +18,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
   private readonly logger = new Logger(DsbMessagePoolingService.name);
 
   constructor(
-    protected readonly dsbApiService: DsbApiService,
+    protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly configService: ConfigService,
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly messageService: MessageService,
@@ -75,7 +75,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         return;
       }
 
-      await this.dsbApiService.login().catch((e) => {
+      await this.ddhubLoginService.login().catch((e) => {
         this.logger.error(`Login failed`, e);
         return;
       });
