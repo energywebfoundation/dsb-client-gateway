@@ -1,8 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChannelTopic } from '../entity/channel.entity';
 import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
-import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
-import { Topic } from '../../dsb-client/dsb-client.interface';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
 import { ChannelUpdateRestrictedFieldsException } from '../exceptions/channel-update-restricted-fields.exception';
 import { CommandBus } from '@nestjs/cqrs';
@@ -16,6 +14,11 @@ import {
   ChannelEntity,
   ChannelWrapperRepository,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
+import {
+  DdhubTopicsService,
+  Topic,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Injectable()
 export class ChannelService {
@@ -23,7 +26,7 @@ export class ChannelService {
 
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
-    protected readonly dsbApiService: DsbApiService,
+    protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly commandBus: CommandBus
   ) {}
 
@@ -47,6 +50,10 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       payload.conditions.topics
     );
+
+    if (payload.conditions.topics.length && !topicsWithIds.length) {
+      throw new TopicNotFoundException();
+    }
 
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
@@ -188,7 +195,7 @@ export class ChannelService {
     const topicsToReturn: ChannelTopic[] = [];
 
     for (const { topicName, owner } of topics) {
-      const receivedTopics = await this.dsbApiService
+      const receivedTopics = await this.ddhubTopicsService
         .getTopicsByOwnerAndName(topicName, owner)
         .catch(() => {
           return {

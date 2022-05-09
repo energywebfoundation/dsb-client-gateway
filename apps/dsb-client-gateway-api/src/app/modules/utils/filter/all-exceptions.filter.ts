@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 
+import { DsbMessageBrokerErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
@@ -24,11 +26,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       const responseBody = {
         err: {
-          reason: exception.response.message,
+          reason:
+            exception.response.data && exception.response.data.returnMessage
+              ? exception.response.data.returnMessage
+              : exception.response.message,
           statusCode: httpStatus,
-          code: exception.code,
+          code:
+            exception.response.data && exception.response.data.returnCode
+              ? DsbMessageBrokerErrors[exception.response.data.returnCode]
+              : exception.code,
           additionalDetails: exception.additionalDetails,
         },
+
         statusCode: httpStatus,
         timestamp: new Date().toISOString(),
       };
