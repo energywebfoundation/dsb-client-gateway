@@ -1,13 +1,13 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { SchedulerRegistry } from '@nestjs/schedule';
-import { ConfigService } from '@nestjs/config';
-import { WebSocketImplementation } from '../../message/message.const';
-import { MessageService } from '../../message/service/message.service';
-import { ChannelService } from '../../channel/service/channel.service';
-import { GetMessageResponse } from '../../message/message.interface';
-import { EventsGateway } from '../../message/gateway/events.gateway';
-import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { ChannelService } from '../../channel/service/channel.service';
+import { EventsGateway } from '../gateway/events.gateway';
+import { WebSocketImplementation } from '../message.const';
+import { GetMessageResponse } from '../message.interface';
+import { MessageService } from './message.service';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'messages',
