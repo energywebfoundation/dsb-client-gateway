@@ -42,13 +42,13 @@ export class DsbMessagePoolingService implements OnModuleInit {
       return;
     }
 
-    this.logger.log('Enabling websockets');
-
     const callback = async () => {
       await this.handleInterval();
     };
     const timeout = setTimeout(callback, 5000);
     this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+
+    this.logger.log('Enabling websockets');
 
   }
 
@@ -71,7 +71,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
         return;
       }
 
-      if (websocketMode === WebSocketImplementation.CLIENT && this.wsClient.rws == null) {
+      if (websocketMode === WebSocketImplementation.CLIENT && (this.wsClient.rws == null || (this.wsClient.rws != null && this.wsClient.rws.readyState == 3))) {
+        await this.wsClient.connect();
         const timeout = setTimeout(callback, 5000);
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
@@ -118,7 +119,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       2
     );
 
-    let isEmpty = true;
+    let emptyMsg = 0;
 
     for (const subscription of subscriptions) {
       const messages: GetMessageResponse[] = await this.messageService.getMessages({
@@ -134,15 +135,13 @@ export class DsbMessagePoolingService implements OnModuleInit {
       this.logger.log(`Found ${messages.length} in ${subscription.fqcn}`);
 
       if (messages && messages.length > 0) {
+        emptyMsg += messages.length;
         await this.messageService.sendMessagesToSubscribers(
           messages,
           subscription.fqcn
         );
-        isEmpty = false;
-      } else {
-        isEmpty = true;
       }
     }
-    if (isEmpty) throw new Error("Channel sub is empty");
+    if (emptyMsg == 0) throw new Error("Channel sub is empty");
   }
 }
