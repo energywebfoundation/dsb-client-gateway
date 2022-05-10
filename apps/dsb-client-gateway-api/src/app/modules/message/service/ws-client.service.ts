@@ -36,21 +36,28 @@ export class WsClientService implements OnModuleInit {
     await this.connect();
   }
 
-  private async connect(): Promise<void> {
+  public async connect(): Promise<void> {
     const wsUrl: string = this.configService.get<string>('WEBSOCKET_URL');
     return new Promise((resolve, reject) => {
       try {
-        const options = {
-          WebSocket: WebSocket, // custom WebSocket constructor
-          connectionTimeout: 1000,
-          maxRetries: 10,
-        };
-        const _ws = new ReconnectingWebSocket(wsUrl, [], options);
-        _ws.addEventListener('open', () => {
-          this.rws = _ws;
-          this.logger.log(`Websockets are connected`);
+        if (this.rws == null) {
+          const options = {
+            WebSocket: WebSocket, // custom WebSocket constructor
+            connectionTimeout: 5000,
+          };
+          const _ws = new ReconnectingWebSocket(wsUrl, [], options);
+          _ws.addEventListener('open', () => {
+            this.rws = _ws;
+            this.logger.log(`Websockets are connected`);
+            resolve();
+          });
+          _ws.addEventListener('close', () => {
+            resolve();
+          });
+        } else {
           resolve();
-        });
+        }
+
       } catch (err) {
         reject(err);
       }
