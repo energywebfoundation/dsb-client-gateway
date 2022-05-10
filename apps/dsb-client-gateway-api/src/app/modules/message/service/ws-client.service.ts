@@ -47,7 +47,9 @@ export class WsClientService implements OnModuleInit {
           };
           const _ws = new ReconnectingWebSocket(wsUrl, [], options);
           _ws.addEventListener('open', () => {
-            this.rws = _ws;
+            if (this.rws == null) {
+              this.rws = _ws;
+            }
             this.logger.log(`Websockets are connected`);
             resolve();
           });
