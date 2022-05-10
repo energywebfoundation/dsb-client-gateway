@@ -15,6 +15,7 @@ import { SymmetricKeysRepositoryModule } from '@dsb-client-gateway/dsb-client-ga
 import { EnrolmentModule } from '../enrolment/enrolment.module';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { DsbMessagePoolingService } from './service/dsb-message-pooling.service';
+import { WsClientService } from './service/ws-client.service';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DsbMessagePoolingService } from './service/dsb-message-pooling.service'
   ],
   providers: [
     EventsGateway,
+    WsClientService,
     RefreshSymmetricKeysCacheCronService,
     RefreshSymmetricKeysCacheHandler,
     DsbMessagePoolingService,

@@ -10,6 +10,7 @@ import { EventsGateway } from '../gateway/events.gateway';
 import { WebSocketImplementation } from '../message.const';
 import { GetMessageResponse } from '../message.interface';
 import { MessageService } from './message.service';
+import { WsClientService } from './ws-client.service';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'ws-messages',
@@ -26,6 +27,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
     protected readonly messageService: MessageService,
     protected readonly channelService: ChannelService,
     protected readonly gateway: EventsGateway,
+    protected readonly wsClient: WsClientService,
   ) { }
 
   public async onModuleInit(): Promise<void> {
@@ -56,10 +58,20 @@ export class DsbMessagePoolingService implements OnModuleInit {
       await this.handleInterval();
     };
 
+    const websocketMode = this.configService.get(
+      'WEBSOCKET',
+      WebSocketImplementation.NONE
+    );
     try {
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
 
-      if (this.gateway.server.clients.size == 0) {
+      if (websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size == 0) {
+        const timeout = setTimeout(callback, 5000);
+        this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        return;
+      }
+
+      if (websocketMode === WebSocketImplementation.CLIENT && this.wsClient.rws == null) {
         const timeout = setTimeout(callback, 5000);
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
@@ -86,9 +98,12 @@ export class DsbMessagePoolingService implements OnModuleInit {
       });
 
       await this.pullMessagesAndEmit(subscriptions);
+
+      const timeout = setTimeout(callback, 1000);
+      this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     } catch (e) {
       this.logger.error(e);
-      const timeout = setTimeout(callback, 1000);
+      const timeout = setTimeout(callback, 60000);
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     }
   }
@@ -102,6 +117,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
       'EVENTS_MAX_PER_SECOND',
       2
     );
+
+    let isEmpty = true;
 
     for (const subscription of subscriptions) {
       const messages: GetMessageResponse[] = await this.messageService.getMessages({
@@ -121,7 +138,11 @@ export class DsbMessagePoolingService implements OnModuleInit {
           messages,
           subscription.fqcn
         );
+        isEmpty = false;
+      } else {
+        isEmpty = true;
       }
     }
+    if (isEmpty) throw new Error("Channel sub is empty");
   }
 }
