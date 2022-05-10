@@ -22,6 +22,7 @@ COPY --chown=node:node dist/apps/dsb-client-gateway-api/* /usr/app/
 COPY --chown=node:node package-lock.json /usr/app/
 
 WORKDIR /usr/app
+RUN mkdir -p data && chown -R node:node data
 RUN npm ci --production
 
 USER node
