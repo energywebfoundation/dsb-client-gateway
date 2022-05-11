@@ -49,8 +49,10 @@ export class WsClientService implements OnModuleInit {
           _ws.addEventListener('open', () => {
             if (this.rws == null) {
               this.rws = _ws;
+              this.logger.log(`Websockets are connected`);
+            } else {
+              this.logger.log(`Websockets are re-connected`);
             }
-            this.logger.log(`Websockets are connected`);
             resolve();
           });
           _ws.addEventListener('close', () => {
