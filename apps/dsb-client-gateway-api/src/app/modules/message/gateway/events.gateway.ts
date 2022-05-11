@@ -1,15 +1,19 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { WebSocket, WebSocketServer as Server } from 'ws';
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
 import { AuthService } from '../../utils/service/auth.service';
 import { ChannelService } from '../../channel/service/channel.service';
+import { MessageService } from '../service/message.service';
 
 @WebSocketGateway({
   cors: {
@@ -30,6 +34,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     protected readonly configService: ConfigService,
     protected readonly authService: AuthService,
     protected readonly channelService: ChannelService,
+    @Inject(forwardRef(() => MessageService))
+    protected readonly messageService: MessageService,
   ) { }
 
   public async afterInit(server: Server) {
@@ -94,6 +100,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     }
 
     this.logger.log('New client connected');
+  }
+
+  @SubscribeMessage('message')
+  public async handleMessage(@ConnectedSocket() client: any, @MessageBody() data): Promise<void> {
+    this.logger.log(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(data)}`);
+    this.messageService.sendMessage(data).then((response) => {
+      client.send(JSON.stringify(response));
+    }).catch((ex) => {
+      this.logger.error(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(ex.response)}`);
+      client.send(JSON.stringify(ex.response));
+    });
   }
 }
 
