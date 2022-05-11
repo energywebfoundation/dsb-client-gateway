@@ -65,14 +65,16 @@ export class DsbMessagePoolingService implements OnModuleInit {
     try {
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
 
-      if (websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size == 0) {
+      if (websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size === 0) {
         const timeout = setTimeout(callback, 5000);
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
       }
 
-      if (websocketMode === WebSocketImplementation.CLIENT && (this.wsClient.rws == null || (this.wsClient.rws != null && this.wsClient.rws.readyState == 3))) {
-        await this.wsClient.connect();
+      if (websocketMode === WebSocketImplementation.CLIENT && (this.wsClient.rws === undefined || (this.wsClient.rws !== undefined && this.wsClient.rws.readyState === this.wsClient.rws.CLOSED))) {
+        if (this.wsClient.rws === undefined) {
+          await this.wsClient.connect();
+        }
         const timeout = setTimeout(callback, 5000);
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
