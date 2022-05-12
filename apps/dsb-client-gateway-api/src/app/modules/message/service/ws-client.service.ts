@@ -48,7 +48,7 @@ export class WsClientService implements OnModuleInit {
         if (this.rws === undefined) {
           const options = {
             WebSocket: WebSocket, // custom WebSocket constructor
-            connectionTimeout: 5000,
+            connectionTimeout: this.configService.get<string>('WEBSOCKET_RECONNECT_TIMEOUT'),
           };
           const _ws = new ReconnectingWebSocket(wsUrl, [], options);
           _ws.addEventListener('open', () => {
