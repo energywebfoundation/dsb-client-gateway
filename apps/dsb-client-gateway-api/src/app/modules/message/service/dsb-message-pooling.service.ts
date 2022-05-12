@@ -45,7 +45,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
     const callback = async () => {
       await this.handleInterval();
     };
-    const timeout = setTimeout(callback, 5000);
+    const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
     this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
 
     this.logger.log('Enabling websockets');
@@ -66,7 +66,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
 
       if (websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size === 0) {
-        const timeout = setTimeout(callback, 5000);
+        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
       }
@@ -75,7 +75,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         if (this.wsClient.rws === undefined) {
           await this.wsClient.connect();
         }
-        const timeout = setTimeout(callback, 5000);
+        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
       }
@@ -87,7 +87,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
           'No subscriptions found. Push messages are enabled when the DID is added to a channel'
         );
 
-        const timeout = setTimeout(callback, 60000);
+        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
 
         return;
@@ -95,18 +95,18 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
       await this.ddhubLoginService.login().catch((e) => {
         this.logger.error(`Login failed`, e);
-        const timeout = setTimeout(callback, 5000);
+        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         return;
       });
 
       await this.pullMessagesAndEmit(subscriptions);
 
-      const timeout = setTimeout(callback, 1000);
+      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) / 5);
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     } catch (e) {
       this.logger.error(e);
-      const timeout = setTimeout(callback, 60000);
+      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     }
   }
