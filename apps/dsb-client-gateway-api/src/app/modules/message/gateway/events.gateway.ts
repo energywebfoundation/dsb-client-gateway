@@ -58,7 +58,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     server.on('connection', (socket, request) => {
       socket['request'] = request;
       // eslint-disable-next-line prefer-const
-      let _clientId = new URLSearchParams(request.url).get("/events?clientId");
+      const _clientId = new URLSearchParams(request.url).get("/events?clientId");
       if (_clientId) {
         this.clientId = _clientId;
       }
