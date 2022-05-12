@@ -83,7 +83,7 @@ export class EnvironmentVariables {
 
   @IsPositive()
   @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
-  WEBSOCKET_RECONNECT_TIMEOUT = 1000;
+  WEBSOCKET_RECONNECT_TIMEOUT = 5000;
 
   @Transform(EnvironmentVariables.transformBoolean('WEBSOCKET_RECONNECT'))
   @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
