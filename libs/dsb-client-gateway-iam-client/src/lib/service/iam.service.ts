@@ -258,6 +258,8 @@ export class IamService {
             includeClaims,
           })
           .catch((e) => {
+            this.logger.error(`Failed fetching did ${did}`, e);
+
             return retryFn(e);
           });
       },
