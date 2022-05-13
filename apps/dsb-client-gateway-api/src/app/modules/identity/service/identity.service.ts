@@ -121,7 +121,11 @@ export class IdentityService {
 
     await this.wrapper.identityRepository.createOne(publicIdentity);
 
-    await this.secretsEngineService.setPrivateKey(privateKey);
+    await this.secretsEngineService.setPrivateKey(privateKey).catch((e) => {
+      this.logger.error(e);
+
+      throw new Error('Secrets engine not initialized');
+    });
 
     await this.iamService.setup(privateKey);
 
