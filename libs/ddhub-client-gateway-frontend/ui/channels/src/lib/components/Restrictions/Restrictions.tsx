@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useStyles } from './Restrictions.styles';
-import { didFormatMinifier } from "@dsb-client-gateway/ui/utils";
 import { Collapse, Chip } from '@mui/material';
 import { useRestrictionsEffects } from './Restrictions.effects';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export interface RestrictionsProps {
   value: string[];
