@@ -72,6 +72,7 @@ export class DdhubLoginService {
   @Span('ddhub_mb_initExtChannel')
   protected async initExtChannel(): Promise<void> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       await promiseRetry(async (retry) => {
         await lastValueFrom(
           this.httpService.post(

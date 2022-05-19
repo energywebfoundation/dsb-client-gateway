@@ -17,6 +17,7 @@ import {
 } from '../dto/message.interface';
 import { SendMessageResponse } from '../dto';
 import { DdhubLoginService } from './ddhub-login.service';
+import { DdhubHealthService } from './ddhub-health.service';
 
 @Injectable()
 export class DdhubMessagesService extends DdhubBaseService {
@@ -25,7 +26,8 @@ export class DdhubMessagesService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
+    protected readonly ddhubHealthService: DdhubHealthService
   ) {
     super(
       new Logger(DdhubMessagesService.name),
@@ -51,6 +53,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     };
 
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<SearchMessageResponseDto[]>(
         () =>
           this.httpService.post('/messages/search', requestBody, {
@@ -81,6 +84,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     amount?: number
   ): Promise<Message[]> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<null>(
         () =>
           this.httpService.get('/messages', {
@@ -130,6 +134,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     };
 
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<null>(
         () =>
           this.httpService.post('/messages', messageData, {
@@ -165,6 +170,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     };
 
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<null>(
         () =>
           this.httpService.post('/messages/internal', requestData, {
@@ -198,6 +204,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     overrideRetry?: OperationOptions
   ): Promise<GetInternalMessageResponse[]> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<null>(
         () =>
           this.httpService.post('/messages/internal/search', dto, {

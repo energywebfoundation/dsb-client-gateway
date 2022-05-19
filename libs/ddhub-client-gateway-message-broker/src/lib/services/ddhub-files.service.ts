@@ -53,6 +53,8 @@ export class DdhubFilesService extends DdhubBaseService {
         formData.append('transactionId', transactionId);
       }
 
+      await this.tlsAgentService.checkTLSEnabled();
+
       const result = await this.request<null>(
         () =>
           this.httpService.post('/messages/upload', formData, {
@@ -87,6 +89,7 @@ export class DdhubFilesService extends DdhubBaseService {
     fileId: string
   ): Promise<{ data: string; headers: any }> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<null>(
         () =>
           this.httpService.get('/messages/download', {

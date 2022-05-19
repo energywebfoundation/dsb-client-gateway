@@ -36,6 +36,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopicById')
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<TopicVersion | null>(
         () =>
           this.httpService.get('/topics/' + topicId + '/versions', {
@@ -61,6 +62,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_deleteTopic')
   public async deleteTopic(id: string): Promise<TopicResultDTO> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       this.logger.log('topic to be deleted', id);
       const result = await this.request<TopicResultDTO>(
         () =>
@@ -93,6 +95,8 @@ export class DdhubTopicsService extends DdhubBaseService {
       this.logger.log(
         `topic to be deleted with version: ${version} and id:${id}`
       );
+
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<TopicResultDTO>(
         () =>
           this.httpService.delete(`/topics/${id}/versions/${version}`, {
@@ -128,6 +132,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   ): Promise<TopicResultDTO> {
     try {
       this.logger.log('topic data to be updated', topicData);
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<TopicResultDTO>(
         () =>
           this.httpService.put(
@@ -166,6 +171,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   ): Promise<TopicResultDTO> {
     try {
       this.logger.log('topic to be updated', data);
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<TopicResultDTO>(
         () =>
           this.httpService.put(`/topics/${id}`, data, {
@@ -191,6 +197,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_postTopics')
   public async postTopics(topicData: UpdateTopicBodyDTO): Promise<Topic> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<null>(
         () =>
           this.httpService.post('/topics', topicData, {
@@ -219,6 +226,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     version: string
   ): Promise<TopicDataResponse> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<TopicDataResponse>(
         () =>
           this.httpService.get(`/topics/${id}/versions/${version}`, {
@@ -248,6 +256,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopicHistoryById')
   public async getTopicHistoryById(id: string): Promise<TopicDataResponse> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<TopicDataResponse>(
         () =>
           this.httpService.get(`/topics/${id}/versions`, {
@@ -281,6 +290,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     }
 
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<null>(
         () =>
           this.httpService.get('/topics/search', {
@@ -314,6 +324,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     }
 
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<Topic[]>(
         () =>
           this.httpService.get('/topics/count', {
@@ -346,6 +357,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     topicId: string
   ): Promise<TopicVersionResponse> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const result = await this.request<null>(
         () =>
           this.httpService.get(`/topics/${topicId}/versions`, {
@@ -378,6 +390,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     const owner = applicationNameSpace.replace(/"/g, '');
 
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<TopicDataResponse>(
         () =>
           this.httpService.get('/topics', {
@@ -412,6 +425,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     owner: string
   ): Promise<TopicDataResponse> {
     try {
+      await this.tlsAgentService.checkTLSEnabled();
       const { data } = await this.request<TopicDataResponse>(
         () =>
           this.httpService.get('/topics', {

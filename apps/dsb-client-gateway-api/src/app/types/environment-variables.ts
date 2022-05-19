@@ -161,6 +161,10 @@ export class EnvironmentVariables {
   @Transform(EnvironmentVariables.transformBoolean('OPENTELEMETRY_ENABLED'))
   OPENTELEMETRY_ENABLED = false;
 
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('MTLS_ENABLED'))
+  MTLS_ENABLED = false;
+
   @IsEnum(OpenTelemetryExporters)
   @ValidateIf(EnvironmentVariables.isOTELEnabled)
   OPEN_TELEMETRY_EXPORTER = OpenTelemetryExporters.ZIPKIN;
