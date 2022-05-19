@@ -1,7 +1,6 @@
 import { FC } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Collapse, Chip } from '@mui/material';
 import { useStyles } from './Restrictions.styles';
-import { Collapse, Chip } from '@mui/material';
 import { useRestrictionsEffects } from './Restrictions.effects';
 
 export interface RestrictionsProps {
