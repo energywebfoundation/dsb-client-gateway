@@ -17,7 +17,7 @@ export const useStyles = makeStyles()((theme) => ({
     lineHeight: '18px',
     fontWeight: 600,
     letterSpacing: '0.4px',
-    color: '#fff',
+    color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
   },
 }));
