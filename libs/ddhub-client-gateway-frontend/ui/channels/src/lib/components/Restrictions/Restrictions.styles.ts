@@ -1,4 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
+import { darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   text: {
@@ -11,6 +12,9 @@ export const useStyles = makeStyles()((theme) => ({
     background: theme.palette.primary.main,
     height: 20,
     borderRadius: 21,
+    '&:hover': {
+      backgroundColor: darken(theme.palette.primary.main, 0.2),
+    },
   },
   chipLabel: {
     fontSize: 12,

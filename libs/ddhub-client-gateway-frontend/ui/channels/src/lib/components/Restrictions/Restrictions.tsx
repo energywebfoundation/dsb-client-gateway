@@ -14,14 +14,31 @@ export const Restrictions: FC<RestrictionsProps> = ({ value, type }) => {
 
   return (
     <Box>
-      {(!isOpen ?
-        (<Typography variant="body2" className={classes.text} sx={{ display: 'inline', marginRight: '8px' }}>
-        { value?.length ? value.slice(0,3).join(', ') : '--' }</Typography>)
-        : (<Collapse in={isOpen} timeout="auto" unmountOnExit>
-            <Typography variant="body2" className={classes.text}>{value.join(', ')}</Typography></Collapse>)
+      {isOpen ? (
+         <Collapse in={isOpen} timeout="auto" unmountOnExit>
+         <Typography variant="body2" className={classes.text}>
+           {value.join(', ')}
+         </Typography>
+       </Collapse>
+
+      ) : (
+        <Typography
+          variant="body2"
+          className={classes.text}
+          sx={{ display: 'inline', marginRight: '8px' }}
+        >
+          {value?.length ? value.slice(0, 3).join(', ') : '--'}
+        </Typography>
       )}
 
-      {(!isOpen && value?.length > 3) ? <Chip label={`+${value.length - 3}`} onClick={handleOpening} className={classes.chip} classes={{label: classes.chipLabel}}/> : ''}
+      {!isOpen && value?.length > 3 && (
+        <Chip
+          label={`+${value.length - 3}`}
+          onClick={handleOpening}
+          className={classes.chip}
+          classes={{ label: classes.chipLabel }}
+        />
+      )}
     </Box>
   );
 };
