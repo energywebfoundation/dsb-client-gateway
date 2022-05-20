@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
+  ApplicationEntity,
   ChannelEntity,
+  CronEntity,
   DidEntity,
   EnrolmentEntity,
   IdentityEntity,
@@ -9,6 +11,17 @@ import {
   TopicEntity,
 } from './module';
 import { ConfigService } from '@nestjs/config';
+
+const ENTITIES = [
+  ChannelEntity,
+  IdentityEntity,
+  EnrolmentEntity,
+  TopicEntity,
+  SymmetricKeysEntity,
+  DidEntity,
+  CronEntity,
+  ApplicationEntity,
+];
 
 @Module({
   imports: [
@@ -18,21 +31,11 @@ import { ConfigService } from '@nestjs/config';
           type: 'better-sqlite3',
           database: configService.get<string>('DB_NAME', 'local.db'),
           synchronize: true,
-          entities: [
-            ChannelEntity,
-            IdentityEntity,
-            EnrolmentEntity,
-            TopicEntity,
-            SymmetricKeysEntity,
-            DidEntity,
-          ],
+          entities: ENTITIES,
         };
       },
       inject: [ConfigService],
     }),
   ],
-  controllers: [],
-  providers: [],
-  exports: [],
 })
 export class DsbClientGatewayStorageModule {}
