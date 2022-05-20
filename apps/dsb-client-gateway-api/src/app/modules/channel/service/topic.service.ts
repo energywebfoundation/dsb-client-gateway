@@ -10,10 +10,6 @@ export class TopicService {
 
   constructor(protected readonly wrapper: TopicRepositoryWrapper) {}
 
-  public async createOrUpdateTopic(topicEntity: TopicEntity): Promise<void> {
-    await this.wrapper.topicRepository.save(topicEntity);
-  }
-
   public async getTopic(
     name: string,
     owner: string,
@@ -33,6 +29,14 @@ export class TopicService {
         name,
         owner,
         version,
+      },
+    });
+  }
+
+  public async getTopicById(id: string): Promise<TopicEntity | null> {
+    return this.wrapper.topicRepository.findOne({
+      where: {
+        id,
       },
     });
   }

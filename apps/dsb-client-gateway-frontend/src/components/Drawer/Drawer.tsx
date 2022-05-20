@@ -1,30 +1,25 @@
 import React from 'react';
+import { Box, Divider, List, Typography } from '@mui/material';
 import {
-  Typography,
-  ListItemText,
-  ListItem,
-  List,
-  Box,
-  Divider,
-} from '@mui/material';
-import Link from 'next/link';
-import clsx from 'clsx';
-import {
-  Home,
-  Layers,
-  GitMerge,
-  Settings,
   Command,
   Database,
   Disc,
+  GitMerge,
+  Home,
+  Layers,
+  Settings,
 } from 'react-feather';
-import { routerConst } from '@dsb-client-gateway/ui/utils';
-import { useDrawerEffects } from './Drawer.effects';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
+import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
+import { MenuItem } from './MenuItem/MenuItem';
+import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const Drawer = () => {
+  const {
+    userData: { displayedRoutes },
+  } = useSetUserDataEffect();
   const { classes } = useStyles();
-  const { isActive } = useDrawerEffects();
 
   return (
     <div>
@@ -33,20 +28,11 @@ export const Drawer = () => {
         <Disc className={classes.disc} size={18} />
       </Box>
       <List>
-        <Link href={routerConst.Dashboard} passHref>
-          <ListItem
-            button
-            className={clsx(classes.navLink, isActive(routerConst.Dashboard))}
-            component="a"
-          >
-            <Home className={classes.icon} size={20} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Dashboard
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <MenuItem
+          href={routerConst.Dashboard}
+          title="Dashboard"
+          icon={<Home className={classes.icon} size={20} />}
+        />
         <Divider classes={{ root: classes.dividerColor }} />
       </List>
 
@@ -54,56 +40,31 @@ export const Drawer = () => {
         Admin
       </Typography>
       <List>
-        <Link href={routerConst.GatewaySettings} passHref>
-          <ListItem
-            button
-            className={clsx(
-              classes.navLink,
-              isActive(routerConst.GatewaySettings)
-            )}
-            component="a"
-          >
-            <Settings className={classes.icon} size={18} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Gateway Settings
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <MenuItem
+          href={routerConst.GatewaySettings}
+          title="Gateway Settings"
+          icon={<Settings className={classes.icon} size={18} />}
+        />
 
-        <Link href={routerConst.AppsAndTopics} passHref>
-          <ListItem
-            button
-            className={clsx(
-              classes.navLink,
-              isActive(routerConst.AppsAndTopics)
-            )}
-            component="a"
-          >
-            <Layers className={classes.icon} size={16} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Apps and Topics
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        {displayedRoutes.has(routerConst.AppsAndTopics) && (
+          <MenuItem
+            href={routerConst.AppsAndTopics}
+            title="Topic management"
+            icon={<Layers className={classes.icon} size={16} />}
+          />
+        )}
 
-        <Link href={routerConst.Channels} passHref>
-          <ListItem
-            button
-            className={clsx(classes.navLink, isActive(routerConst.Channels))}
-            component="a"
-          >
-            <Command className={classes.icon} size={18} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Channels
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <CollapsableMenu
+          menuTitle="Channels"
+          subMenu={[
+            { title: 'My apps and topics', href: routerConst.ChannelApps },
+            {
+              title: 'Channel management',
+              href: routerConst.ChannelsManagement,
+            },
+          ].filter((menu) => displayedRoutes.has(menu.href))}
+          menuIcon={<Command className={classes.icon} size={18} />}
+        />
 
         <Divider classes={{ root: classes.dividerColor }} />
       </List>
@@ -112,53 +73,38 @@ export const Drawer = () => {
         Messaging
       </Typography>
       <List>
-        <Link href={routerConst.IntegrationAPIs} passHref>
-          <ListItem
-            button
-            className={clsx(
-              classes.navLink,
-              isActive(routerConst.IntegrationAPIs)
-            )}
-            component="a"
-          >
-            <GitMerge className={classes.icon} size={18} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Integration APIs
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <MenuItem
+          href={routerConst.IntegrationAPIs}
+          title="Integration APIs"
+          icon={<GitMerge className={classes.icon} size={18} />}
+        />
 
-        <Link href="/files" passHref>
-          <ListItem
-            button
-            className={clsx(classes.navLink, isActive('/files'))}
-            component="a"
-          >
-            <Database className={classes.icon} size={18} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Data Messaging
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <CollapsableMenu
+          menuTitle="Large Data Messaging"
+          subMenu={[
+            {
+              title: 'File upload',
+              href: routerConst.LargeDataMessagingFileUpload,
+            },
+            {
+              title: 'File download',
+              href: routerConst.LargeDataMessagingFileDownload,
+            },
+          ].filter((menu) => displayedRoutes.has(menu.href))}
+          menuIcon={<Database className={classes.icon} size={18} />}
+        />
 
-        <Link href="#" passHref>
-          <ListItem
-            button
-            className={clsx(classes.navLink, isActive('#'))}
-            component="a"
-          >
-            <Database className={classes.icon} size={18} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Large Data Messaging
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <CollapsableMenu
+          menuTitle="Data Messaging"
+          subMenu={[
+            { title: 'File upload', href: routerConst.DataMessagingFileUpload },
+            {
+              title: 'File download',
+              href: routerConst.DataMessagingFileDownload,
+            },
+          ].filter((menu) => displayedRoutes.has(menu.href))}
+          menuIcon={<Database className={classes.icon} size={18} />}
+        />
       </List>
     </div>
   );

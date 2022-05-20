@@ -1,20 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ChannelService } from './channel.service';
-import { IdentityService } from '../../identity/service/identity.service';
 import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
-  TopicEntity,
+  TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { TopicService } from './topic.service';
 import {
   DdhubDidService,
   DdhubTopicsService,
-  Topic,
-  TopicVersion,
   TopicVersionResponse,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 
 @Injectable()
 export class ChannelDidCacheService {
@@ -24,9 +21,9 @@ export class ChannelDidCacheService {
     protected readonly iamService: IamService,
     protected readonly channelService: ChannelService,
     protected readonly identityService: IdentityService,
-    protected readonly topicService: TopicService,
     protected readonly ddhubTopicService: DdhubTopicsService,
-    protected readonly ddhubDidService: DdhubDidService
+    protected readonly ddhubDidService: DdhubDidService,
+    protected readonly wrapper: TopicRepositoryWrapper
   ) {}
 
   @Span('channel_refreshChannelCache')
@@ -67,74 +64,25 @@ export class ChannelDidCacheService {
       uniqueDids
     );
 
-    for (const { topicId, topicName, owner } of internalChannel.conditions
+    for (const { topicId, owner, topicName } of internalChannel.conditions
       .topics) {
-      const topicInformation =
-        await this.ddhubTopicService.getTopicsByOwnerAndName(topicName, owner);
+      const topicVersions: TopicVersionResponse =
+        await this.ddhubTopicService.getTopicVersions(topicId);
 
-      if (topicInformation.records.length === 0) {
-        this.logger.warn(`Topic with id ${topicId} does not have any versions`);
-
-        continue;
-      }
-
-      const topic: Topic = topicInformation.records[0];
-
-      const topicVersion: TopicVersion | null =
-        await this.ddhubTopicService.getTopicById(topic.id);
-
-      if (!topicVersion) {
-        this.logger.error(
-          `Topic version is missing for topic with id ${topicId}`
-        );
-      }
-
-      const topicVersions: TopicVersionResponse = await this.ddhubTopicService
-        .getTopicVersions(topic.id)
-        .catch((e) => ({
-          records: [],
-          count: 0,
-          page: 0,
-          limit: 0,
-        }));
-
-      if (topicVersions.records.length === 0) {
-        this.logger.warn(`Topic with id ${topic.id} has no versions`);
-
-        return;
-      }
-
-      this.logger.log(`Found ${topicVersions.records.length} topic versions`);
-
-      await this.channelService.updateChannelTopic(
-        fqcn,
-        topic.id,
-        topicVersions.records.map((topicVersion) => ({
-          id: topic.id,
-          owner: topic.owner,
-          name: topic.name,
-          schemaType: topic.schemaType,
+      for (const topicVersion of topicVersions.records) {
+        await this.wrapper.topicRepository.save({
+          id: topicId,
+          owner: owner,
+          name: topicName,
+          schemaType: topicVersion.schemaType,
           version: topicVersion.version,
           schema: topicVersion.schema,
-        }))
-      );
+          tags: topicVersion.tags,
+        });
 
-      this.logger.log('Found topic', topic);
-
-      for (const { schema, version } of topicVersions.records) {
-        const typedSchema = schema as object;
-
-        const topicEntity: TopicEntity = {
-          id: topic.id,
-          schema: typedSchema,
-          version,
-          owner: topic.owner,
-          name: topic.name,
-          schemaType: topic.schemaType,
-          tags: ['xd'],
-        };
-
-        await this.topicService.createOrUpdateTopic(topicEntity);
+        this.logger.log(
+          `stored topic with name ${topicVersion.name} and owner ${topicVersion.owner} with version ${topicVersion.version}`
+        );
       }
     }
   }

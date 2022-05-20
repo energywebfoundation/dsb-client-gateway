@@ -1,45 +1,46 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { EventsGateway } from '../gateway/events.gateway';
-import { ConfigService } from '@nestjs/config';
 import {
-  SendMessageDto,
-  uploadMessageBodyDto,
-} from '../dto/request/send-message.dto';
-import { GetMessagesDto } from '../dto/request/get-messages.dto';
+  DdhubFilesService,
+  DdhubMessagesService
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import {
+  ChannelEntity,
+  TopicEntity
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { v4 as uuidv4 } from 'uuid';
+import { ChannelType } from '../../../modules/channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
 import { TopicService } from '../../channel/service/topic.service';
+import { KeysService } from '../../keys/service/keys.service';
+import { EncryptedMessageType } from '../../message/message.const';
+import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
-import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
+import { GetMessagesDto } from '../dto/request/get-messages.dto';
+import {
+  SendMessageDto,
+  uploadMessageBodyDto
+} from '../dto/request/send-message.dto';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
-import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
-import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
-import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-and-topic-name-required.exception';
-import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
+import { FileNotFoundException } from '../exceptions/file-not-found.exception';
 import { FileSizeException } from '../exceptions/file-size.exception';
 import { FIleTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
-import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
+import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
+import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
+import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
+import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
+import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
+import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-and-topic-name-required.exception';
+import { EventsGateway } from '../gateway/events.gateway';
 import {
   DownloadMessageResponse,
   GetMessageResponse,
   SearchMessageResponseDto,
-  SendMessageResponse,
+  SendMessageResponse
 } from '../message.interface';
-import { ChannelType } from '../../../modules/channel/channel.const';
-import { KeysService } from '../../keys/service/keys.service';
-import { v4 as uuidv4 } from 'uuid';
-import { EncryptedMessageType } from '../../message/message.const';
-import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import {
-  ChannelEntity,
-  TopicEntity,
-} from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { FileNotFoundException } from '../exceptions/file-not-found.exception';
-import {
-  DdhubFilesService,
-  DdhubMessagesService,
-  Message,
-} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
-import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
+import { WsClientService } from './ws-client.service';
+import { Span } from 'nestjs-otel';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -53,39 +54,14 @@ export class MessageService {
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly gateway: EventsGateway,
+    protected readonly wsClient: WsClientService,
     protected readonly configService: ConfigService,
     protected readonly channelService: ChannelService,
     protected readonly topicService: TopicService,
     protected readonly keyService: KeysService,
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService
-  ) {}
-
-  public async sendMessagesToSubscribers(
-    messages: Message[],
-    fqcn: string
-  ): Promise<void> {
-    const emitMode: EventEmitMode = this.configService.get(
-      'EVENTS_EMIT_MODE',
-      EventEmitMode.BULK
-    );
-
-    if (emitMode === EventEmitMode.BULK) {
-      this.broadcast(messages.map((message) => ({ ...message, fqcn })));
-
-      return;
-    }
-
-    messages.forEach((message: Message) => {
-      this.broadcast({ ...message, fqcn });
-    });
-  }
-
-  private broadcast(data): void {
-    this.gateway.server.clients.forEach((client) => {
-      client.send(JSON.stringify(data));
-    });
-  }
+  ) { }
 
   private checkTopicForChannel(
     channel: ChannelEntity,
@@ -96,6 +72,7 @@ export class MessageService {
     );
   }
 
+  @Span('message_sendMessage')
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       dto.fqcn
@@ -203,6 +180,7 @@ export class MessageService {
     );
   }
 
+  @Span('message_getMessages')
   public async getMessages({
     fqcn,
     from,
@@ -213,7 +191,9 @@ export class MessageService {
   }: GetMessagesDto): Promise<GetMessageResponse[]> {
     const getMessagesResponse: Array<GetMessageResponse> = [];
 
-    const channel = await this.channelService.getChannelOrThrow(fqcn);
+    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
+      fqcn
+    );
 
     // topic owner and topic name should be present
     if ((topicOwner && !topicName) || (!topicOwner && topicName)) {
@@ -225,7 +205,10 @@ export class MessageService {
     if (!topicName && !topicOwner) {
       topicIds = channel.conditions.topics.map((topic) => topic.topicId);
     } else {
-      const topic = await this.topicService.getTopic(topicName, topicOwner);
+      const topic: TopicEntity = await this.topicService.getTopic(
+        topicName,
+        topicOwner
+      );
 
       if (!topic) {
         this.logger.error(
@@ -256,18 +239,22 @@ export class MessageService {
     //validate signature and decrypt messages
     await Promise.allSettled(
       messages.map(async (message: SearchMessageResponseDto) => {
+        const topicFromCache: TopicEntity =
+          await this.topicService.getTopicById(message.topicId);
+
         const result: GetMessageResponse = {
           id: message.messageId,
-          topicName: topicName,
-          topicOwner: topicOwner,
+          topicName: topicFromCache.name,
+          topicOwner: topicFromCache.owner,
           topicVersion: message.topicVersion,
+          topicSchemaType: topicFromCache.schemaType,
           payload: message.payload,
           signature: message.signature,
           sender: message.senderDid,
           timestampNanos: message.timestampNanos,
           transactionId: message.transactionId,
           signatureValid: false,
-          decryption: { status: true },
+          decryption: { status: false },
         };
 
         if (!message.isFile) {
@@ -287,18 +274,24 @@ export class MessageService {
             result.signatureValid = true;
 
             try {
-              const decryptedMessage = await this.keyService.decryptMessage(
-                message.payload,
-                message.clientGatewayMessageId,
-                message.senderDid
-              );
+              const decryptedMessage: string | null =
+                await this.keyService.decryptMessage(
+                  message.payload,
+                  message.clientGatewayMessageId,
+                  message.senderDid
+                );
 
               if (!decryptedMessage) {
                 result.decryption.status = false;
                 result.decryption.errorMessage = 'Decryption failed.';
                 result.payload = '';
+
+                this.logger.error(
+                  `failed to decrypt ${message.clientGatewayMessageId}`
+                );
               } else {
                 result.payload = decryptedMessage;
+                result.decryption.status = true;
               }
 
               this.logger.debug(
