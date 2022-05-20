@@ -40,17 +40,40 @@ export const getTopicsControllerGetTopicsMock = () => ({
   count: 6,
   limit: 6,
   page: 1,
-  records: [...Array(6)].map(() => ({
-    id: faker.datatype.uuid(),
-    name: faker.word.noun(),
-    owner: faker.random.arrayElement([
-      'ddhub.apps.energyweb.iam.ewc',
-      'torta.apps.eggplant.vege.iam.ewc',
-    ]),
-    schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
-    tags: [...Array(3)].map(() => faker.word.noun()),
-    version: '1.0.0',
-  })),
+  records: [
+    {
+      id: faker.datatype.uuid(),
+      name: faker.word.noun(),
+      owner: 'ddhub.apps.energyweb.iam.ewc',
+      schemaType: 'JSD7',
+      tags: [...Array(3)].map(() => faker.word.noun()),
+      version: '1.0.0',
+    },
+    {
+      id: faker.datatype.uuid(),
+      name: faker.word.noun(),
+      owner: 'ddhub.apps.energyweb.iam.ewc',
+      schemaType: 'XML',
+      tags: [...Array(3)].map(() => faker.word.noun()),
+      version: '1.0.0',
+    },
+    {
+      id: faker.datatype.uuid(),
+      name: faker.word.noun(),
+      owner: 'ddhub.apps.energyweb.iam.ewc',
+      schemaType: 'CSV',
+      tags: [...Array(3)].map(() => faker.word.noun()),
+      version: '1.0.0',
+    },
+    {
+      id: faker.datatype.uuid(),
+      name: faker.word.noun(),
+      owner: 'ddhub.apps.energyweb.iam.ewc',
+      schemaType: 'TSV',
+      tags: [...Array(3)].map(() => faker.word.noun()),
+      version: '1.0.0',
+    },
+  ],
 });
 
 export const getTopicsControllerPostTopicsMock = () => ({
@@ -74,7 +97,7 @@ export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
       id: faker.datatype.uuid(),
       name: faker.word.adverb(),
       owner: 'ddhub.apps.energyweb.iam.ewc',
-      schema: {"data":"test"},
+      schema: { data: 'test' },
       schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
       tags: [...Array(1)].map(() => faker.word.noun()),
       version: '1.0.0',
@@ -86,7 +109,7 @@ export const getTopicsControllerGetTopicHistoryByIdAndVersionMock = () => ({
   id: faker.datatype.uuid(),
   name: faker.word.noun(),
   owner: 'ddhub.apps.energyweb.iam.ewc',
-  schema: {"data":"test"},
+  schema: { data: 'test' },
   schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
   tags: [faker.word.noun()],
   version: '1.0.0',
@@ -98,7 +121,13 @@ export const getChannelControllerGetByTypeMock = () => [
     type: 'sub',
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
-      roles: ['marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles'],
+      roles: [
+        'marketoperator.roles',
+        'marketoperator.roles',
+        'marketoperator.roles',
+        'marketoperator.roles',
+        'marketoperator.roles',
+      ],
       topics: [
         {
           topicName: 'operatorEnvelope',
@@ -207,4 +236,4 @@ export const getChannelMessagesMock = () => [
   },
 ];
 
-export const getDownloadMessageMock = () => ('text')
+export const getDownloadMessageMock = () => 'text';
