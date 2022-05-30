@@ -173,6 +173,9 @@ export class EnvironmentVariables {
   APPLICATION_NAMESPACE_REGULAR_EXPRESSION = '\\w.apps.*\\w.iam.ewc';
 
   @IsString()
+  REQUEST_BODY_SIZE = '50mb';
+
+  @IsString()
   DB_NAME = 'local.db';
 
   static isOTELEnabled(values: EnvironmentVariables): boolean {
