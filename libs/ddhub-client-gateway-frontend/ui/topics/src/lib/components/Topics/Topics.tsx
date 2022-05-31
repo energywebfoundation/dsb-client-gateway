@@ -22,7 +22,7 @@ export const Topics: FC<TopicsProps> = ({
     openCreateTopic,
     topics,
     actions,
-    topicsFetched,
+    isLoading,
     handleRowClick,
     pagination,
     handlePageChange,
@@ -39,7 +39,7 @@ export const Topics: FC<TopicsProps> = ({
         onRowClick={handleRowClick}
         onPageChange={handlePageChange}
         onSearchInput={handleSearchInput}
-        loading={!topicsFetched}
+        loading={isLoading}
       >
         {!readonly && <CreateButton onCreate={openCreateTopic} />}
       </GenericTable>
