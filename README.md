@@ -49,6 +49,57 @@ $ node dist/apps/dsb-client-gateway-scheduler/main.js
 Running pure `node` in production is not recommended. Use any process manager (pm2, docker etc.) for stability.  
 You can find docker images in `ci` directory.
 
+## How to run with containers
+### Start with docker-composer in local environment
+```
+cd get-started && docker-compose up
+```
+Once all the servers are up and running. please follow below steps
+
+ 1, create secret path 'dsb'
+    * open a browser visit http://localhost:8200, type in token 'root'
+    * Press `Enable new engine` , select `KV` and press 'Next' , in the path input type `dsb` , press on Method options and select Version to be `v1` and press Enable engine
+ 2, ddhub-clientgateway should accessbile at http://localhost:3009, api docs at http://localhost:3009/docs
+
+### Start with kubernetes by using helm chart manually
+
+To run the ddhub-gateway stack on a kubernetes cluster. make sure you have `helm` installed, and `kubectl` configurated.
+before start running any deployment, created a namespace 'ddhub-gateway' for the deployment (optional)
+```
+kubectl create namespace ddhub-gateway
+```
+
+1, Deploy vault secret engine
+
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm install vault hashicorp/vault --namespace ddhub-gateway
+```
+once all the servers for vault are running, run command `kubectl port-forward service/vault 8200:8200 -n ddhub-gateway` then follow: 
+  1, follow this [guide](https://learn.hashicorp.com/tutorials/vault/getting-started-ui?in=vault/getting-started) jump to step 5 with open your browser at http://localhost:8200
+  2, create secret path 'dsb'
+    * open a browser visit http://localhost:8200, type in token, value for 'root_token' from the json file you downloaded from step one,
+    * Press `Enable new engine` , select `KV` and press 'Next' , in the path input type `dsb` , press on Method options and select Version to be `v1` and press Enable engine
+
+2, Deploy ddhub-gateway
+add ewf helm repo
+```
+helm repo add ewf https://aemocontainerregistry.azurecr.io/helm/v1/repo
+```
+ please update value files at path `/get-started/helm-values` . replace CAPTIALIZED placehoders.
+
+    - put in vault token (from above step downloaded json file) in `/get-started/helm-values/vault-secret.yaml`,
+    - ingress in both value files are disabled, you ll need to put in your hostname before you enable it.
+
+ created secret for storing `VAULT_TOKEN`, and deploy ddhub-gateway   
+ ```
+kubectl apply -f /get-started/helm-values/vault-secret.yaml -n ddhub-gateway
+
+helm install ddhub-gateway-demo -f /get-started/helm-values/frontend-values.yaml -f /get-started/helm-values/values.yaml ewf/ddhub-client-gateway-api -n ddhub-gateway
+```
+
+Check all the pods by running `kubectl get pods -n ddhub-gateway`, once they are all running, you should be able to visit your hostname to access the ddhub-gateway.
+
 ## Swagger
 Swagger is available on route `{{API_HOST}}/docs`.    
 Postman collection to import is available under `${{API_HOST}}/docs-json`

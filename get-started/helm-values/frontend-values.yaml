@@ -1,0 +1,34 @@
+ddhub-client-gateway-ui:
+  enabled: true
+  clientgateway:
+    config:
+      # -- Define the port the gateway will run on.
+      port: 80
+  image:
+    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+    repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: canary
+
+  nameOverride: "ddhub-client-gateway-ui-demo"
+  fullnameOverride: "ddhub-client-gateway-ui-demo"
+
+  ingress:
+    enabled: false
+    annotations:
+      kubernetes.io/ingress.class: azure/application-gateway
+      appgw.ingress.kubernetes.io/ssl-redirect: "true"
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: ddhub-gateway-demo.YOURORG.com
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-ui-demo
+            servicePort: 80
+    tls:
+      - secretName: YOUR_CERTIFICATE_SECRET
+        hosts:
+          - ddhub-gateway-demo.YOURORG.com
