@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { fuzzyTextFilterFn } from './filters/fuzzy-text-filter';
 import { textFilter } from './filters/text-filter';
 import {
@@ -9,6 +9,7 @@ import {
   useTable,
 } from 'react-table';
 import { TableProps } from './Table.types';
+import {PaginatedSearchTopicResponse} from "@dsb-client-gateway/dsb-client-gateway-api-client";
 
 export type Order = 'asc' | 'desc';
 
@@ -18,6 +19,7 @@ export function useTableEffects<T>({
   onRowClick,
   paginationProps,
   onPageChange,
+  onSearchInput,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('');
@@ -86,6 +88,14 @@ export function useTableEffects<T>({
     setOrderBy(property);
   };
 
+  const handleSearchInput = (searchInput: string) => {
+    if (!onSearchInput) {
+      return;
+    }
+
+    onSearchInput(searchInput);
+  };
+
   function descendingComparator(
     a: Record<string, string>,
     b: Record<string, string>,
@@ -137,6 +147,7 @@ export function useTableEffects<T>({
     handleChangePage,
     handleRowClick,
     handleRequestSort,
+    handleSearchInput,
     order,
     orderBy,
     getComparator,
