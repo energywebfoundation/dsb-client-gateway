@@ -81,7 +81,24 @@ export const getTopicsControllerGetTopicsMock = (queryParams: any) => ({
         version: '1.0.0',
       })),
     }
+);
 
+export const getTopicsControllerGetTopicsSearchMock = (queryParams: any) => ({
+    count: 8,
+    limit: Number(queryParams.limit),
+    page: Number(queryParams.page),
+    records: [...Array(6)].map(() => ({
+      id: faker.datatype.uuid(),
+      name: faker.word.noun(),
+      owner: faker.random.arrayElement([
+        'ddhub.apps.energyweb.iam.ewc',
+        'torta.apps.eggplant.vege.iam.ewc',
+      ]),
+      schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
+      tags: [...Array(3)].map(() => faker.word.noun()),
+      version: '1.0.0',
+    })),
+  }
 );
 
 export const getTopicsControllerPostTopicsMock = () => ({
