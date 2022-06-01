@@ -3,7 +3,7 @@ ARG IMAGE=nginx:alpine
 FROM $IMAGE
 
 
-COPY ci/nginx.conf /etc/nginx/conf.d
+COPY ci/default.conf /etc/nginx/conf.d
 COPY dist/apps/dsb-client-gateway-frontend/exported /usr/share/nginx/html
 
 
