@@ -22,6 +22,9 @@ Retrieves and caches data for performance purposes
 [Frontend](docs/frontend-variables.md)
 ## How to run
 
+### Environment Variables
+there is a list of environment variables listed at ./docs/api-variables.md
+
 After configuring environment variables (in `.env` file) run following commands
 
 ### Development mode
@@ -97,6 +100,8 @@ helm install ddhub-gateway-demo -f /get-started/helm-values/frontend-values.yaml
 ```
 
 Check all the pods by running `kubectl get pods -n ddhub-gateway`, once they are all running, you should be able to visit your hostname to access the ddhub-gateway.
+
+
 
 ## Swagger
 Swagger is available on route `{{API_HOST}}/docs`.    
