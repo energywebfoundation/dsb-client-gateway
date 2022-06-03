@@ -4,17 +4,16 @@ services:
     image: hashicorp/vault:latest
     restart: always
     volumes:
-      - /vault/data
-      - /etc/vault/logs
+      - ./vault:/vault/file
+      - ../config:/vault/config
     ports:
       - "8200:8200/tcp"
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: 'root'
       VAULT_DEV_LISTEN_ADDRESS: '0.0.0.0:8200'
     cap_add:
       - IPC_LOCK
     container_name: vault_dev
-    entrypoint: "vault server -dev"
+    entrypoint: "vault server -config=/vault/config/vault.json"
 
   ddhub-gateway-UI:
     image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:canary
@@ -28,6 +27,8 @@ services:
       - 'vault_dev'
     ports:
       - 3333:3333
+    volumes:
+      - ./data:/usr/app/data
     environment:
       NODE_ENV: test
       DSB_BASE_URL: https://ddhub-demo.energyweb.org
@@ -36,6 +37,26 @@ services:
       SECRETS_ENGINE: vault
       VAULT_ENDPOINT: http://vault_dev:8200
       VAULT_TOKEN: root
+      DB_NAME: ./data/local.db
+      
+  # ddhub-gateway-scheduler:
+  #   image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:canary
+  #   container_name: ddhub-gateway-scheduler
+  #   depends_on:
+  #     - 'vault_dev'
+  #   volumes:
+  #     - ./data:/usr/app/data
+  #   environment:
+  #     NODE_ENV: test
+  #     DSB_BASE_URL: https://ddhub-demo.energyweb.org
+  #     CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
+  #     EVENT_SERVER_URL: https://identityevents-staging.energyweb.org
+  #     SECRETS_ENGINE: vault
+  #     VAULT_ENDPOINT: http://vault_dev:8200
+  #     VAULT_TOKEN: root
+  #     DB_NAME: ./data/local.db
+  #     DID_AUTH_URL: https://ddhub-demo.energyweb.org
+  #     DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
 
   proxy-server:
     image: nginx:alpine
