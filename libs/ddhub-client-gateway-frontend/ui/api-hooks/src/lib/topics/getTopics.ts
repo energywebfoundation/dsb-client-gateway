@@ -7,6 +7,7 @@ import {
   PaginatedSearchTopicResponse, TopicsControllerGetTopicsBySearchParams
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useState } from 'react';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useTopicsSearch } from './getTopicBySearch';
 
 export const useTopics = ({
@@ -14,6 +15,7 @@ export const useTopics = ({
   limit = 0,
   owner,
 }: TopicsControllerGetTopicsParams) => {
+  const Swal = useCustomAlert();
   const [keyword, setKeyword] = useState('');
   const [params, setParams] = useState({ page, limit });
   const [params2, setParams2] = useState({ page, limit, keyword });
@@ -29,6 +31,10 @@ export const useTopics = ({
     {
       query: {
         enabled: !!owner,
+        onError: (err: { message: string }) => {
+          console.error(err);
+          Swal.error({ text: err?.message });
+        },
       },
     }
   );
