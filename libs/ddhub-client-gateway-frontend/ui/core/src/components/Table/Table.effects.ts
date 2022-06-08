@@ -9,7 +9,6 @@ import {
   useTable,
 } from 'react-table';
 import { TableProps } from './Table.types';
-import {PaginatedSearchTopicResponse} from "@dsb-client-gateway/dsb-client-gateway-api-client";
 
 export type Order = 'asc' | 'desc';
 
