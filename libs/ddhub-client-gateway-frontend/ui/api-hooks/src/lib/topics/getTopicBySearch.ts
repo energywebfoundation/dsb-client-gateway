@@ -1,11 +1,8 @@
-import { keyBy } from 'lodash';
 import {
-  GetTopicDto,
   TopicsControllerGetTopicsBySearchParams,
-  topicsControllerGetTopicsBySearch,
-  PaginatedSearchTopicResponse, PaginatedResponse, TopicsControllerGetTopicsParams,
+  useTopicsControllerGetTopicsBySearch,
+  PaginatedResponse,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useState } from 'react';
 
 export const useTopicsSearch = (
   {
@@ -14,11 +11,21 @@ export const useTopicsSearch = (
     keyword = '',
   }: TopicsControllerGetTopicsBySearchParams) => {
 
-  const getTopicsSearch = async () => topicsControllerGetTopicsBySearch(
-    { page, limit, keyword }
-  );
+  const { data, isSuccess, isError }  = useTopicsControllerGetTopicsBySearch({
+    keyword,
+    page,
+    limit
+  }, {
+    query: {
+      enabled: !!keyword
+    }
+  })
+
+  const topicsBySearch = data ?? {} as PaginatedResponse;
+  const topicsBySearchLoaded = isSuccess && data !== undefined && !isError;
 
   return {
-    getTopicsSearch
+    topicsBySearch,
+    topicsBySearchLoaded
   };
 };
