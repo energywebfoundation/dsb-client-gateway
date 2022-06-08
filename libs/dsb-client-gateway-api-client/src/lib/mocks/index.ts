@@ -88,7 +88,7 @@ export const getTopicsControllerGetTopicsMock = (queryParams: any) => ({
 );
 
 export const getTopicsControllerGetTopicsSearchMock = (queryParams: any) => ({
-    count: 8,
+    count: 12,
     limit: Number(queryParams.limit),
     page: Number(queryParams.page),
     records: [...Array(6)].map(() => ({
