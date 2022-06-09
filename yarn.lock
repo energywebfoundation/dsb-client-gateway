@@ -8136,10 +8136,10 @@ nats.ws@1.0.0-111:
   resolved "https://registry.yarnpkg.com/nats.ws/-/nats.ws-1.0.0-111.tgz#25b22a4cb7f8f401090c4571af950438308dbb4c"
   integrity sha512-kR5mc7I/bvSJy38F8gbSYmllOAoM83xEBNlSFhTn0fJb7+fUtrrEk9OYZF+zrlFnQf3nc34dHQRuThCrVLEU5w==
 
-nats.ws@^1.2.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/nats.ws/-/nats.ws-1.3.0.tgz#180533f0bde0bad77933f514f0662c10d94b4a94"
-  integrity sha512-BIeWvvRca/Qnh7PJzOBBOjcFbgmKBuTfTifxpkGAKQlSEX/AgM/CS957TrTEgb12UzcCIS4IhXwbTNK1K0PMGw==
+nats.ws@^1.8.0:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/nats.ws/-/nats.ws-1.8.1.tgz#6a252159582f38f5f004fd8caca3c8a5a159315c"
+  integrity sha512-7p1GkLfHTb42KX0wWZNEVEefYRQhsknE6tptMmr8oNzYA5gZ2BaZGQgXF+JUU9pBU6K+fVsClOrXt8nRugwDMg==
   optionalDependencies:
     nkeys.js "^1.0.0-9"
 
