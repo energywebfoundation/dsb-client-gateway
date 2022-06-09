@@ -14,7 +14,7 @@
     "prettier:fix": "prettier --write src/*"
   },
   "dependencies": {
-    "@asyncapi/parser": "^1.7.0",
+    "@asyncapi/parser": "^1.15.0",
     "@asyncapi/react-component": "^1.0.0-next.15",
     "@material-ui/core": "^4.12.2",
     "@material-ui/icons": "^4.11.2",

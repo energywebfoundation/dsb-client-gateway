@@ -24,6 +24,21 @@
   dependencies:
     "@openapi-contrib/openapi-schema-to-json-schema" "^3.0.0"
 
+"@asyncapi/parser@^1.15.0":
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/@asyncapi/parser/-/parser-1.15.1.tgz#95dc3b7c36b7ecbfb7a9b38ea80dcadfcd3cfeba"
+  integrity sha512-n8Ny17ar0+4mm+nU1ddvu44DKxAzTr1NtH2yPWJRpODFzjH2BrQ0Xe1e7djzL2jJjeqHpWl6DZdLWChFvL0iPg==
+  dependencies:
+    "@apidevtools/json-schema-ref-parser" "^9.0.6"
+    "@asyncapi/specs" "^2.14.0"
+    "@fmvilas/pseudo-yaml-ast" "^0.3.1"
+    ajv "^6.10.1"
+    js-yaml "^3.13.1"
+    json-to-ast "^2.1.0"
+    lodash.clonedeep "^4.5.0"
+    node-fetch "^2.6.0"
+    tiny-merge-patch "^0.1.2"
+
 "@asyncapi/parser@^1.7.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@asyncapi/parser/-/parser-1.9.0.tgz#8a380d210ae843a00c01a15a85093547999ae343"
@@ -57,6 +72,11 @@
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/@asyncapi/specs/-/specs-2.8.0.tgz#c7e19d533ab5ab4ad188155e4f2abb67efee53e0"
   integrity sha512-ZVyr1L0Le8Z0mvr2BPriszaDu53rZxevjqVCXt3PqJMPJuiiGMVhkslmclj474nBK0ckygSRe8jAd4smm9XOrg==
+
+"@asyncapi/specs@^2.14.0":
+  version "2.14.0"
+  resolved "https://registry.yarnpkg.com/@asyncapi/specs/-/specs-2.14.0.tgz#a4535fedde931181f20d41356ed1906d0fb73d48"
+  integrity sha512-hHsYF6XsYNIKb1P2rXaooF4H+uKKQ4b/Ljxrk3rZ3riEDiSxMshMEfb1fUlw9Yj4V4OmJhjXwkNvw8W59AXv1A==
 
 "@babel/code-frame@7.12.11":
   version "7.12.11"
